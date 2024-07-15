@@ -258,8 +258,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e239fba9370059f4a8b9a016fe844007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 6
-  height: 8
+  width: 7
+  height: 7
   spacingX: 0
   spacingY: 0
   potionPrefabs:
@@ -271,14 +271,13 @@ MonoBehaviour:
   potionBoardGO: {fileID: 1428986004}
   arrayLayout:
     rows:
-    - row: 000000000000
-    - row: 000000000000
-    - row: 000000000000
-    - row: 000000000000
-    - row: 000000000000
-    - row: 000000000000
-    - row: 000000000000
-    - row: 000000000000
+    - row: 00000000000000
+    - row: 00000000000000
+    - row: 00000000000000
+    - row: 00000000000000
+    - row: 00000000000000
+    - row: 00000000000000
+    - row: 00000000000000
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

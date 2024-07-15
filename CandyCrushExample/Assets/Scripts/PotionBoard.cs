@@ -5,8 +5,8 @@ using UnityEngine;
 public class PotionBoard : MonoBehaviour
 {
     //define the size of the board
-    public int width = 6;
-    public int height = 8;
+    public int width = 7;
+    public int height = 7;
     //define some spacing for the board
     public float spacingX;
     public float spacingY;
@@ -37,7 +37,7 @@ public class PotionBoard : MonoBehaviour
         potionBoard = new Node[width, height];
 
         spacingX = (float)(width - 1) / 2;
-        spacingY = (float)((height - 1) / 2) + 1;
+        spacingY = (float)(height - 1) / 2;
 
         for (int y = 0; y < height; y++)
         {

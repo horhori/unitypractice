@@ -5,7 +5,8 @@ using System.Collections;
 [CustomPropertyDrawer(typeof(ArrayLayout))]
 public class CustPropertyDrawer : PropertyDrawer
 {
-
+	private int width = 7;
+	private int height = 7;
 
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
@@ -14,16 +15,16 @@ public class CustPropertyDrawer : PropertyDrawer
 		newposition.y += 144f;
 		SerializedProperty data = property.FindPropertyRelative("rows");
 		//data.rows[0][]
-		if (data.arraySize != 8)
-			data.arraySize = 8;
-		for (int j = 0; j < 8; j++)
+		if (data.arraySize != height)
+			data.arraySize = height;
+		for (int j = 0; j < height; j++)
 		{
 			SerializedProperty row = data.GetArrayElementAtIndex(j).FindPropertyRelative("row");
 			newposition.height = 18f;
-			if (row.arraySize != 6)
-				row.arraySize = 6;
-			newposition.width = position.width / 6;
-			for (int i = 0; i < 6; i++)
+			if (row.arraySize != width)
+				row.arraySize = width;
+			newposition.width = position.width / width;
+			for (int i = 0; i < width; i++)
 			{
 				EditorGUI.PropertyField(newposition, row.GetArrayElementAtIndex(i), GUIContent.none);
 				newposition.x += newposition.width;
