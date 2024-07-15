@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node : MonoBehaviour
+public class Node
 {
     //to determine whether the space can be filled with potions or not.
     public bool isUsable;
