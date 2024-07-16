@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PotionBoard : MonoBehaviour
 {
@@ -91,6 +93,7 @@ public class PotionBoard : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
+                // 블럭 보드 부모 위치를 반영하여 블럭 생성
                 Vector2 position = new Vector2(x - spacingX, y - spacingY);
                 if (arrayLayout.rows[y].row[x])
                 {
@@ -103,9 +106,9 @@ public class PotionBoard : MonoBehaviour
 
                     GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
                     potion.transform.SetParent(potionParent.transform);
+
                     potion.GetComponent<Potion>().SetIndicies(x, y);
                     potionBoard[x, y] = new Node(true, potion);
-
                     potionsToDestroy.Add(potion);
                 }
             }
@@ -293,6 +296,7 @@ public class PotionBoard : MonoBehaviour
 
     // 현재 블럭을 새로 만들고 내림
     // TODO : 1. 미리 생성된 블럭이 내려오게 변경
+    //        2. 모든 블럭이 일정한 속도로 내려오게(현재는 같은 시간에 한번에 내려오고 있음)
     private void SpawnPotionAtTop(int x)
     {
         int index = FindIndexOfLowestNull(x);
@@ -300,8 +304,11 @@ public class PotionBoard : MonoBehaviour
         Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
         // get a random potion
         int randomIndex = Random.Range(0, potionPrefabs.Length);
-        GameObject newPotion = Instantiate(potionPrefabs[randomIndex], new Vector2(x - spacingX, height - spacingY), Quaternion.identity);
+        Vector2 position = new Vector2(x - spacingX, height - spacingY);
+
+        GameObject newPotion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
         newPotion.transform.SetParent(potionParent.transform);
+
         // set indicies
         newPotion.GetComponent<Potion>().SetIndicies(x, index);
         // set it on the potion board
@@ -407,12 +414,10 @@ public class PotionBoard : MonoBehaviour
         return null;
     }
 
-    // 블럭 타입이 일치하는지 확인 후 
+    // 블럭 타입이 일치하는지 확인 후 Match 결과 반환
     MatchResult IsConnected(Potion potion)
     {
         List<Potion> connectedPotions = new();
-
-        //PotionType potionType = potion.potionType;
 
         connectedPotions.Add(potion);
 
@@ -557,6 +562,7 @@ public class PotionBoard : MonoBehaviour
     }
 
     // 블럭을 인접한 블럭과 위치 바꿈
+    // TODO : 1. 벽에 부딫히는 경우 튕겨 돌아와야 함
     private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
     {
         // 인접한 블럭을 클릭하지 않은 경우
