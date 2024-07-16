@@ -21,9 +21,9 @@ public class Board : MonoBehaviour
 
     private void SetUp()
     {
-        for(int i=0; i<width; i++)
+        for (int i = 0; i < width; i++)
         {
-            for (int j=0; j<height; j++)
+            for (int j = 0; j < height; j++)
             {
                 Vector2 tempPosition = new Vector2(i, j);
                 GameObject backgroundTile = Instantiate(tilePrefab, tempPosition, Quaternion.identity);
