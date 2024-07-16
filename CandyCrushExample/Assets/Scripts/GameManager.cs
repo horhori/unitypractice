@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 
 // TODO : 1. UI 변경
 //        2. 게임 종료 시간 설정
-//        3. 레벨 설정
+//        3. 승리 / 패배 종료 변경
+//        4. 레벨 설정
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // static reference;
@@ -21,11 +22,20 @@ public class GameManager : MonoBehaviour
     public int moves; // the number of turns you can take
     public int points; // the crrent points you have earned.
 
+    // 남은 시간
+
+
+    // 남은 시간이 종료되었을 때 
     public bool isGameEnded;
 
+    public TMP_Text stageText;
     public TMP_Text pointsText;
+    public TMP_Text timeText;
+
+    // move, goal 삭제 예정
     public TMP_Text movesText;
     public TMP_Text goalText;
+    
 
     private void Awake()
     {
@@ -34,6 +44,7 @@ public class GameManager : MonoBehaviour
 
     public void Initialize(int _moves, int _goal)
     {
+        // move, goal 삭제 예정
         moves = _moves;
         goal = _goal;
     }
@@ -42,6 +53,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         pointsText.text = "Points: " + points.ToString();
+        // move, goal 삭제 예정
         movesText.text = "Moves: " + moves.ToString();
         goalText.text = "Points: " + goal.ToString();
     }
@@ -49,11 +61,14 @@ public class GameManager : MonoBehaviour
     public void ProcessTurn(int _pointsToGain, bool _subtractMoves)
     {
         points += _pointsToGain;
+
+        // TODO : 횟수는 삭제
         if (_subtractMoves)
         {
             moves--;
         }
 
+        // TODO : 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
         if (points >= goal)
         {
             // win game
@@ -65,6 +80,7 @@ public class GameManager : MonoBehaviour
             PotionBoard.Instance.potionParent.SetActive(false);
             return;
         }
+        // TODO : 남은 시간이 다 지나면 패배
         if (moves == 0)
         {
             // lose game
@@ -77,6 +93,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
     public void WinGame()
     {
         //SceneManager.LoadScene("Main Menu");
@@ -84,6 +101,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
+    // 남은 시간이 다 지나면 패배
     public void LoseGame()
     {
         //SceneManager.LoadScene("Main Menu");
