@@ -4,34 +4,40 @@ using UnityEngine;
 
 public class PotionBoard : MonoBehaviour
 {
-    //define the size of the board
+    // 가로 세로 블럭 개수 설정
     public int width = 7;
     public int height = 7;
-    //define some spacing for the board
+    // X축, Y축 간격
     public float spacingX;
     public float spacingY;
-    //get a reference to our potion prefabs
+    // 블럭 목록
     public GameObject[] potionPrefabs;
-    //get a reference to the collection nodes potionBoard + GO
+    // 블럭보드
     public Node[,] potionBoard;
     public GameObject potionBoardGO;
 
+    // 매칭되었을 때 제거할 블럭 목록
+    // 매칭되는 블럭들을 추가후 제거하고 비우고 반복
     public List<GameObject> potionsToDestroy = new();
 
+    [SerializeField]
+    List<Potion> potionsToRemove = new();
+
+    // 블럭 원래 위치
+    // 블럭이 제거되고 새로 생성될 때 해당 위치 참조
     public GameObject potionParent;
 
+    // unity 상에서 선택된 블럭 확인할 수 있게 SerializeField(직렬화) 사용
+    // SerializeField : private이여도 unity에서 확인할 수 있음
     [SerializeField]
     private Potion selectedPotion;
 
     [SerializeField]
     private bool isProcessingMove;
 
-    [SerializeField]
-    List<Potion> potionsToRemove = new();
-
-    //layoutArray
+    // Unity 상에서 쉽게 특정 위치 안 나오게 
     public ArrayLayout arrayLayout;
-    //public static of potionboard
+    // static Instance
     public static PotionBoard Instance;
 
     private void Awake()
@@ -44,6 +50,7 @@ public class PotionBoard : MonoBehaviour
         InitializeBoard();
     }
 
+    // TODO : 1. 현재 조작 클릭 -> 슬라이드 변경
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -69,7 +76,7 @@ public class PotionBoard : MonoBehaviour
     // 보드 생성
     // width, height 값에 따라 보드 판 생성.
     // 각 보드 자리마다 Node를 가지고 있음
-    // Node는 사용가능한 자리인지(isUsable), 사용 가능하면 해당 자리에 기물(Potion)을 가짐
+    // Node는 사용가능한 자리인지(isUsable), 사용 가능하면 해당 자리에 기물(Potion->Block)을 가짐
     // 랜덤하게 생성 후 매치되는 경우에는 다시 생성됨
     void InitializeBoard()
     {
@@ -124,6 +131,8 @@ public class PotionBoard : MonoBehaviour
     }
 
     // 보드에 매칭되어 있는게 있는지 체크
+    // TODO : 1. 체크 시 매칭 경우의 수가 없는 경우 다시 섞여야 함
+    //        2. 일정 시간이 지나고 조작이 없는 경우 매칭되는 블럭 표시
     public bool CheckBoard()
     {
         if (GameManager.Instance.isGameEnded)
@@ -191,7 +200,7 @@ public class PotionBoard : MonoBehaviour
 
         RemoveAndRefill(potionsToRemove);
 
-        // 점수 획득 하나당 1점
+        // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
         GameManager.Instance.ProcessTurn(potionsToRemove.Count, _subtractMoves);
         yield return new WaitForSeconds(0.4f);
 
@@ -203,7 +212,8 @@ public class PotionBoard : MonoBehaviour
 
     #region Cascading Potions
 
-    // RemoveAndRefill (List of potions)
+    // 블럭 지워지고 다시 생성
+    // TODO : 1. 처음 보드 생성될 때 특정 갯수(7*14, 7*21...) 생성
     private void RemoveAndRefill(List<Potion> _potionsToRemove)
     {
         // Removing the potion and clearing the board at that location
@@ -281,6 +291,8 @@ public class PotionBoard : MonoBehaviour
         }
     }
 
+    // 현재 블럭을 새로 만들고 내림
+    // TODO : 1. 미리 생성된 블럭이 내려오게 변경
     private void SpawnPotionAtTop(int x)
     {
         int index = FindIndexOfLowestNull(x);
@@ -314,6 +326,9 @@ public class PotionBoard : MonoBehaviour
 
     #endregion
 
+    // 가로 또는 세로 매칭이 일어났을 때 반대(가로이면 세로, 세로이면 가로 매칭이 일어났는지) 체크
+    // 반대 방향도 매칭이 일어났을 경우 Super
+    // TODO : 1. Super -> 족보 로직 세분화
     private MatchResult SuperMatch(MatchResult _matchedResults)
     {
         // if we have a horizontal or long horizontal match
@@ -392,12 +407,12 @@ public class PotionBoard : MonoBehaviour
         return null;
     }
 
-    // IsConnected
+    // 블럭 타입이 일치하는지 확인 후 
     MatchResult IsConnected(Potion potion)
     {
         List<Potion> connectedPotions = new();
 
-        PotionType potionType = potion.potionType;
+        //PotionType potionType = potion.potionType;
 
         connectedPotions.Add(potion);
 
@@ -516,7 +531,7 @@ public class PotionBoard : MonoBehaviour
 
     #region Swapping Potions
 
-    // select potion
+    // 블럭 선택
     public void SelectPotion(Potion _potion)
     {
         // if we don't have a potion currently selected, then set the potion i just clicked to my selectedpotion
@@ -525,14 +540,14 @@ public class PotionBoard : MonoBehaviour
             Debug.Log(_potion);
             selectedPotion = _potion;
         }
-        // if we select the same potion twice, then let's make selectedpoton null
+        // if we select the same potion twice, then let's make selectedpotion null
         else if (selectedPotion == _potion)
         {
             selectedPotion = null;
         }
 
-        // if selectedpotion is not null ans is not the current potion, attempt a swap
-        // selectedpotion back to null
+        // 블럭이 선택됐고 이후에 선택된 블럭이 이미 선택한 블럭이 아닌 경우
+        // 선택된 블럭은 null
         else if (selectedPotion != _potion)
         {
             SwapPotion(selectedPotion, _potion);
@@ -541,24 +556,27 @@ public class PotionBoard : MonoBehaviour
 
     }
 
-    // swap potion - logic
+    // 블럭을 인접한 블럭과 위치 바꿈
     private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
     {
-        // !IsAdjacent don't do anything
+        // 인접한 블럭을 클릭하지 않은 경우
+        // 아무 일도 일어나지 않고 선택된 블럭 풀림
         if (!IsAdjacent(_currentPotion, _targetPotion))
         {
             return;
         }
 
-        // Do Swap
+        // 위치 바꾸기
         DoSwap(_currentPotion, _targetPotion);
 
+        // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
         isProcessingMove = true;
 
         // startCoroutine ProcessMatches.
         StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
     }
-    // do swap
+    
+    // TODO : 1. 바꾸는 속도 조절
     private void DoSwap(Potion _currentPotion, Potion _targetPotion)
     {
         GameObject temp = potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion;
@@ -566,7 +584,7 @@ public class PotionBoard : MonoBehaviour
         potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion = potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion;
         potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion = temp;
 
-        // update indicies
+        // 위치 업데이트
         int tempXIndex = _currentPotion.xIndex;
         int tempYIndex = _currentPotion.yIndex;
         _currentPotion.xIndex = _targetPotion.xIndex;
@@ -574,10 +592,16 @@ public class PotionBoard : MonoBehaviour
         _targetPotion.xIndex = tempXIndex;
         _targetPotion.yIndex = tempYIndex;
 
+        // 바꾸는 속도 조절
         _currentPotion.MoveToTarget(potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion.transform.position);
-
         _targetPotion.MoveToTarget(potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion.transform.position);
 
+    }
+
+    // 블럭 선택 후 인접한 블럭 선택했는지 체크
+    private bool IsAdjacent(Potion _currentPotion, Potion _targetPotion)
+    {
+        return Mathf.Abs(_currentPotion.xIndex - _targetPotion.xIndex) + Mathf.Abs(_currentPotion.yIndex - _targetPotion.yIndex) == 1;
     }
 
     private IEnumerator ProcessMatches(Potion _currentPotion, Potion _targetPotion)
@@ -588,21 +612,15 @@ public class PotionBoard : MonoBehaviour
         {
             // Start a coroutine that is going to process our matches in our turn.
             StartCoroutine(ProcessTurnOnMatchedBoard(true));
-        } else
+        }
+        else
         {
+            // 매칭이 일어나지 않은 경우 다시 스왑
             DoSwap(_currentPotion, _targetPotion);
         }
 
         isProcessingMove = false;
     }
-
-    // IsAdjacent
-    private bool IsAdjacent(Potion _currentPotion, Potion _targetPotion)
-    {
-        return Mathf.Abs(_currentPotion.xIndex - _targetPotion.xIndex) + Mathf.Abs(_currentPotion.yIndex - _targetPotion.yIndex) == 1;
-    }
-
-    // ProcessMatches
 
     #endregion
 }
@@ -615,12 +633,21 @@ public class MatchResult
     public MatchDirection direction;
 }
 
+
+// 족보 : 3배열, 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 (시스템 기획서 27P)
+//        
+// 4배열 네모, 5배열 L자는 터지는 경우가 아님
+
+// TODO : 1. 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 족보 만들어야 함
+//        2. Super 로직 변경하여 각각 로직 만들어야 함
+//        3. 특수 블럭 로직
+
 public enum MatchDirection
 {
-    Vertical,
-    Horizontal,
-    LongVertical,
-    LongHorizontal,
-    Super,
+    Vertical, // 3 세로
+    Horizontal, // 3 가로
+    LongVertical, // 4 이상 세로
+    LongHorizontal, // 4 이상 가로
+    Super, // 가로 세로 합쳐서 작동중
     None
 }

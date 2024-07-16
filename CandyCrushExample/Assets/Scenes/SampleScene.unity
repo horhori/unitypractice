@@ -379,11 +379,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -828,7 +828,7 @@ GameObject:
   m_Component:
   - component: {fileID: 894325664}
   m_Layer: 0
-  m_Name: Potions
+  m_Name: Blocks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1250,7 +1250,7 @@ GameObject:
   - component: {fileID: 1428986006}
   - component: {fileID: 1428986007}
   m_Layer: 0
-  m_Name: Potion Board
+  m_Name: Block Board
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1288,17 +1288,19 @@ MonoBehaviour:
   spacingX: 0
   spacingY: 0
   potionPrefabs:
-  - {fileID: 5930547338441292345, guid: 868a386f723b8be45a86dfa7652305e3, type: 3}
-  - {fileID: 5930547338441292345, guid: f666244d21ac6de428df3f7697cb8ddd, type: 3}
-  - {fileID: 5930547338441292345, guid: 6c597d806bad704419da251730356785, type: 3}
-  - {fileID: 5930547338441292345, guid: 61115a64e51418341b0800b4e4d9c3fc, type: 3}
-  - {fileID: 5930547338441292345, guid: 7a91c599a653c2c45a44e6484b0a6f74, type: 3}
+  - {fileID: 1144039111903245365, guid: cdedc50f04652754c971e194489e8009, type: 3}
+  - {fileID: 6038627020351170447, guid: 9e1e3b80cb1f22a41a199ba8c4c6a00a, type: 3}
+  - {fileID: 7860487677378601990, guid: ac15baa880b863d44876a838169758c1, type: 3}
+  - {fileID: 3984533700635743897, guid: 9d72265c8a5a2cf4eae5333482f9ccf1, type: 3}
+  - {fileID: 8510273532980300452, guid: fef306e7c9ff2564a9b6cb9f2e92388f, type: 3}
+  - {fileID: 8424117927359534880, guid: 4ffb1b7789493ba47b13912e4e303c6a, type: 3}
+  - {fileID: 5316080088508569776, guid: b489eb3544b5f7a429cdce12b24351d6, type: 3}
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
+  potionsToRemove: []
   potionParent: {fileID: 894325663}
   selectedPotion: {fileID: 0}
   isProcessingMove: 0
-  potionsToRemove: []
   arrayLayout:
     rows:
     - row: 00000000000000

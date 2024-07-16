@@ -4,12 +4,16 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// 게임 스코어, 게임 승리/패배 조건, UI 
+// 게임 스코어, 게임 승리/패배 조건, UI 설정
+
+// TODO : 1. UI 변경
+//        2. 게임 종료 시간 설정
+//        3. 레벨 설정
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // static reference;
 
-    public GameObject backgroundPanel; // gery background 
+    public GameObject backgroundPanel; // grey background 
     public GameObject victoryPanel; // 승리/패배 화면 클릭할 때 포션 동작 안되게 
     public GameObject losePanel;
 

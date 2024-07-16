@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Timers;
 using UnityEngine;
 
+// Potion -> Block
+// 이름 변경 시 메모리 부족 발생
+
+// TODO : 1. Potion -> Block 리팩토링
 public class Potion : MonoBehaviour
 {
 
@@ -29,13 +33,12 @@ public class Potion : MonoBehaviour
         yIndex = _y;
     }
 
-    // MoveToTarget
     public void MoveToTarget(Vector2 _targetPos)
     {
         StartCoroutine(MoveCoroutine(_targetPos));
     }
 
-    // MoveCoroutine
+    // TODO : 1. 블럭 바뀌는 시간 자연스럽게 조절
     private IEnumerator MoveCoroutine(Vector2 _targetPos)
     {
         isMoving = true;
@@ -62,11 +65,14 @@ public class Potion : MonoBehaviour
 
 }
 
+// TODO : 1. 특수 블럭
 public enum PotionType
 {
-    Red,
-    Blue,
-    Purple,
-    Green,
-    White
+    BlueBlock,
+    PurpleBlock,
+    GreenBlock,
+    OrangeBlock,
+    PinkBlock,
+    RedBlock,
+    YellowBlock,
 }
