@@ -35,6 +35,9 @@ public class PotionBoard : MonoBehaviour
     private Potion selectedPotion;
 
     [SerializeField]
+    private Potion targetedPotion;
+
+    [SerializeField]
     private bool isProcessingMove;
 
     // Unity 상에서 쉽게 특정 위치 안 나오게 
@@ -53,27 +56,193 @@ public class PotionBoard : MonoBehaviour
     }
 
     // TODO : 1. 현재 조작 클릭 -> 슬라이드 변경
+    //           : 240717 완료, 스와이프 로직 적용 각도 계산하여 슬라이드 구현 완료(Potion에서 마우스 위치에 따라 각도 계산됨)
+
     private void Update()
     {
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //    RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+        //    if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
+        //    {
+        //        if (isProcessingMove)
+        //        {
+        //            return;
+        //        }
+
+        //        Potion potion = hit.collider.gameObject.GetComponent<Potion>();
+        //        //Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
+
+        //        SelectPotion(potion);
+        //    }
+        //}
+
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+            SelectPotion();
+        }
 
-            if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
-            {
-                if (isProcessingMove)
-                {
-                    return;
-                }
-
-                Potion potion = hit.collider.gameObject.GetComponent<Potion>();
-                Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
-
-                SelectPotion(potion);
-            }
+        if (Input.GetMouseButtonUp(0) && selectedPotion)
+        {
+            Swipe();
         }
     }
+
+    #region Swapping Potions
+
+    // 블럭 선택 - 맨 처음 클릭 버전
+    //public void SelectPotion(Potion _potion)
+    //{
+    //    // if we don't have a potion currently selected, then set the potion i just clicked to my selectedpotion
+    //    if (selectedPotion == null)
+    //    {
+    //        //Debug.Log(_potion);
+    //        selectedPotion = _potion;
+
+    //    }
+    //    // if we select the same potion twice, then let's make selectedpotion null
+    //    else if (selectedPotion == _potion)
+    //    {
+    //        selectedPotion = null;
+    //    }
+
+    //    // 블럭이 선택됐고 이후에 선택된 블럭이 이미 선택한 블럭이 아닌 경우
+    //    // 선택된 블럭은 null
+    //    else if (selectedPotion != _potion)
+    //    {
+    //        SwapPotion(selectedPotion, _potion);
+    //        selectedPotion = null;
+    //    }
+    //}
+
+    // Update에서 마우스 클릭 시 SelectPotion() 메서드로 선택한 블럭 저장
+    private void SelectPotion()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+        if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
+        {
+            if (isProcessingMove)
+            {
+                return;
+            }
+
+            Potion potion = hit.collider.gameObject.GetComponent<Potion>();
+            //Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
+
+            selectedPotion = potion;
+        }
+    }
+
+    // Update에서 마우스 클릭 뗐을 때 각도 계산하여 해당 위치 블럭과 스왑 진행 후 선택한 블럭 해제
+    // TODO : 1. 모서리로 스와이프 했을 경우 벽에 튕겨나오기 추가(현재는 에러 안나게 막아놓기만 함)
+
+    private void Swipe()
+    {
+        float swipeAngle = selectedPotion.swipeAngle;
+        //Debug.Log("swipeAngle : " + swipeAngle);
+        int originX = selectedPotion.xIndex;
+        int originY = selectedPotion.yIndex;
+
+        if (swipeAngle > -45 && swipeAngle <= 45 && originX != width - 1)
+        {
+            // Right Swipe
+            targetedPotion = potionBoard[originX + 1, originY].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+        else if (swipeAngle > 45 && swipeAngle <= 135 && originY != height - 1)
+        {
+            // Up Swipe
+            targetedPotion = potionBoard[originX, originY + 1].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+        else if ((swipeAngle > 135 || swipeAngle <= -135) && originX != 0)
+        {
+            // Left Swipe
+            targetedPotion = potionBoard[originX - 1, originY].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+        else if (swipeAngle < -45 && swipeAngle >= -135 && originY != 0)
+        {
+            // Down Swipe
+            targetedPotion = potionBoard[originX, originY - 1].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+
+        selectedPotion = null;
+    }
+
+    // 블럭을 인접한 블럭과 위치 바꿈
+    // TODO : 1. 벽에 부딫히는 경우 튕겨 돌아와야 함
+    private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
+    {
+        // 인접한 블럭을 클릭하지 않은 경우
+        // 아무 일도 일어나지 않고 선택된 블럭 풀림
+        //if (!IsAdjacent(_currentPotion, _targetPotion))
+        //{
+        //    return;
+        //}
+
+        // 위치 바꾸기
+        DoSwap(_currentPotion, _targetPotion);
+
+        // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
+        isProcessingMove = true;
+
+        // startCoroutine ProcessMatches.
+        StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
+    }
+
+    // TODO : 1. 바꾸는 속도 조절
+    private void DoSwap(Potion _currentPotion, Potion _targetPotion)
+    {
+        GameObject temp = potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion;
+
+        potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion = potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion;
+        potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion = temp;
+
+        // 위치 업데이트
+        int tempXIndex = _currentPotion.xIndex;
+        int tempYIndex = _currentPotion.yIndex;
+        _currentPotion.xIndex = _targetPotion.xIndex;
+        _currentPotion.yIndex = _targetPotion.yIndex;
+        _targetPotion.xIndex = tempXIndex;
+        _targetPotion.yIndex = tempYIndex;
+
+        // 바꾸는 속도 조절
+        _currentPotion.MoveToTarget(potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion.transform.position);
+        _targetPotion.MoveToTarget(potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion.transform.position);
+
+    }
+
+    // 블럭 선택 후 인접한 블럭 선택했는지 체크
+    //private bool IsAdjacent(Potion _currentPotion, Potion _targetPotion)
+    //{
+    //    return Mathf.Abs(_currentPotion.xIndex - _targetPotion.xIndex) + Mathf.Abs(_currentPotion.yIndex - _targetPotion.yIndex) == 1;
+    //}
+
+    private IEnumerator ProcessMatches(Potion _currentPotion, Potion _targetPotion)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        if (CheckBoard())
+        {
+            // Start a coroutine that is going to process our matches in our turn.
+            StartCoroutine(ProcessTurnOnMatchedBoard(true));
+        }
+        else
+        {
+            // 매칭이 일어나지 않은 경우 다시 스왑
+            DoSwap(_currentPotion, _targetPotion);
+        }
+
+        isProcessingMove = false;
+    }
+
+    #endregion
 
     // 보드 생성
     // width, height 값에 따라 보드 판 생성.
@@ -106,6 +275,7 @@ public class PotionBoard : MonoBehaviour
 
                     GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
                     potion.transform.SetParent(potionParent.transform);
+                    potion.transform.name = "[" + x + ", " + y + "]" + potion.gameObject.name;
 
                     potion.GetComponent<Potion>().SetIndicies(x, y);
                     potionBoard[x, y] = new Node(true, potion);
@@ -116,7 +286,7 @@ public class PotionBoard : MonoBehaviour
 
         if (CheckBoard())
         {
-            Debug.Log("We have matches let's re-create the board");
+            //Debug.Log("We have matches let's re-create the board");
             InitializeBoard();
         }
     }
@@ -142,12 +312,12 @@ public class PotionBoard : MonoBehaviour
         {
             return false;
         }
-        Debug.Log("Checking Board");
+        //Debug.Log("Checking Board");
         bool hasMatched = false;
 
         potionsToRemove.Clear();
 
-        foreach(Node nodePotion in potionBoard)
+        foreach (Node nodePotion in potionBoard)
         {
             if (nodePotion.potion != null)
             {
@@ -237,9 +407,9 @@ public class PotionBoard : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                if (potionBoard[x,y].potion ==null)
+                if (potionBoard[x, y].potion == null)
                 {
-                    Debug.Log("The location X: " + x + "Y: " + y + " is empty, attempting to refill it.");
+                    //Debug.Log("The location X: " + x + "Y: " + y + " is empty, attempting to refill it.");
                     RefillPotion(x, y);
                 }
             }
@@ -255,16 +425,16 @@ public class PotionBoard : MonoBehaviour
         int yOffset = 1;
 
         // while the cell above our current cell is null and we're below the height of the board
-        while (y + yOffset < height && potionBoard[x,y + yOffset].potion == null)
+        while (y + yOffset < height && potionBoard[x, y + yOffset].potion == null)
         {
             // increment y offset
-            Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
+            //Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
             yOffset++;
         }
 
         // we've either hit the top of the board or we found a potion
 
-        if (y + yOffset < height && potionBoard[x, y+ yOffset].potion != null)
+        if (y + yOffset < height && potionBoard[x, y + yOffset].potion != null)
         {
             // we've found a potion
 
@@ -272,7 +442,7 @@ public class PotionBoard : MonoBehaviour
 
             // Move it to the correct location
             Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
-            Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
+            //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
 
             //Move to location
             potionAbove.MoveToTarget(targetPos);
@@ -289,7 +459,7 @@ public class PotionBoard : MonoBehaviour
         // if we're hit the top of the board without finding a potion
         if (y + yOffset == height)
         {
-            Debug.Log("I've reached the top of the board without finding a potion");
+            //Debug.Log("I've reached the top of the board without finding a potion");
             SpawnPotionAtTop(x);
         }
     }
@@ -301,7 +471,7 @@ public class PotionBoard : MonoBehaviour
     {
         int index = FindIndexOfLowestNull(x);
         int locationToMoveTo = height - index;
-        Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
+        //Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
         // get a random potion
         int randomIndex = Random.Range(0, potionPrefabs.Length);
         Vector2 position = new Vector2(x - spacingX, height - spacingY);
@@ -358,7 +528,7 @@ public class PotionBoard : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    Debug.Log("I have a super Horizontal Match");
+                    //Debug.Log("I have a super Horizontal Match");
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
 
                     return new MatchResult
@@ -395,7 +565,7 @@ public class PotionBoard : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    Debug.Log("I have a super Vertical Match");
+                    //Debug.Log("I have a super Vertical Match");
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
 
                     return new MatchResult
@@ -431,7 +601,7 @@ public class PotionBoard : MonoBehaviour
         // have we made a 3 match? (Horizontal match)
         if (connectedPotions.Count == 3)
         {
-            Debug.Log("I have a normal horizontal match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a normal horizontal match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -443,7 +613,7 @@ public class PotionBoard : MonoBehaviour
         // checking for more than 3 (Long horizontal match)
         else if (connectedPotions.Count > 3)
         {
-            Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -468,7 +638,7 @@ public class PotionBoard : MonoBehaviour
         // have we made a 3 match? (Vertical match)
         if (connectedPotions.Count == 3)
         {
-            Debug.Log("I have a normal Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a normal Vertical match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -480,7 +650,7 @@ public class PotionBoard : MonoBehaviour
         // checking for more than 3 (Long Vertical match)
         else if (connectedPotions.Count > 3)
         {
-            Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -533,102 +703,6 @@ public class PotionBoard : MonoBehaviour
 
         }
     }
-
-    #region Swapping Potions
-
-    // 블럭 선택
-    public void SelectPotion(Potion _potion)
-    {
-        // if we don't have a potion currently selected, then set the potion i just clicked to my selectedpotion
-        if (selectedPotion == null)
-        {
-            Debug.Log(_potion);
-            selectedPotion = _potion;
-        }
-        // if we select the same potion twice, then let's make selectedpotion null
-        else if (selectedPotion == _potion)
-        {
-            selectedPotion = null;
-        }
-
-        // 블럭이 선택됐고 이후에 선택된 블럭이 이미 선택한 블럭이 아닌 경우
-        // 선택된 블럭은 null
-        else if (selectedPotion != _potion)
-        {
-            SwapPotion(selectedPotion, _potion);
-            selectedPotion = null;
-        }
-
-    }
-
-    // 블럭을 인접한 블럭과 위치 바꿈
-    // TODO : 1. 벽에 부딫히는 경우 튕겨 돌아와야 함
-    private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
-    {
-        // 인접한 블럭을 클릭하지 않은 경우
-        // 아무 일도 일어나지 않고 선택된 블럭 풀림
-        if (!IsAdjacent(_currentPotion, _targetPotion))
-        {
-            return;
-        }
-
-        // 위치 바꾸기
-        DoSwap(_currentPotion, _targetPotion);
-
-        // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
-        isProcessingMove = true;
-
-        // startCoroutine ProcessMatches.
-        StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
-    }
-    
-    // TODO : 1. 바꾸는 속도 조절
-    private void DoSwap(Potion _currentPotion, Potion _targetPotion)
-    {
-        GameObject temp = potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion;
-
-        potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion = potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion;
-        potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion = temp;
-
-        // 위치 업데이트
-        int tempXIndex = _currentPotion.xIndex;
-        int tempYIndex = _currentPotion.yIndex;
-        _currentPotion.xIndex = _targetPotion.xIndex;
-        _currentPotion.yIndex = _targetPotion.yIndex;
-        _targetPotion.xIndex = tempXIndex;
-        _targetPotion.yIndex = tempYIndex;
-
-        // 바꾸는 속도 조절
-        _currentPotion.MoveToTarget(potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion.transform.position);
-        _targetPotion.MoveToTarget(potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion.transform.position);
-
-    }
-
-    // 블럭 선택 후 인접한 블럭 선택했는지 체크
-    private bool IsAdjacent(Potion _currentPotion, Potion _targetPotion)
-    {
-        return Mathf.Abs(_currentPotion.xIndex - _targetPotion.xIndex) + Mathf.Abs(_currentPotion.yIndex - _targetPotion.yIndex) == 1;
-    }
-
-    private IEnumerator ProcessMatches(Potion _currentPotion, Potion _targetPotion)
-    {
-        yield return new WaitForSeconds(0.2f);
-
-        if (CheckBoard())
-        {
-            // Start a coroutine that is going to process our matches in our turn.
-            StartCoroutine(ProcessTurnOnMatchedBoard(true));
-        }
-        else
-        {
-            // 매칭이 일어나지 않은 경우 다시 스왑
-            DoSwap(_currentPotion, _targetPotion);
-        }
-
-        isProcessingMove = false;
-    }
-
-    #endregion
 }
 
 

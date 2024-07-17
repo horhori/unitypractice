@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
@@ -16,8 +17,10 @@ public class Potion : MonoBehaviour
     public int yIndex;
 
     public bool isMatched;
-    private Vector2 currentPos;
-    private Vector2 targetPos;
+
+    private Vector2 currentPos; // firstTouchPosition
+    private Vector2 targetPos; // finalTouchPosition
+    public float swipeAngle = 0;
 
     public bool isMoving;
 
@@ -31,6 +34,28 @@ public class Potion : MonoBehaviour
     {
         xIndex = _x;
         yIndex = _y;
+    }
+
+    public void OnMouseDown()
+    {
+        if (!isMoving)
+        {
+            currentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
+    }
+
+    public void OnMouseUp()
+    {
+        if (!isMoving)
+        {
+            targetPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            CalculateAngle();
+        }
+    }
+
+    void CalculateAngle()
+    {
+        swipeAngle = Mathf.Atan2(targetPos.y - currentPos.y, targetPos.x - currentPos.x) * 180 / Mathf.PI;
     }
 
     public void MoveToTarget(Vector2 _targetPos)
