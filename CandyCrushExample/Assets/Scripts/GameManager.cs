@@ -17,8 +17,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // static reference;
 
-    public GameObject backgroundPanel; // grey background 
-    public GameObject victoryPanel; // 승리/패배 화면 클릭할 때 포션 동작 안되게 
+    public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
+    public GameObject victoryPanel; 
     public GameObject losePanel;
 
     public int goal; // the amount of points you need to get to win.

@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 public class PotionBoard : MonoBehaviour
 {
     // 가로 세로 블럭 개수 설정
+    // 스테이지 따라 width, height 달라짐
     public int width = 7;
     public int height = 7;
     // X축, Y축 간격
@@ -60,25 +61,6 @@ public class PotionBoard : MonoBehaviour
 
     private void Update()
     {
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //    RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-
-        //    if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
-        //    {
-        //        if (isProcessingMove)
-        //        {
-        //            return;
-        //        }
-
-        //        Potion potion = hit.collider.gameObject.GetComponent<Potion>();
-        //        //Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
-
-        //        SelectPotion(potion);
-        //    }
-        //}
-
         if (Input.GetMouseButtonDown(0))
         {
             SelectPotion();
@@ -171,12 +153,60 @@ public class PotionBoard : MonoBehaviour
             targetedPotion = potionBoard[originX, originY - 1].potion.GetComponent<Potion>();
             SwapPotion(selectedPotion, targetedPotion);
         }
+        // 벽에 부딫히는 경우
+        else if (swipeAngle > -45 && swipeAngle <= 45 && originX == width - 1)
+        {
+            // 오른쪽
+            Vector3 tempDirection = new Vector3(1, 0);
+            BounceEdge(selectedPotion, tempDirection);
+        }
+        else if (swipeAngle > 45 && swipeAngle <= 135 && originY == height - 1)
+        {
+            // 위쪽
+            Vector3 tempDirection = new Vector3(0, 1);
+            BounceEdge(selectedPotion, tempDirection);
+        }
+        else if ((swipeAngle > 135 || swipeAngle <= -135) && originX == 0)
+        {
+            // 왼쪽
+            Vector3 tempDirection = new Vector3(-1, 0);
+            BounceEdge(selectedPotion, tempDirection);
+        }
+        else if (swipeAngle < -45 && swipeAngle >= -135 && originY == 0)
+        {
+            // 아래쪽
+            Vector3 tempDirection = new Vector3(0, -1);
+            BounceEdge(selectedPotion, tempDirection);
+        }
 
         selectedPotion = null;
     }
 
+    // 벽에 부딫히는 경우
+    // TODO : 1. 벽에 부딫히는 경우 튕겨 돌아와야 함
+    //           -> 240718 부분 완료. 부딫혔을 때 속도, 거리 조절 필요
+    private void BounceEdge(Potion _currentPotion, Vector3 _targetDirection)
+    {
+        Vector2 originPosition = _currentPotion.transform.position;
+        Vector2 targetPosition = _currentPotion.transform.position + _targetDirection;
+
+        isProcessingMove = true;
+
+        _currentPotion.MoveToTarget(targetPosition);
+
+        StartCoroutine(ProcessBounce(_currentPotion, originPosition));
+    }
+
+    private IEnumerator ProcessBounce(Potion _currentPotion, Vector2 _originPosition)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        _currentPotion.MoveToTarget(_originPosition);
+
+        isProcessingMove = false;
+    }
+
     // 블럭을 인접한 블럭과 위치 바꿈
-    // TODO : 1. 벽에 부H히는 경우 튕겨 돌아와야 함
     private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
     {
         // 인접한 블럭을 클릭하지 않은 경우
@@ -485,6 +515,7 @@ public class PotionBoard : MonoBehaviour
         potionBoard[x, index] = new Node(true, newPotion);
         // move it to that location
         Vector3 targetPosition = new Vector3(newPotion.transform.position.x, newPotion.transform.position.y - locationToMoveTo, newPotion.transform.position.z);
+        // 아래로 떨어지는 부분
         newPotion.GetComponent<Potion>().MoveToTarget(targetPosition);
     }
 

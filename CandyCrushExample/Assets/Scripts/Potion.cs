@@ -10,13 +10,16 @@ using UnityEngine;
 // TODO : 1. Potion -> Block 리팩토링
 public class Potion : MonoBehaviour
 {
-
     public PotionType potionType;
 
+    // 좌표를 의미하는게 아니라 번째임
     public int xIndex;
     public int yIndex;
 
     public bool isMatched;
+
+    // TODO : 1. 해당 블럭이 스왑되면 매칭이 되는지 여부 (true면 발광, 위아래로 살짝 움직임 적용)
+    //public bool isMatchable;
 
     private Vector2 currentPos; // firstTouchPosition
     private Vector2 targetPos; // finalTouchPosition
@@ -60,10 +63,14 @@ public class Potion : MonoBehaviour
 
     public void MoveToTarget(Vector2 _targetPos)
     {
+
         StartCoroutine(MoveCoroutine(_targetPos));
     }
 
     // TODO : 1. 블럭 바뀌는 시간 자연스럽게 조절
+    //        2. 벽에 부딫혔을 때 속도, 거리 조절 필요 -> 벽에 부딫혔을 때 따로 메서드 만들어야 할듯
+    //           -> UI 적용 후 벽과 거리 측정해서 작업 예정
+    //        3. 새로 블럭 생성되어 빈 자리에 떨어지는 것도 여기서 처리하는데 따로 메서드 만들어야 할듯
     private IEnumerator MoveCoroutine(Vector2 _targetPos)
     {
         isMoving = true;
@@ -87,7 +94,6 @@ public class Potion : MonoBehaviour
         transform.position = _targetPos;
         isMoving = false;
     }
-
 }
 
 // TODO : 1. 특수 블럭
@@ -100,4 +106,11 @@ public enum PotionType
     PinkBlock,
     RedBlock,
     YellowBlock,
+}
+
+// 바구니 제작중...
+public struct Bag
+{
+    public PotionType potionType;
+
 }
