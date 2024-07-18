@@ -223,9 +223,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1947160168}
-  - component: {fileID: 1947160167}
   - component: {fileID: 1947160170}
-  - component: {fileID: 1947160169}
+  - component: {fileID: 1947160171}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -233,30 +232,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1947160167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947160166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7ae3dbcc9b6a0d44856f42710264a06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  width: 7
-  height: 10
-  tilePrefab: {fileID: 1832570368233753920, guid: 48c79cab17bfdf945a2888849266e59b, type: 3}
-  dots:
-  - {fileID: 8414022224123836126, guid: 58ac0c5a071ca1a44b26a904714c073c, type: 3}
-  - {fileID: 4266185640911096349, guid: 529e835707c6a174ca5bbbc9cc8f85af, type: 3}
-  - {fileID: 7223206215871020899, guid: 71a39704ca6b15d4fa55613aad9f2713, type: 3}
-  - {fileID: 2028427029964720647, guid: 3ce95620389acdf40b2ff5ea7b9d89e0, type: 3}
-  - {fileID: 3685867481437075591, guid: dff6b8edafbddb343a1054c8119a8c8e, type: 3}
-  - {fileID: 1345234637040937531, guid: 9fdffdc995246a34ca847997edd21301, type: 3}
-  - {fileID: 8985954151640656220, guid: 78cdf6337e2f04d4887dcce82a3a584c, type: 3}
-  - {fileID: 4510957856116942564, guid: b60ea7ab1c0a1194eaac51ddd0afbb2f, type: 3}
 --- !u!4 &1947160168
 Transform:
   m_ObjectHideFlags: 0
@@ -272,19 +247,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1947160169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947160166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4708f7611c63b748acfb643e49efc2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  swipeAngle: 0
 --- !u!58 &1947160170
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -320,6 +282,31 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &1947160171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947160166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ae3dbcc9b6a0d44856f42710264a06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 7
+  height: 10
+  offSet: 20
+  tilePrefab: {fileID: 1832570368233753920, guid: 48c79cab17bfdf945a2888849266e59b, type: 3}
+  dots:
+  - {fileID: 8414022224123836126, guid: 58ac0c5a071ca1a44b26a904714c073c, type: 3}
+  - {fileID: 4266185640911096349, guid: 529e835707c6a174ca5bbbc9cc8f85af, type: 3}
+  - {fileID: 7223206215871020899, guid: 71a39704ca6b15d4fa55613aad9f2713, type: 3}
+  - {fileID: 8480648580388222843, guid: 626f1eed02f9e874889154b8c23333c3, type: 3}
+  - {fileID: 2028427029964720647, guid: 3ce95620389acdf40b2ff5ea7b9d89e0, type: 3}
+  - {fileID: 3685867481437075591, guid: dff6b8edafbddb343a1054c8119a8c8e, type: 3}
+  - {fileID: 1345234637040937531, guid: 9fdffdc995246a34ca847997edd21301, type: 3}
+  - {fileID: 513616534341131676, guid: 78cdf6337e2f04d4887dcce82a3a584c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

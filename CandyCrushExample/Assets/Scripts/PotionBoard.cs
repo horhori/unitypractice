@@ -6,38 +6,41 @@ using UnityEngine.UIElements;
 
 public class PotionBoard : MonoBehaviour
 {
-    // °¡·Î ¼¼·Î ºí·° °³¼ö ¼³Á¤
+    // ê°€ë¡œ ì„¸ë¡œ ë¸”ëŸ­ ê°œìˆ˜ ì„¤ì •
     public int width = 7;
     public int height = 7;
-    // XÃà, YÃà °£°İ
+    // Xì¶•, Yì¶• ê°„ê²©
     public float spacingX;
     public float spacingY;
-    // ºí·° ¸ñ·Ï
+    // ë¸”ëŸ­ ëª©ë¡
     public GameObject[] potionPrefabs;
-    // ºí·°º¸µå
+    // ë¸”ëŸ­ë³´ë“œ
     public Node[,] potionBoard;
     public GameObject potionBoardGO;
 
-    // ¸ÅÄªµÇ¾úÀ» ¶§ Á¦°ÅÇÒ ºí·° ¸ñ·Ï
-    // ¸ÅÄªµÇ´Â ºí·°µéÀ» Ãß°¡ÈÄ Á¦°ÅÇÏ°í ºñ¿ì°í ¹İº¹
+    // ë§¤ì¹­ë˜ì—ˆì„ ë•Œ ì œê±°í•  ë¸”ëŸ­ ëª©ë¡
+    // ë§¤ì¹­ë˜ëŠ” ë¸”ëŸ­ë“¤ì„ ì¶”ê°€í›„ ì œê±°í•˜ê³  ë¹„ìš°ê³  ë°˜ë³µ
     public List<GameObject> potionsToDestroy = new();
 
     [SerializeField]
     List<Potion> potionsToRemove = new();
 
-    // ºí·° ¿ø·¡ À§Ä¡
-    // ºí·°ÀÌ Á¦°ÅµÇ°í »õ·Î »ı¼ºµÉ ¶§ ÇØ´ç À§Ä¡ ÂüÁ¶
+    // ë¸”ëŸ­ ì›ë˜ ìœ„ì¹˜
+    // ë¸”ëŸ­ì´ ì œê±°ë˜ê³  ìƒˆë¡œ ìƒì„±ë  ë•Œ í•´ë‹¹ ìœ„ì¹˜ ì°¸ì¡°
     public GameObject potionParent;
 
-    // unity »ó¿¡¼­ ¼±ÅÃµÈ ºí·° È®ÀÎÇÒ ¼ö ÀÖ°Ô SerializeField(Á÷·ÄÈ­) »ç¿ë
-    // SerializeField : privateÀÌ¿©µµ unity¿¡¼­ È®ÀÎÇÒ ¼ö ÀÖÀ½
+    // unity ìƒì—ì„œ ì„ íƒëœ ë¸”ëŸ­ í™•ì¸í•  ìˆ˜ ìˆê²Œ SerializeField(ì§ë ¬í™”) ì‚¬ìš©
+    // SerializeField : privateì´ì—¬ë„ unityì—ì„œ í™•ì¸í•  ìˆ˜ ìˆìŒ
     [SerializeField]
     private Potion selectedPotion;
 
     [SerializeField]
+    private Potion targetedPotion;
+
+    [SerializeField]
     private bool isProcessingMove;
 
-    // Unity »ó¿¡¼­ ½±°Ô Æ¯Á¤ À§Ä¡ ¾È ³ª¿À°Ô 
+    // Unity ìƒì—ì„œ ì‰½ê²Œ íŠ¹ì • ìœ„ì¹˜ ì•ˆ ë‚˜ì˜¤ê²Œ 
     public ArrayLayout arrayLayout;
     // static Instance
     public static PotionBoard Instance;
@@ -52,34 +55,200 @@ public class PotionBoard : MonoBehaviour
         InitializeBoard();
     }
 
-    // TODO : 1. ÇöÀç Á¶ÀÛ Å¬¸¯ -> ½½¶óÀÌµå º¯°æ
+    // TODO : 1. í˜„ì¬ ì¡°ì‘ í´ë¦­ -> ìŠ¬ë¼ì´ë“œ ë³€ê²½
+    //           : 240717 ì™„ë£Œ, ìŠ¤ì™€ì´í”„ ë¡œì§ ì ìš© ê°ë„ ê³„ì‚°í•˜ì—¬ ìŠ¬ë¼ì´ë“œ êµ¬í˜„ ì™„ë£Œ(Potionì—ì„œ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ì— ë”°ë¼ ê°ë„ ê³„ì‚°ë¨)
+
     private void Update()
     {
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //    RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+        //    if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
+        //    {
+        //        if (isProcessingMove)
+        //        {
+        //            return;
+        //        }
+
+        //        Potion potion = hit.collider.gameObject.GetComponent<Potion>();
+        //        //Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
+
+        //        SelectPotion(potion);
+        //    }
+        //}
+
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+            SelectPotion();
+        }
 
-            if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
-            {
-                if (isProcessingMove)
-                {
-                    return;
-                }
-
-                Potion potion = hit.collider.gameObject.GetComponent<Potion>();
-                Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
-
-                SelectPotion(potion);
-            }
+        if (Input.GetMouseButtonUp(0) && selectedPotion)
+        {
+            Swipe();
         }
     }
 
-    // º¸µå »ı¼º
-    // width, height °ª¿¡ µû¶ó º¸µå ÆÇ »ı¼º.
-    // °¢ º¸µå ÀÚ¸®¸¶´Ù Node¸¦ °¡Áö°í ÀÖÀ½
-    // Node´Â »ç¿ë°¡´ÉÇÑ ÀÚ¸®ÀÎÁö(isUsable), »ç¿ë °¡´ÉÇÏ¸é ÇØ´ç ÀÚ¸®¿¡ ±â¹°(Potion->Block)À» °¡Áü
-    // ·£´ıÇÏ°Ô »ı¼º ÈÄ ¸ÅÄ¡µÇ´Â °æ¿ì¿¡´Â ´Ù½Ã »ı¼ºµÊ
+    #region Swapping Potions
+
+    // ë¸”ëŸ­ ì„ íƒ - ë§¨ ì²˜ìŒ í´ë¦­ ë²„ì „
+    //public void SelectPotion(Potion _potion)
+    //{
+    //    // if we don't have a potion currently selected, then set the potion i just clicked to my selectedpotion
+    //    if (selectedPotion == null)
+    //    {
+    //        //Debug.Log(_potion);
+    //        selectedPotion = _potion;
+
+    //    }
+    //    // if we select the same potion twice, then let's make selectedpotion null
+    //    else if (selectedPotion == _potion)
+    //    {
+    //        selectedPotion = null;
+    //    }
+
+    //    // ë¸”ëŸ­ì´ ì„ íƒëê³  ì´í›„ì— ì„ íƒëœ ë¸”ëŸ­ì´ ì´ë¯¸ ì„ íƒí•œ ë¸”ëŸ­ì´ ì•„ë‹Œ ê²½ìš°
+    //    // ì„ íƒëœ ë¸”ëŸ­ì€ null
+    //    else if (selectedPotion != _potion)
+    //    {
+    //        SwapPotion(selectedPotion, _potion);
+    //        selectedPotion = null;
+    //    }
+    //}
+
+    // Updateì—ì„œ ë§ˆìš°ìŠ¤ í´ë¦­ ì‹œ SelectPotion() ë©”ì„œë“œë¡œ ì„ íƒí•œ ë¸”ëŸ­ ì €ì¥
+    private void SelectPotion()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+        if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
+        {
+            if (isProcessingMove)
+            {
+                return;
+            }
+
+            Potion potion = hit.collider.gameObject.GetComponent<Potion>();
+            //Debug.Log("I have a clicked a potion it is : " + potion.gameObject);
+
+            selectedPotion = potion;
+        }
+    }
+
+    // Updateì—ì„œ ë§ˆìš°ìŠ¤ í´ë¦­ ë—ì„ ë•Œ ê°ë„ ê³„ì‚°í•˜ì—¬ í•´ë‹¹ ìœ„ì¹˜ ë¸”ëŸ­ê³¼ ìŠ¤ì™‘ ì§„í–‰ í›„ ì„ íƒí•œ ë¸”ëŸ­ í•´ì œ
+    // TODO : 1. ëª¨ì„œë¦¬ë¡œ ìŠ¤ì™€ì´í”„ í–ˆì„ ê²½ìš° ë²½ì— íŠ•ê²¨ë‚˜ì˜¤ê¸° ì¶”ê°€(í˜„ì¬ëŠ” ì—ëŸ¬ ì•ˆë‚˜ê²Œ ë§‰ì•„ë†“ê¸°ë§Œ í•¨)
+
+    private void Swipe()
+    {
+        float swipeAngle = selectedPotion.swipeAngle;
+        //Debug.Log("swipeAngle : " + swipeAngle);
+        int originX = selectedPotion.xIndex;
+        int originY = selectedPotion.yIndex;
+
+        if (swipeAngle > -45 && swipeAngle <= 45 && originX != width - 1)
+        {
+            // Right Swipe
+            targetedPotion = potionBoard[originX + 1, originY].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+        else if (swipeAngle > 45 && swipeAngle <= 135 && originY != height - 1)
+        {
+            // Up Swipe
+            targetedPotion = potionBoard[originX, originY + 1].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+        else if ((swipeAngle > 135 || swipeAngle <= -135) && originX != 0)
+        {
+            // Left Swipe
+            targetedPotion = potionBoard[originX - 1, originY].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+        else if (swipeAngle < -45 && swipeAngle >= -135 && originY != 0)
+        {
+            // Down Swipe
+            targetedPotion = potionBoard[originX, originY - 1].potion.GetComponent<Potion>();
+            SwapPotion(selectedPotion, targetedPotion);
+        }
+
+        selectedPotion = null;
+    }
+
+    // ë¸”ëŸ­ì„ ì¸ì ‘í•œ ë¸”ëŸ­ê³¼ ìœ„ì¹˜ ë°”ê¿ˆ
+    // TODO : 1. ë²½ì— ë¶€Â‹HíˆëŠ” ê²½ìš° íŠ•ê²¨ ëŒì•„ì™€ì•¼ í•¨
+    private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
+    {
+        // ì¸ì ‘í•œ ë¸”ëŸ­ì„ í´ë¦­í•˜ì§€ ì•Šì€ ê²½ìš°
+        // ì•„ë¬´ ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•Šê³  ì„ íƒëœ ë¸”ëŸ­ í’€ë¦¼
+        //if (!IsAdjacent(_currentPotion, _targetPotion))
+        //{
+        //    return;
+        //}
+
+        // ìœ„ì¹˜ ë°”ê¾¸ê¸°
+        DoSwap(_currentPotion, _targetPotion);
+
+        // ë°”ê¾¼ ë‹¤ìŒì— ë§¤ì¹­ì´ ì¼ì–´ë‚˜ê³  ë¸”ëŸ­ì´ ì œê±°ë˜ëŠ” ë™ì•ˆ true
+        isProcessingMove = true;
+
+        // startCoroutine ProcessMatches.
+        StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
+    }
+
+    // TODO : 1. ë°”ê¾¸ëŠ” ì†ë„ ì¡°ì ˆ
+    private void DoSwap(Potion _currentPotion, Potion _targetPotion)
+    {
+        GameObject temp = potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion;
+
+        potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion = potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion;
+        potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion = temp;
+
+        // ìœ„ì¹˜ ì—…ë°ì´íŠ¸
+        int tempXIndex = _currentPotion.xIndex;
+        int tempYIndex = _currentPotion.yIndex;
+        _currentPotion.xIndex = _targetPotion.xIndex;
+        _currentPotion.yIndex = _targetPotion.yIndex;
+        _targetPotion.xIndex = tempXIndex;
+        _targetPotion.yIndex = tempYIndex;
+
+        // ë°”ê¾¸ëŠ” ì†ë„ ì¡°ì ˆ
+        _currentPotion.MoveToTarget(potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion.transform.position);
+        _targetPotion.MoveToTarget(potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion.transform.position);
+
+    }
+
+    // ë¸”ëŸ­ ì„ íƒ í›„ ì¸ì ‘í•œ ë¸”ëŸ­ ì„ íƒí–ˆëŠ”ì§€ ì²´í¬
+    //private bool IsAdjacent(Potion _currentPotion, Potion _targetPotion)
+    //{
+    //    return Mathf.Abs(_currentPotion.xIndex - _targetPotion.xIndex) + Mathf.Abs(_currentPotion.yIndex - _targetPotion.yIndex) == 1;
+    //}
+
+    private IEnumerator ProcessMatches(Potion _currentPotion, Potion _targetPotion)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        if (CheckBoard())
+        {
+            // Start a coroutine that is going to process our matches in our turn.
+            StartCoroutine(ProcessTurnOnMatchedBoard(true));
+        }
+        else
+        {
+            // ë§¤ì¹­ì´ ì¼ì–´ë‚˜ì§€ ì•Šì€ ê²½ìš° ë‹¤ì‹œ ìŠ¤ì™‘
+            DoSwap(_currentPotion, _targetPotion);
+        }
+
+        isProcessingMove = false;
+    }
+
+    #endregion
+
+    // ë³´ë“œ ìƒì„±
+    // width, height ê°’ì— ë”°ë¼ ë³´ë“œ íŒ ìƒì„±.
+    // ê° ë³´ë“œ ìë¦¬ë§ˆë‹¤ Nodeë¥¼ ê°€ì§€ê³  ìˆìŒ
+    // NodeëŠ” ì‚¬ìš©ê°€ëŠ¥í•œ ìë¦¬ì¸ì§€(isUsable), ì‚¬ìš© ê°€ëŠ¥í•˜ë©´ í•´ë‹¹ ìë¦¬ì— ê¸°ë¬¼(Potion->Block)ì„ ê°€ì§
+    // ëœë¤í•˜ê²Œ ìƒì„± í›„ ë§¤ì¹˜ë˜ëŠ” ê²½ìš°ì—ëŠ” ë‹¤ì‹œ ìƒì„±ë¨
     void InitializeBoard()
     {
         DestroyPotions();
@@ -93,7 +262,7 @@ public class PotionBoard : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                // ºí·° º¸µå ºÎ¸ğ À§Ä¡¸¦ ¹İ¿µÇÏ¿© ºí·° »ı¼º
+                // ë¸”ëŸ­ ë³´ë“œ ë¶€ëª¨ ìœ„ì¹˜ë¥¼ ë°˜ì˜í•˜ì—¬ ë¸”ëŸ­ ìƒì„±
                 Vector2 position = new Vector2(x - spacingX, y - spacingY);
                 if (arrayLayout.rows[y].row[x])
                 {
@@ -101,11 +270,12 @@ public class PotionBoard : MonoBehaviour
                 }
                 else
                 {
-                    // Àç·á µî±Ş Á¶Á¤
+                    // ì¬ë£Œ ë“±ê¸‰ ì¡°ì •
                     int randomIndex = Random.Range(0, potionPrefabs.Length);
 
                     GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
                     potion.transform.SetParent(potionParent.transform);
+                    potion.transform.name = "[" + x + ", " + y + "]" + potion.gameObject.name;
 
                     potion.GetComponent<Potion>().SetIndicies(x, y);
                     potionBoard[x, y] = new Node(true, potion);
@@ -116,7 +286,7 @@ public class PotionBoard : MonoBehaviour
 
         if (CheckBoard())
         {
-            Debug.Log("We have matches let's re-create the board");
+            //Debug.Log("We have matches let's re-create the board");
             InitializeBoard();
         }
     }
@@ -133,21 +303,21 @@ public class PotionBoard : MonoBehaviour
         }
     }
 
-    // º¸µå¿¡ ¸ÅÄªµÇ¾î ÀÖ´Â°Ô ÀÖ´ÂÁö Ã¼Å©
-    // TODO : 1. Ã¼Å© ½Ã ¸ÅÄª °æ¿ìÀÇ ¼ö°¡ ¾ø´Â °æ¿ì ´Ù½Ã ¼¯¿©¾ß ÇÔ
-    //        2. ÀÏÁ¤ ½Ã°£ÀÌ Áö³ª°í Á¶ÀÛÀÌ ¾ø´Â °æ¿ì ¸ÅÄªµÇ´Â ºí·° Ç¥½Ã
+    // ë³´ë“œì— ë§¤ì¹­ë˜ì–´ ìˆëŠ”ê²Œ ìˆëŠ”ì§€ ì²´í¬
+    // TODO : 1. ì²´í¬ ì‹œ ë§¤ì¹­ ê²½ìš°ì˜ ìˆ˜ê°€ ì—†ëŠ” ê²½ìš° ë‹¤ì‹œ ì„ì—¬ì•¼ í•¨
+    //        2. ì¼ì • ì‹œê°„ì´ ì§€ë‚˜ê³  ì¡°ì‘ì´ ì—†ëŠ” ê²½ìš° ë§¤ì¹­ë˜ëŠ” ë¸”ëŸ­ í‘œì‹œ
     public bool CheckBoard()
     {
         if (GameManager.Instance.isGameEnded)
         {
             return false;
         }
-        Debug.Log("Checking Board");
+        //Debug.Log("Checking Board");
         bool hasMatched = false;
 
         potionsToRemove.Clear();
 
-        foreach(Node nodePotion in potionBoard)
+        foreach (Node nodePotion in potionBoard)
         {
             if (nodePotion.potion != null)
             {
@@ -203,7 +373,7 @@ public class PotionBoard : MonoBehaviour
 
         RemoveAndRefill(potionsToRemove);
 
-        // ÇöÀç Á¦°ÅµÇ´Â ºí·° ´ç 1Á¡À¸·Î Á¡¼ö Ä«¿îÆ® µÊ
+        // í˜„ì¬ ì œê±°ë˜ëŠ” ë¸”ëŸ­ ë‹¹ 1ì ìœ¼ë¡œ ì ìˆ˜ ì¹´ìš´íŠ¸ ë¨
         GameManager.Instance.ProcessTurn(potionsToRemove.Count, _subtractMoves);
         yield return new WaitForSeconds(0.4f);
 
@@ -215,8 +385,8 @@ public class PotionBoard : MonoBehaviour
 
     #region Cascading Potions
 
-    // ºí·° Áö¿öÁö°í ´Ù½Ã »ı¼º
-    // TODO : 1. Ã³À½ º¸µå »ı¼ºµÉ ¶§ Æ¯Á¤ °¹¼ö(7*14, 7*21...) »ı¼º
+    // ë¸”ëŸ­ ì§€ì›Œì§€ê³  ë‹¤ì‹œ ìƒì„±
+    // TODO : 1. ì²˜ìŒ ë³´ë“œ ìƒì„±ë  ë•Œ íŠ¹ì • ê°¯ìˆ˜(7*14, 7*21...) ìƒì„±
     private void RemoveAndRefill(List<Potion> _potionsToRemove)
     {
         // Removing the potion and clearing the board at that location
@@ -237,9 +407,9 @@ public class PotionBoard : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                if (potionBoard[x,y].potion ==null)
+                if (potionBoard[x, y].potion == null)
                 {
-                    Debug.Log("The location X: " + x + "Y: " + y + " is empty, attempting to refill it.");
+                    //Debug.Log("The location X: " + x + "Y: " + y + " is empty, attempting to refill it.");
                     RefillPotion(x, y);
                 }
             }
@@ -255,16 +425,16 @@ public class PotionBoard : MonoBehaviour
         int yOffset = 1;
 
         // while the cell above our current cell is null and we're below the height of the board
-        while (y + yOffset < height && potionBoard[x,y + yOffset].potion == null)
+        while (y + yOffset < height && potionBoard[x, y + yOffset].potion == null)
         {
             // increment y offset
-            Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
+            //Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
             yOffset++;
         }
 
         // we've either hit the top of the board or we found a potion
 
-        if (y + yOffset < height && potionBoard[x, y+ yOffset].potion != null)
+        if (y + yOffset < height && potionBoard[x, y + yOffset].potion != null)
         {
             // we've found a potion
 
@@ -272,7 +442,7 @@ public class PotionBoard : MonoBehaviour
 
             // Move it to the correct location
             Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
-            Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
+            //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
 
             //Move to location
             potionAbove.MoveToTarget(targetPos);
@@ -289,19 +459,19 @@ public class PotionBoard : MonoBehaviour
         // if we're hit the top of the board without finding a potion
         if (y + yOffset == height)
         {
-            Debug.Log("I've reached the top of the board without finding a potion");
+            //Debug.Log("I've reached the top of the board without finding a potion");
             SpawnPotionAtTop(x);
         }
     }
 
-    // ÇöÀç ºí·°À» »õ·Î ¸¸µé°í ³»¸²
-    // TODO : 1. ¹Ì¸® »ı¼ºµÈ ºí·°ÀÌ ³»·Á¿À°Ô º¯°æ
-    //        2. ¸ğµç ºí·°ÀÌ ÀÏÁ¤ÇÑ ¼Óµµ·Î ³»·Á¿À°Ô(ÇöÀç´Â °°Àº ½Ã°£¿¡ ÇÑ¹ø¿¡ ³»·Á¿À°í ÀÖÀ½)
+    // í˜„ì¬ ë¸”ëŸ­ì„ ìƒˆë¡œ ë§Œë“¤ê³  ë‚´ë¦¼
+    // TODO : 1. ë¯¸ë¦¬ ìƒì„±ëœ ë¸”ëŸ­ì´ ë‚´ë ¤ì˜¤ê²Œ ë³€ê²½
+    //        2. ëª¨ë“  ë¸”ëŸ­ì´ ì¼ì •í•œ ì†ë„ë¡œ ë‚´ë ¤ì˜¤ê²Œ(í˜„ì¬ëŠ” ê°™ì€ ì‹œê°„ì— í•œë²ˆì— ë‚´ë ¤ì˜¤ê³  ìˆìŒ)
     private void SpawnPotionAtTop(int x)
     {
         int index = FindIndexOfLowestNull(x);
         int locationToMoveTo = height - index;
-        Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
+        //Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
         // get a random potion
         int randomIndex = Random.Range(0, potionPrefabs.Length);
         Vector2 position = new Vector2(x - spacingX, height - spacingY);
@@ -333,9 +503,9 @@ public class PotionBoard : MonoBehaviour
 
     #endregion
 
-    // °¡·Î ¶Ç´Â ¼¼·Î ¸ÅÄªÀÌ ÀÏ¾î³µÀ» ¶§ ¹İ´ë(°¡·ÎÀÌ¸é ¼¼·Î, ¼¼·ÎÀÌ¸é °¡·Î ¸ÅÄªÀÌ ÀÏ¾î³µ´ÂÁö) Ã¼Å©
-    // ¹İ´ë ¹æÇâµµ ¸ÅÄªÀÌ ÀÏ¾î³µÀ» °æ¿ì Super
-    // TODO : 1. Super -> Á·º¸ ·ÎÁ÷ ¼¼ºĞÈ­
+    // ê°€ë¡œ ë˜ëŠ” ì„¸ë¡œ ë§¤ì¹­ì´ ì¼ì–´ë‚¬ì„ ë•Œ ë°˜ëŒ€(ê°€ë¡œì´ë©´ ì„¸ë¡œ, ì„¸ë¡œì´ë©´ ê°€ë¡œ ë§¤ì¹­ì´ ì¼ì–´ë‚¬ëŠ”ì§€) ì²´í¬
+    // ë°˜ëŒ€ ë°©í–¥ë„ ë§¤ì¹­ì´ ì¼ì–´ë‚¬ì„ ê²½ìš° Super
+    // TODO : 1. Super -> ì¡±ë³´ ë¡œì§ ì„¸ë¶„í™”
     private MatchResult SuperMatch(MatchResult _matchedResults)
     {
         // if we have a horizontal or long horizontal match
@@ -358,7 +528,7 @@ public class PotionBoard : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    Debug.Log("I have a super Horizontal Match");
+                    //Debug.Log("I have a super Horizontal Match");
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
 
                     return new MatchResult
@@ -395,7 +565,7 @@ public class PotionBoard : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    Debug.Log("I have a super Vertical Match");
+                    //Debug.Log("I have a super Vertical Match");
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
 
                     return new MatchResult
@@ -414,7 +584,7 @@ public class PotionBoard : MonoBehaviour
         return null;
     }
 
-    // ºí·° Å¸ÀÔÀÌ ÀÏÄ¡ÇÏ´ÂÁö È®ÀÎ ÈÄ Match °á°ú ¹İÈ¯
+    // ë¸”ëŸ­ íƒ€ì…ì´ ì¼ì¹˜í•˜ëŠ”ì§€ í™•ì¸ í›„ Match ê²°ê³¼ ë°˜í™˜
     MatchResult IsConnected(Potion potion)
     {
         List<Potion> connectedPotions = new();
@@ -431,7 +601,7 @@ public class PotionBoard : MonoBehaviour
         // have we made a 3 match? (Horizontal match)
         if (connectedPotions.Count == 3)
         {
-            Debug.Log("I have a normal horizontal match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a normal horizontal match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -443,7 +613,7 @@ public class PotionBoard : MonoBehaviour
         // checking for more than 3 (Long horizontal match)
         else if (connectedPotions.Count > 3)
         {
-            Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -468,7 +638,7 @@ public class PotionBoard : MonoBehaviour
         // have we made a 3 match? (Vertical match)
         if (connectedPotions.Count == 3)
         {
-            Debug.Log("I have a normal Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a normal Vertical match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -480,7 +650,7 @@ public class PotionBoard : MonoBehaviour
         // checking for more than 3 (Long Vertical match)
         else if (connectedPotions.Count > 3)
         {
-            Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
 
             return new MatchResult
             {
@@ -533,102 +703,6 @@ public class PotionBoard : MonoBehaviour
 
         }
     }
-
-    #region Swapping Potions
-
-    // ºí·° ¼±ÅÃ
-    public void SelectPotion(Potion _potion)
-    {
-        // if we don't have a potion currently selected, then set the potion i just clicked to my selectedpotion
-        if (selectedPotion == null)
-        {
-            Debug.Log(_potion);
-            selectedPotion = _potion;
-        }
-        // if we select the same potion twice, then let's make selectedpotion null
-        else if (selectedPotion == _potion)
-        {
-            selectedPotion = null;
-        }
-
-        // ºí·°ÀÌ ¼±ÅÃµÆ°í ÀÌÈÄ¿¡ ¼±ÅÃµÈ ºí·°ÀÌ ÀÌ¹Ì ¼±ÅÃÇÑ ºí·°ÀÌ ¾Æ´Ñ °æ¿ì
-        // ¼±ÅÃµÈ ºí·°Àº null
-        else if (selectedPotion != _potion)
-        {
-            SwapPotion(selectedPotion, _potion);
-            selectedPotion = null;
-        }
-
-    }
-
-    // ºí·°À» ÀÎÁ¢ÇÑ ºí·°°ú À§Ä¡ ¹Ù²Ş
-    // TODO : 1. º®¿¡ ºÎ‹HÈ÷´Â °æ¿ì Æ¨°Ü µ¹¾Æ¿Í¾ß ÇÔ
-    private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
-    {
-        // ÀÎÁ¢ÇÑ ºí·°À» Å¬¸¯ÇÏÁö ¾ÊÀº °æ¿ì
-        // ¾Æ¹« ÀÏµµ ÀÏ¾î³ªÁö ¾Ê°í ¼±ÅÃµÈ ºí·° Ç®¸²
-        if (!IsAdjacent(_currentPotion, _targetPotion))
-        {
-            return;
-        }
-
-        // À§Ä¡ ¹Ù²Ù±â
-        DoSwap(_currentPotion, _targetPotion);
-
-        // ¹Ù²Û ´ÙÀ½¿¡ ¸ÅÄªÀÌ ÀÏ¾î³ª°í ºí·°ÀÌ Á¦°ÅµÇ´Â µ¿¾È true
-        isProcessingMove = true;
-
-        // startCoroutine ProcessMatches.
-        StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
-    }
-    
-    // TODO : 1. ¹Ù²Ù´Â ¼Óµµ Á¶Àı
-    private void DoSwap(Potion _currentPotion, Potion _targetPotion)
-    {
-        GameObject temp = potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion;
-
-        potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion = potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion;
-        potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion = temp;
-
-        // À§Ä¡ ¾÷µ¥ÀÌÆ®
-        int tempXIndex = _currentPotion.xIndex;
-        int tempYIndex = _currentPotion.yIndex;
-        _currentPotion.xIndex = _targetPotion.xIndex;
-        _currentPotion.yIndex = _targetPotion.yIndex;
-        _targetPotion.xIndex = tempXIndex;
-        _targetPotion.yIndex = tempYIndex;
-
-        // ¹Ù²Ù´Â ¼Óµµ Á¶Àı
-        _currentPotion.MoveToTarget(potionBoard[_targetPotion.xIndex, _targetPotion.yIndex].potion.transform.position);
-        _targetPotion.MoveToTarget(potionBoard[_currentPotion.xIndex, _currentPotion.yIndex].potion.transform.position);
-
-    }
-
-    // ºí·° ¼±ÅÃ ÈÄ ÀÎÁ¢ÇÑ ºí·° ¼±ÅÃÇß´ÂÁö Ã¼Å©
-    private bool IsAdjacent(Potion _currentPotion, Potion _targetPotion)
-    {
-        return Mathf.Abs(_currentPotion.xIndex - _targetPotion.xIndex) + Mathf.Abs(_currentPotion.yIndex - _targetPotion.yIndex) == 1;
-    }
-
-    private IEnumerator ProcessMatches(Potion _currentPotion, Potion _targetPotion)
-    {
-        yield return new WaitForSeconds(0.2f);
-
-        if (CheckBoard())
-        {
-            // Start a coroutine that is going to process our matches in our turn.
-            StartCoroutine(ProcessTurnOnMatchedBoard(true));
-        }
-        else
-        {
-            // ¸ÅÄªÀÌ ÀÏ¾î³ªÁö ¾ÊÀº °æ¿ì ´Ù½Ã ½º¿Ò
-            DoSwap(_currentPotion, _targetPotion);
-        }
-
-        isProcessingMove = false;
-    }
-
-    #endregion
 }
 
 
@@ -640,20 +714,20 @@ public class MatchResult
 }
 
 
-// Á·º¸ : 3¹è¿­, 4¹è¿­ Á÷¼±, 4¹è¿­ ³×¸ğ, 5¹è¿­ Á÷¼±, 5¹è¿­ LÀÚ (½Ã½ºÅÛ ±âÈ¹¼­ 27P)
+// ì¡±ë³´ : 3ë°°ì—´, 4ë°°ì—´ ì§ì„ , 4ë°°ì—´ ë„¤ëª¨, 5ë°°ì—´ ì§ì„ , 5ë°°ì—´ Lì (ì‹œìŠ¤í…œ ê¸°íšì„œ 27P)
 //        
-// 4¹è¿­ ³×¸ğ, 5¹è¿­ LÀÚ´Â ÅÍÁö´Â °æ¿ì°¡ ¾Æ´Ô
+// 4ë°°ì—´ ë„¤ëª¨, 5ë°°ì—´ LìëŠ” í„°ì§€ëŠ” ê²½ìš°ê°€ ì•„ë‹˜
 
-// TODO : 1. 4¹è¿­ Á÷¼±, 4¹è¿­ ³×¸ğ, 5¹è¿­ Á÷¼±, 5¹è¿­ LÀÚ Á·º¸ ¸¸µé¾î¾ß ÇÔ
-//        2. Super ·ÎÁ÷ º¯°æÇÏ¿© °¢°¢ ·ÎÁ÷ ¸¸µé¾î¾ß ÇÔ
-//        3. Æ¯¼ö ºí·° ·ÎÁ÷
+// TODO : 1. 4ë°°ì—´ ì§ì„ , 4ë°°ì—´ ë„¤ëª¨, 5ë°°ì—´ ì§ì„ , 5ë°°ì—´ Lì ì¡±ë³´ ë§Œë“¤ì–´ì•¼ í•¨
+//        2. Super ë¡œì§ ë³€ê²½í•˜ì—¬ ê°ê° ë¡œì§ ë§Œë“¤ì–´ì•¼ í•¨
+//        3. íŠ¹ìˆ˜ ë¸”ëŸ­ ë¡œì§
 
 public enum MatchDirection
 {
-    Vertical, // 3 ¼¼·Î
-    Horizontal, // 3 °¡·Î
-    LongVertical, // 4 ÀÌ»ó ¼¼·Î
-    LongHorizontal, // 4 ÀÌ»ó °¡·Î
-    Super, // °¡·Î ¼¼·Î ÇÕÃÄ¼­ ÀÛµ¿Áß
+    Vertical, // 3 ì„¸ë¡œ
+    Horizontal, // 3 ê°€ë¡œ
+    LongVertical, // 4 ì´ìƒ ì„¸ë¡œ
+    LongHorizontal, // 4 ì´ìƒ ê°€ë¡œ
+    Super, // ê°€ë¡œ ì„¸ë¡œ í•©ì³ì„œ ì‘ë™ì¤‘
     None
 }
