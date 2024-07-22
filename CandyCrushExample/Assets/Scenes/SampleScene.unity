@@ -1486,7 +1486,6 @@ MonoBehaviour:
   victoryPanel: {fileID: 392116405}
   losePanel: {fileID: 1214384969}
   goal: 30
-  moves: 10
   points: 0
   stageNumber: 1
   min: 0

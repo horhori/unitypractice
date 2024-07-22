@@ -99,6 +99,7 @@ public class Potion : MonoBehaviour
 // TODO : 1. 특수 블럭
 public enum PotionType
 {
+    // 기본 블럭
     BlueBlock,
     PurpleBlock,
     GreenBlock,
@@ -106,6 +107,12 @@ public enum PotionType
     PinkBlock,
     RedBlock,
     YellowBlock,
+    // 특수 블럭
+    Bomb, // 폭탄
+    DrillVertical, // 드릴 세로
+    DrillHorizontal, // 드릴 가로
+    Pick, // 곡괭이
+    Prism, // 프리즘
 }
 
 // 바구니 제작중...

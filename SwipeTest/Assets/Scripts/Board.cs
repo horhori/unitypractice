@@ -74,7 +74,7 @@ public class Board : MonoBehaviour
         // 세팅 시에 미리 매칭이 일어나지 않도록 하기 위함
         if (column > 1 && row > 1)
         {
-            if (allDots[column - 1, row].tag==piece.tag && allDots[column - 2, row].tag == piece.tag)
+            if (allDots[column - 1, row].tag == piece.tag && allDots[column - 2, row].tag == piece.tag)
             {
                 return true;
             }
@@ -114,9 +114,9 @@ public class Board : MonoBehaviour
         if (allDots[column, row].GetComponent<Dot>().isMatched)
         {
             findMatches.currentMatches.Remove(allDots[column, row]);
+            GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
             // Instantiate만 하면 unity에서 메모리 삭제하지 않아서 GameObject로 받아서 Destroy 필요
             // Destroy 2번째 매개 변수로 초를 주면 해당 시간 지나서 Destroy됨
-            GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
             Destroy(particle, .5f);
             Destroy(allDots[column, row]);
             allDots[column, row] = null;
@@ -175,7 +175,6 @@ public class Board : MonoBehaviour
                 if (allDots[i,j] == null)
                 {
                     // 생성되는 곳 y에 offSet만큼 더함
-                    // 
                     Vector2 tempPosition = new Vector2(i, j + offSet);
                     int dotToUse = Random.Range(0, dots.Length);
                     GameObject piece = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
@@ -218,7 +217,7 @@ public class Board : MonoBehaviour
             DestroyMatches();
         }
 
-        // 보드 채운 다음 pause 주고 mvoe 상태로 변경
+        // 보드 채운 다음 pause 주고 move 상태로 변경
         // // 모든 블럭이 다시 제자리로 돌아간 후(0.5초 기다린 후) move 상태로 변경
         yield return new WaitForSeconds(.5f);
         currentState = GameState.move;
