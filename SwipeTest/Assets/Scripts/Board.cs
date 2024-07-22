@@ -22,6 +22,7 @@ public class Board : MonoBehaviour
     public GameObject destroyEffect;
     private BackgroundTile[,] allTiles;
     public GameObject[,] allDots;
+    public Dot currentDot;
     private FindMatches findMatches;
 
 
@@ -108,12 +109,118 @@ public class Board : MonoBehaviour
         return false;
     }
 
+    private bool ColumnOrRow()
+    {
+        int numberHorizontal = 0, numberVertical = 0;
+        Dot firstPiece = findMatches.currentMatches[0].GetComponent<Dot>();
+
+        // 5 매칭 가로, 세로인지 확인 
+        // 카운트가 5인데 이상하게 되어있을 수 있어서
+        if(firstPiece != null)
+        {
+            foreach (GameObject currentPiece in findMatches.currentMatches)
+            {
+                Dot dot = currentPiece.GetComponent<Dot>();
+                if (dot.row == firstPiece.row) 
+                {
+                    numberHorizontal++;
+                }
+                if (dot.column == firstPiece.column)
+                {
+                    numberVertical++;
+                }
+            }
+        }
+
+        // 5 매칭 가로 세로면 true 반환 -> color bomb 생성
+        // false 반환(5 매칭 L or 5매칭 T)이면 adjacent 반환
+        return (numberVertical == 5 || numberHorizontal == 5);
+    }
+
+    private void CheckToMakeBombs()
+    {
+        if(findMatches.currentMatches.Count == 4 || findMatches.currentMatches.Count == 7)
+        {
+            findMatches.CheckBombs();
+        }
+        if(findMatches.currentMatches.Count == 5 || findMatches.currentMatches.Count == 8)
+        {
+            if(ColumnOrRow())
+            {
+                // Make a color bomb
+                // is the current dot matched?
+                if(currentDot != null)
+                {
+                    if(currentDot.isMatched)
+                    {
+                        if(!currentDot.isColorBomb)
+                        {
+                            currentDot.isMatched = false;
+                            currentDot.MakeColorBomb();
+                        }
+                    } else
+                    {
+                        if (currentDot.otherDot != null)
+                        {
+                            Dot otherDot = currentDot.otherDot.GetComponent<Dot>();
+                            if(otherDot.isMatched)
+                            {
+                                if(!otherDot.isColorBomb)
+                                {
+                                    otherDot.isMatched = false;
+                                    otherDot.MakeColorBomb();
+                                }
+                            }
+                        }
+                    }
+                }
+            } else
+            {
+                // Make a adjacent bomb
+                // is the current dot matched?
+                if (currentDot != null)
+                {
+                    if (currentDot.isMatched)
+                    {
+                        if (!currentDot.isAdjacentBomb)
+                        {
+                            currentDot.isMatched = false;
+                            currentDot.MakeAdjacentBomb();
+                        }
+                    }
+                    else
+                    {
+                        if (currentDot.otherDot != null)
+                        {
+                            Dot otherDot = currentDot.otherDot.GetComponent<Dot>();
+                            if (otherDot.isMatched)
+                            {
+                                if (!otherDot.isAdjacentBomb)
+                                {
+                                    otherDot.isMatched = false;
+                                    otherDot.MakeAdjacentBomb();
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
     // isMatched true로 체크된 Dot Destroy
     private void DestroyMatchesAt(int column, int row)
     {
         if (allDots[column, row].GetComponent<Dot>().isMatched)
         {
-            findMatches.currentMatches.Remove(allDots[column, row]);
+            // How many elements are in the matched pieces list from findmatches?
+            // 4매칭일때 폭탄(드릴) 생성
+            if (findMatches.currentMatches.Count >= 4)
+            {
+                CheckToMakeBombs();
+            }
+            
             GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
             // Instantiate만 하면 unity에서 메모리 삭제하지 않아서 GameObject로 받아서 Destroy 필요
             // Destroy 2번째 매개 변수로 초를 주면 해당 시간 지나서 Destroy됨
@@ -135,6 +242,7 @@ public class Board : MonoBehaviour
                 }
             }
         }
+        findMatches.currentMatches.Clear();
         StartCoroutine(DecreaseRowCo());
     }
 
@@ -178,6 +286,8 @@ public class Board : MonoBehaviour
                     Vector2 tempPosition = new Vector2(i, j + offSet);
                     int dotToUse = Random.Range(0, dots.Length);
                     GameObject piece = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
+                    //piece.name = "( " + i + ". " + j + " )";
+                    //piece.transform.parent = this.transform;
                     allDots[i, j] = piece;
                     piece.GetComponent<Dot>().row = j;
                     piece.GetComponent<Dot>().column = i;
@@ -216,7 +326,8 @@ public class Board : MonoBehaviour
             yield return new WaitForSeconds(.5f);
             DestroyMatches();
         }
-
+        findMatches.currentMatches.Clear();
+        currentDot = null;
         // 보드 채운 다음 pause 주고 move 상태로 변경
         // // 모든 블럭이 다시 제자리로 돌아간 후(0.5초 기다린 후) move 상태로 변경
         yield return new WaitForSeconds(.5f);

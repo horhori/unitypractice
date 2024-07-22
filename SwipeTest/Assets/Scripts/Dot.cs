@@ -16,21 +16,36 @@ public class Dot : MonoBehaviour
 
     private FindMatches findMatches;
     private Board board;
-    private GameObject otherDot;
+    public GameObject otherDot;
     private Vector2 firstTouchPosition;
     private Vector2 finalTouchPosition;
 
     private Vector2 tempPosition;
 
-    [SerializeField]
-    private float swipeAngle = 0;
-
+    [Header("Swipe stuff")]
+    public float swipeAngle = 0;
     // 쉽게 스와이프되는거 방지용
     public float swipeResist = 1f;
+
+    [Header("Powerup stuff")]
+    // 매칭 5 될때 한가지 색 다 지움
+    public bool isColorBomb;
+    public bool isColumnBomb;
+    public bool isRowBomb;
+    public bool isAdjacentBomb;
+    public GameObject rowArrow;
+    public GameObject columnArrow;
+    public GameObject colorBomb;
+    public GameObject adjacentMarker;
 
     // Start is called before the first frame update
     void Start()
     {
+        isColumnBomb = false;
+        isRowBomb = false;
+        isColorBomb = false;
+        isAdjacentBomb = false;
+
         board = FindObjectOfType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
         //targetX = (int)transform.position.x;
@@ -42,17 +57,29 @@ public class Dot : MonoBehaviour
         //previousColumn = column;
     }
 
+    // This is for testing and Debug only.
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            isAdjacentBomb = true;
+            GameObject color = Instantiate(adjacentMarker, transform.position, Quaternion.identity);
+            color.transform.parent = this.transform;
+
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        //FindMatches();
 
         // 색깔 검정으로 바뀌는건 isMatched 되서임
-        if (isMatched)
-        {
-            SpriteRenderer mySprite = GetComponent<SpriteRenderer>();
-            mySprite.color = new Color(0f, 0f, 0f, .2f);
-        }
+        //if (isMatched)
+        //{
+        //    SpriteRenderer mySprite = GetComponent<SpriteRenderer>();
+        //    Color currentColor = mySprite.color;
+        //    mySprite.color = new Color(currentColor.r, currentColor.g, currentColor.b, .5f);
+        //}
 
         targetX = column;
         targetY = row;
@@ -101,6 +128,19 @@ public class Dot : MonoBehaviour
     // 코루틴 사용해서 매칭 안되는 경우 제자리로
     public IEnumerator CheckMoveCo()
     {
+        // 폭탄인지 체크
+        if (isColorBomb)
+        {
+            // This piece is a color bomb, and the other piece is the color to destroy
+            findMatches.MatchPiecesOfColor(otherDot.tag);
+            isMatched = true;
+        } else if(otherDot.GetComponent<Dot>().isColorBomb)
+        {
+            // The other piece is a color bomb, and this piece has the color to destroy
+            findMatches.MatchPiecesOfColor(this.gameObject.tag);
+            otherDot.GetComponent<Dot>().isMatched = true;
+        }
+
         yield return new WaitForSeconds(.5f);
 
         if (otherDot != null)
@@ -114,6 +154,7 @@ public class Dot : MonoBehaviour
                 column = previousColumn;
                 // 모든 블럭이 다시 제자리로 돌아간 후(0.5초 기다린 후) move 상태로 변경
                 yield return new WaitForSeconds(.5f);
+                board.currentDot = null;
                 board.currentState = GameState.move;
             }
             else
@@ -121,7 +162,7 @@ public class Dot : MonoBehaviour
             {
                 board.DestroyMatches();
             }
-            otherDot = null;
+            //otherDot = null;
         } 
           
     } 
@@ -161,9 +202,11 @@ public class Dot : MonoBehaviour
             MovePieces();
 
             board.currentState = GameState.wait;
+            board.currentDot = this;
         } else
         {
             board.currentState = GameState.move;
+
         }
 
 
@@ -211,43 +254,35 @@ public class Dot : MonoBehaviour
         StartCoroutine(CheckMoveCo());
     }
 
-    // 여기서 Dot들을 isMatched true로 바꿈
-    // tag를 바꾸지 않아서 에러나는듯 함
-    // 가운데 기준으로 좌우, 위아래 tag가 같으면 셋 다 true로 바꿈
-    /// FindMatches 게임오브젝트 따로 생성하여 거기서 한번에 매칭 체크함
 
-    //void FindMatches()
-    //{
-    //    if (column > 0 && column < board.width - 1)
-    //    {
-    //        GameObject leftDot1 = board.allDots[column - 1, row];
-    //        GameObject rightDot1 = board.allDots[column + 1, row];
-    //        if(leftDot1 != null &&  rightDot1 != null)
-    //        {
-    //            if (leftDot1.tag == this.gameObject.tag && rightDot1.tag == this.gameObject.tag)
-    //            {
-    //                leftDot1.GetComponent<Dot>().isMatched = true;
-    //                rightDot1.GetComponent<Dot>().isMatched = true;
-    //                isMatched = true;
-    //            }
-    //        }
 
-    //    }
+    public void MakeRowBomb()
+    {
+        isRowBomb = true;
+        GameObject arrow = Instantiate(rowArrow, transform.position, Quaternion.identity);
+        arrow.transform.parent = this.transform;
+    }
 
-    //    if (row > 0 && row < board.height - 1)
-    //    {
-    //        GameObject upDot1 = board.allDots[column, row + 1];
-    //        GameObject downDot1 = board.allDots[column, row - 1];
-    //        if (upDot1 != null && downDot1 != null)
-    //        {
-    //            if (upDot1.tag == this.gameObject.tag && downDot1.tag == this.gameObject.tag)
-    //            {
-    //                upDot1.GetComponent<Dot>().isMatched = true;
-    //                downDot1.GetComponent<Dot>().isMatched = true;
-    //                isMatched = true;
-    //            }
-    //        }
+    public void MakeColumnBomb()
+    {
+        isColumnBomb = true;
+        GameObject arrow = Instantiate(columnArrow, transform.position, Quaternion.identity);
+        arrow.transform.parent = this.transform;
+    }
 
-    //    }
-    //}
+    public void MakeColorBomb()
+    {
+        isColorBomb = true;
+        GameObject color = Instantiate(colorBomb, transform.position, Quaternion.identity);
+        color.transform.parent = this.transform;
+    }
+
+    public void MakeAdjacentBomb()
+    {
+        isAdjacentBomb = true;
+        GameObject marker = Instantiate(adjacentMarker, transform.position, Quaternion.identity);
+        marker.transform.parent = this.transform;
+    }
+
+
 }

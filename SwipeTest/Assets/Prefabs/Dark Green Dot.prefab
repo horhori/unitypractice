@@ -105,8 +105,17 @@ MonoBehaviour:
   targetX: 0
   targetY: 0
   isMatched: 0
+  otherDot: {fileID: 0}
   swipeAngle: 0
   swipeResist: 1
+  isColorBomb: 0
+  isColumnBomb: 0
+  isRowBomb: 0
+  isAdjacentBomb: 0
+  rowArrow: {fileID: 2430682998792144668, guid: b1e8f43fd7688634ebd98b61b08fb267, type: 3}
+  columnArrow: {fileID: 5815976646608954941, guid: e158bd5444f7172438fa77a118d0c6cb, type: 3}
+  colorBomb: {fileID: 8262426371096988080, guid: b19c5a75a87c9224cb53d72c53226b41, type: 3}
+  adjacentMarker: {fileID: 2145352538377165508, guid: f6319a023590c034396e7fa8f6cf4485, type: 3}
 --- !u!58 &-453160181138459260
 CircleCollider2D:
   m_ObjectHideFlags: 0
