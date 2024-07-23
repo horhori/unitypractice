@@ -14,11 +14,9 @@ public class FindMatches : MonoBehaviour
     // 매칭 체크된 Dot들을 리스트에 저장하기 위한
     public List<GameObject> currentMatches = new List<GameObject>();
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         board = FindObjectOfType<Board>();
-
     }
 
     public void FindAllMatches()

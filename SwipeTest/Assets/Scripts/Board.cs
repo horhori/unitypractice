@@ -25,11 +25,14 @@ public class Board : MonoBehaviour
     public Dot currentDot;
     private FindMatches findMatches;
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         findMatches = FindObjectOfType<FindMatches>();
+        Debug.Log(findMatches);
+    }
+
+    private void Start()
+    {
         allTiles = new BackgroundTile[width, height];
         allDots = new GameObject[width, height];
         SetUp();
@@ -55,7 +58,6 @@ public class Board : MonoBehaviour
                 {
                     dotToUse = Random.Range(0, dots.Length);
                 }
-                maxIterations = 0;
 
                 GameObject dot = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
                 dot.GetComponent<Dot>().row = j;
