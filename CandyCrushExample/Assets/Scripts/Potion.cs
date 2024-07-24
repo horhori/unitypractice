@@ -113,6 +113,7 @@ public enum PotionType
     DrillHorizontal, // 드릴 가로
     Pick, // 곡괭이
     Prism, // 프리즘
+    
 }
 
 // 바구니 제작중...

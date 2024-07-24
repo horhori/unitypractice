@@ -96,7 +96,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: aece116c62e248d43857199e5d5db8aa, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -935,6 +935,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04c34e3bcef9fe349913cf8fa48dcc98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  potionsToRemove: []
+  isCheckedHorizontal_4: 0
+  isCheckedVertical_4: 0
+  isCheckedSquare: 0
+  isCheckedMatched_5: 0
+  isCheckedSuper: 0
 --- !u!4 &911737944
 Transform:
   m_ObjectHideFlags: 0
@@ -1744,12 +1750,23 @@ MonoBehaviour:
   - {fileID: 8510273532980300452, guid: fef306e7c9ff2564a9b6cb9f2e92388f, type: 3}
   - {fileID: 8424117927359534880, guid: 4ffb1b7789493ba47b13912e4e303c6a, type: 3}
   - {fileID: 5316080088508569776, guid: b489eb3544b5f7a429cdce12b24351d6, type: 3}
+  - {fileID: 8013583354852745770, guid: b9f12af6a5cfc2e4ca2e2c57981bd535, type: 3}
+  - {fileID: 5192727067900508847, guid: 92783e9139a50404bbee350c8bf7300a, type: 3}
+  - {fileID: 6374337627133068288, guid: 6be8c92bcb4d6734598a32b66084fa6d, type: 3}
+  - {fileID: 24305634971114452, guid: a2dbfb218d414834bba94ea69c888b28, type: 3}
+  - {fileID: 5038854057198368486, guid: b2343b8d2c2e73e45a581a1084bc34e8, type: 3}
+  normalBlockLength: 5
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
-  potionsToRemove: []
   potionParent: {fileID: 894325663}
   selectedPotion: {fileID: 0}
   targetedPotion: {fileID: 0}
+  isProcessingMove: 0
+  drillHorizontalBlock: {fileID: 6374337627133068288, guid: 6be8c92bcb4d6734598a32b66084fa6d, type: 3}
+  drillVerticalBlock: {fileID: 5192727067900508847, guid: 92783e9139a50404bbee350c8bf7300a, type: 3}
+  pickBlock: {fileID: 0}
+  prismBlock: {fileID: 0}
+  bombBlock: {fileID: 8013583354852745770, guid: b9f12af6a5cfc2e4ca2e2c57981bd535, type: 3}
   arrayLayout:
     rows:
     - row: 00000000000000

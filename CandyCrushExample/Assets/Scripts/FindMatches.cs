@@ -10,8 +10,17 @@ public class FindMatches : MonoBehaviour
     // 지워지는 블럭 여기에 저장해서 제거
     public List<Potion> potionsToRemove = new();
 
+    // 특수블럭 생성 여부
+    // 4 가로 체크 후 드릴(가로) 생성
+    public bool isCheckedHorizontal_4 = false;
+    // 4 세로 체크 후 드릴(가로) 생성
+    public bool isCheckedVertical_4 = false;
     // 네모 체크 후 곡괭이 생성
-    private bool isCheckedSquare { get; set; } = false;
+    public bool isCheckedSquare = false;
+    // 5 가로, 세로 체크 후 프리즘 생성
+    public bool isCheckedMatched_5 = false;
+    // 5 L자 체크 후 폭탄 생성
+    public bool isCheckedSuper = false;
 
 
     void Awake()
@@ -61,7 +70,7 @@ public class FindMatches : MonoBehaviour
                         if (isCheckedSquare)
                         {
                             Debug.Log("네모 체크됨, 곡괭이 추가");
-                            board.axe++;
+                            //board.pick++;
                             isCheckedSquare = false;
                         }
 
@@ -205,6 +214,7 @@ public class FindMatches : MonoBehaviour
         else if (connectedPotions.Count == 4)
         {
             //Debug.Log("I have a horizontal_4 match, the color of my match is : " + connectedPotions[0].potionType);
+            isCheckedHorizontal_4 = true;
 
             return new MatchResult
             {
@@ -216,6 +226,7 @@ public class FindMatches : MonoBehaviour
         else if (connectedPotions.Count >= 5)
         {
             //Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
+            isCheckedMatched_5 = true;
 
             return new MatchResult
             {
@@ -255,6 +266,7 @@ public class FindMatches : MonoBehaviour
         else if (connectedPotions.Count == 4)
         {
             //Debug.Log("I have a Vertical_4 match, the color of my match is : " + connectedPotions[0].potionType);
+            isCheckedVertical_4 = true;
 
             return new MatchResult
             {
@@ -266,6 +278,7 @@ public class FindMatches : MonoBehaviour
         else if (connectedPotions.Count >= 5)
         {
             //Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+            isCheckedMatched_5 = true;
 
             return new MatchResult
             {

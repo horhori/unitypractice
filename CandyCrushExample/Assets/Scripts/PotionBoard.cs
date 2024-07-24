@@ -13,8 +13,10 @@ public class PotionBoard : MonoBehaviour
     // X축, Y축 간격
     public float spacingX;
     public float spacingY;
-    // 블럭 목록
+    // 일반 블럭 목록
     public GameObject[] potionPrefabs;
+    // 일반 블럭 갯수
+    public int normalBlockLength = 7;
     // 블럭보드
     public Node[,] potionBoard;
     public GameObject potionBoardGO;
@@ -37,17 +39,24 @@ public class PotionBoard : MonoBehaviour
     private Potion targetedPotion;
 
     [SerializeField]
-    private bool isProcessingMove { get; set; }
+    private bool isProcessingMove;
+
+    public GameObject drillHorizontalBlock;
+    public GameObject drillVerticalBlock;
+    public GameObject pickBlock;
+    public GameObject prismBlock;
+    public GameObject bombBlock;
+
 
     // 추가해야 할 곡괭이 수
-    public int axe { get; set; } = 0;
+    //public int pick;
 
     // Unity 상에서 쉽게 특정 위치 안 나오게 
     public ArrayLayout arrayLayout;
     // static Instance
     public static PotionBoard Instance;
 
-    // 매칭 로직 다른데로 옮기는중
+    // 매칭 로직 담당
     public FindMatches findMatches;
 
     private void Awake()
@@ -59,6 +68,12 @@ public class PotionBoard : MonoBehaviour
     void Start()
     {
         InitializeBoard();
+        // 초기 생성 때 매칭 로직에서 나중에 할거랑 겹쳐서 임시로 처리
+        findMatches.isCheckedVertical_4 = false;
+        findMatches.isCheckedHorizontal_4 = false;
+        findMatches.isCheckedSquare = false;
+        findMatches.isCheckedSuper = false;
+        findMatches.isCheckedMatched_5 = false;
     }
 
     private void Update()
@@ -73,6 +88,119 @@ public class PotionBoard : MonoBehaviour
             Swipe();
         }
     }
+
+    #region Setup
+
+    // 보드 생성
+    // width, height 값에 따라 보드 판 생성.
+    // 각 보드 자리마다 Node를 가지고 있음
+    // Node는 사용가능한 자리인지(isUsable), 사용 가능하면 해당 자리에 기물(Potion->Block)을 가짐
+    // 랜덤하게 생성 후 매치되는 경우에는 다시 생성됨
+    // TODO : 1. 처음 보드 생성될 때 특정 갯수(7*14, 7*21...) 생성
+    void InitializeBoard()
+    {
+        DestroyPotions();
+
+        potionBoard = new Node[width, height];
+
+        spacingX = (float)(width - 1) / 2;
+        spacingY = (float)(height - 1) / 2;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // 블럭 보드 부모 위치를 반영하여 블럭 생성
+                Vector2 position = new Vector2(x - spacingX, y - spacingY);
+                if (arrayLayout.rows[y].row[x])
+                {
+                    potionBoard[x, y] = new Node(false, null);
+                }
+                else
+                {
+                    // 재료 등급 조정
+                    int randomIndex = Random.Range(0, normalBlockLength);
+
+                    GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
+                    potion.transform.SetParent(potionParent.transform);
+                    potion.transform.name = "[" + x + ", " + y + "]" + potion.name;
+
+                    potion.GetComponent<Potion>().SetIndicies(x, y);
+                    potionBoard[x, y] = new Node(true, potion);
+                    potionsToDestroy.Add(potion);
+                }
+            }
+        }
+
+        if (CheckInitializeBoard())
+        {
+            InitializeBoard();
+        }
+    }
+
+    private void DestroyPotions()
+    {
+        if (potionsToDestroy != null)
+        {
+            foreach (GameObject potion in potionsToDestroy)
+            {
+                Destroy(potion);
+            }
+            potionsToDestroy.Clear();
+        }
+    }
+
+    // InitailizeBoard()에서 사용하는 최초 매칭 확인하여 초기화하는 메서드
+    public bool CheckInitializeBoard()
+    {
+        bool hasMatched = false;
+
+        foreach (Node nodePotion in potionBoard)
+        {
+            if (nodePotion.potion != null)
+            {
+                nodePotion.potion.GetComponent<Potion>().isMatched = false;
+            }
+        }
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                // checking if potion node is usable
+                if (potionBoard[x, y].isUsable)
+                {
+                    // then proceed to get potion class in node.
+                    Potion potion = potionBoard[x, y].potion.GetComponent<Potion>();
+
+                    // ensure its not matched
+                    if (!potion.isMatched)
+                    {
+                        // run some matching logic
+
+                        MatchResult matchedPotions = findMatches.IsConnected(potion);
+
+                        //if (isCheckedSquare)
+                        //{
+                        //    Debug.Log("네모 체크됨");
+                        //    Debug.Log("곡괭이 추가");
+                        //    axe++;
+                        //    isCheckedSquare = false;
+                        //}
+
+                        if (matchedPotions.connectedPotions.Count >= 3)
+                        {
+                            hasMatched = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return hasMatched;
+    }
+
+    #endregion
 
     #region Swapping Potions
 
@@ -238,119 +366,6 @@ public class PotionBoard : MonoBehaviour
 
     #endregion
 
-    #region Setup
-
-    // 보드 생성
-    // width, height 값에 따라 보드 판 생성.
-    // 각 보드 자리마다 Node를 가지고 있음
-    // Node는 사용가능한 자리인지(isUsable), 사용 가능하면 해당 자리에 기물(Potion->Block)을 가짐
-    // 랜덤하게 생성 후 매치되는 경우에는 다시 생성됨
-    // TODO : 1. 처음 보드 생성될 때 특정 갯수(7*14, 7*21...) 생성
-    void InitializeBoard()
-    {
-        DestroyPotions();
-
-        potionBoard = new Node[width, height];
-
-        spacingX = (float)(width - 1) / 2;
-        spacingY = (float)(height - 1) / 2;
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                // 블럭 보드 부모 위치를 반영하여 블럭 생성
-                Vector2 position = new Vector2(x - spacingX, y - spacingY);
-                if (arrayLayout.rows[y].row[x])
-                {
-                    potionBoard[x, y] = new Node(false, null);
-                }
-                else
-                {
-                    // 재료 등급 조정
-                    int randomIndex = Random.Range(0, potionPrefabs.Length);
-
-                    GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
-                    potion.transform.SetParent(potionParent.transform);
-                    potion.transform.name = "[" + x + ", " + y + "]" + potion.name;
-
-                    potion.GetComponent<Potion>().SetIndicies(x, y);
-                    potionBoard[x, y] = new Node(true, potion);
-                    potionsToDestroy.Add(potion);
-                }
-            }
-        }
-
-        if (CheckInitializeBoard())
-        {
-            InitializeBoard();
-        }
-    }
-
-    private void DestroyPotions()
-    {
-        if (potionsToDestroy != null)
-        {
-            foreach (GameObject potion in potionsToDestroy)
-            {
-                Destroy(potion);
-            }
-            potionsToDestroy.Clear();
-        }
-    }
-
-    // InitailizeBoard()에서 사용하는 최초 매칭 확인하여 초기화하는 메서드
-    public bool CheckInitializeBoard()
-    {
-        bool hasMatched = false;
-
-        foreach (Node nodePotion in potionBoard)
-        {
-            if (nodePotion.potion != null)
-            {
-                nodePotion.potion.GetComponent<Potion>().isMatched = false;
-            }
-        }
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                // checking if potion node is usable
-                if (potionBoard[x, y].isUsable)
-                {
-                    // then proceed to get potion class in node.
-                    Potion potion = potionBoard[x, y].potion.GetComponent<Potion>();
-
-                    // ensure its not matched
-                    if (!potion.isMatched)
-                    {
-                        // run some matching logic
-
-                        MatchResult matchedPotions = findMatches.IsConnected(potion);
-
-                        //if (isCheckedSquare)
-                        //{
-                        //    Debug.Log("네모 체크됨");
-                        //    Debug.Log("곡괭이 추가");
-                        //    axe++;
-                        //    isCheckedSquare = false;
-                        //}
-
-                        if (matchedPotions.connectedPotions.Count >= 3)
-                        {
-                            hasMatched = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return hasMatched;
-    }
-
-    #endregion
-
     #region Cascading Potions
 
     public IEnumerator ProcessTurnOnMatchedBoard(bool _subtractMoves)
@@ -390,8 +405,6 @@ public class PotionBoard : MonoBehaviour
             potionBoard[_xIndex, _yIndex] = new Node(true, null);
         }
 
-        // 블럭 생성
-        // TODO : 1. 예약된 특수 블럭 우선 생성
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -457,14 +470,28 @@ public class PotionBoard : MonoBehaviour
     private void SpawnPotionAtTop(int x)
     {
         int index = FindIndexOfLowestNull(x);
+        
         int locationToMoveTo = height - index;
         //Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
-        // get a random potion
-        int randomIndex = Random.Range(0, potionPrefabs.Length);
+
         Vector2 position = new Vector2(x - spacingX, height - spacingY);
 
+        int makeBlockTypeIndex;
+
         // TODO : 1. 특수블럭 생성되어야 할 경우 우선 생성
-        GameObject newPotion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
+        PotionType potionType = MakeSpecialBlock();
+        // 일반 블럭인 경우
+        if (potionType == PotionType.BlueBlock)
+        {
+            // get a random potion
+            // 일반 블럭 인덱스 0~6까지
+            makeBlockTypeIndex = Random.Range(0, normalBlockLength);
+        } else
+        {
+            Debug.Log((int)potionType);
+            makeBlockTypeIndex = (int)potionType;
+        }
+        GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
         newPotion.transform.SetParent(potionParent.transform);
 
         // set indicies
@@ -491,6 +518,71 @@ public class PotionBoard : MonoBehaviour
     }
 
     #endregion
+    
+    // FindMatches가 가지고 있는 특수 블록 생성 여부에 따라서 해당 블럭 우선 생성
+    private PotionType MakeSpecialBlock()
+    {
+        if (findMatches.isCheckedHorizontal_4)
+        {
+            return MakeDrillHorizontal();
+        }
+        else if (findMatches.isCheckedVertical_4)
+        {
+            return MakeDrillVertical();
+        }
+        else if (findMatches.isCheckedSquare)
+        {
+            return MakePick();
+        }
+        else if (findMatches.isCheckedMatched_5)
+        {
+            return MakePrism();
+        }
+        else if (findMatches.isCheckedSuper)
+        {
+            return MakeBomb();
+        }
+
+        // 일반 블럭인 경우 blueblock 타입으로 반환
+        return PotionType.BlueBlock;
+    }
+
+    private PotionType MakeDrillHorizontal()
+    {
+        Debug.Log("가로 드릴 생성");
+        findMatches.isCheckedHorizontal_4 = false;
+        return PotionType.DrillHorizontal;
+    }
+
+    private PotionType MakeDrillVertical()
+    {
+        Debug.Log("세로 드릴 생성");
+        findMatches.isCheckedVertical_4 = false;
+        return PotionType.DrillVertical;
+    }
+
+    private PotionType MakePick()
+    {
+        Debug.Log("곡괭이 생성");
+        findMatches.isCheckedSquare = false;
+        return PotionType.Pick;
+    }
+
+    private PotionType MakePrism()
+    {
+        Debug.Log("프리즘 생성");
+        findMatches.isCheckedMatched_5 = false;
+        return PotionType.Prism;
+    }
+
+    private PotionType MakeBomb()
+    {
+        Debug.Log("폭탄 생성");
+        findMatches.isCheckedSuper = false;
+        return PotionType.Bomb;
+    }
+
+
 }
 
 public class MatchResult
