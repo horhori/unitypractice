@@ -1755,7 +1755,7 @@ MonoBehaviour:
   - {fileID: 6374337627133068288, guid: 6be8c92bcb4d6734598a32b66084fa6d, type: 3}
   - {fileID: 24305634971114452, guid: a2dbfb218d414834bba94ea69c888b28, type: 3}
   - {fileID: 5038854057198368486, guid: b2343b8d2c2e73e45a581a1084bc34e8, type: 3}
-  normalBlockLength: 5
+  normalBlockLength: 7
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
   potionParent: {fileID: 894325663}

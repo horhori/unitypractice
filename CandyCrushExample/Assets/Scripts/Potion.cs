@@ -24,6 +24,7 @@ public class Potion : MonoBehaviour
     private Vector2 currentPos; // firstTouchPosition
     private Vector2 targetPos; // finalTouchPosition
     public float swipeAngle = 0;
+    public float swipeResist = 1f;
 
     public bool isMoving;
 
@@ -58,7 +59,11 @@ public class Potion : MonoBehaviour
 
     void CalculateAngle()
     {
-        swipeAngle = Mathf.Atan2(targetPos.y - currentPos.y, targetPos.x - currentPos.x) * 180 / Mathf.PI;
+        // swipeResist 이상의 입력을 했을 때만 적용
+        if (Mathf.Abs(targetPos.y - currentPos.y) > swipeResist || Mathf.Abs(targetPos.x - currentPos.x) > swipeResist)
+        {
+            swipeAngle = Mathf.Atan2(targetPos.y - currentPos.y, targetPos.x - currentPos.x) * 180 / Mathf.PI;
+        }
     }
 
     public void MoveToTarget(Vector2 _targetPos)
@@ -120,5 +125,4 @@ public enum PotionType
 public struct Bag
 {
     public PotionType potionType;
-
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 
@@ -67,12 +68,12 @@ public class FindMatches : MonoBehaviour
 
                         MatchResult matchedPotions = IsConnected(potion);
 
-                        if (isCheckedSquare)
-                        {
-                            Debug.Log("³×¸ð Ã¼Å©µÊ, °î±ªÀÌ Ãß°¡");
-                            //board.pick++;
-                            isCheckedSquare = false;
-                        }
+                        //if (isCheckedSquare)
+                        //{
+                        //    Debug.Log("³×¸ð Ã¼Å©µÊ, °î±ªÀÌ Ãß°¡");
+                        //    //board.pick++;
+                        //    isCheckedSquare = false;
+                        //}
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {
@@ -427,4 +428,47 @@ public class FindMatches : MonoBehaviour
 
         }
     }
+
+    // µå¸±(¼¼·Î) ±â´É
+    List<Potion> GetColumnPieces(int column)
+    {
+        List<Potion> blocks = new List<Potion>();
+
+        for (int i = 0; i < board.height; i++)
+        {
+            if (board.potionBoard[column, i].isUsable)
+            {
+                Potion potion = board.potionBoard[column, i].potion.GetComponent<Potion>();
+                if (!potion.isMatched)
+                {
+                    blocks.Add(board.potionBoard[column, i].potion.GetComponent<Potion>());
+                }
+            }
+        }
+
+        return blocks;
+    }
+
+
+    // µå¸±(°¡·Î) ±â´É
+    List<Potion> GetRowPieces(int row)
+    {
+        List<Potion> blocks = new List<Potion>();
+        
+        for (int i=0; i<board.width; i++)
+        {
+            if (board.potionBoard[i, row].isUsable)
+            {
+                Potion potion = board.potionBoard[i, row].potion.GetComponent<Potion>();
+                if (!potion.isMatched)
+                {
+                    blocks.Add(board.potionBoard[i, row].potion.GetComponent<Potion>());
+                }
+            }
+        }
+
+        return blocks;
+    }
+
+
 }

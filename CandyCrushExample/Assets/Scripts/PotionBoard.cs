@@ -85,7 +85,8 @@ public class PotionBoard : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) && selectedPotion)
         {
-            Swipe();
+            // 입력값(각도)을 계산하여 Run
+            RunInput();
         }
     }
 
@@ -178,15 +179,8 @@ public class PotionBoard : MonoBehaviour
                     {
                         // run some matching logic
 
+                        // TODO : 1. 초기 생성 IsConnected랑 게임 도중이랑 분리 필요 -> 폭탄 때문에
                         MatchResult matchedPotions = findMatches.IsConnected(potion);
-
-                        //if (isCheckedSquare)
-                        //{
-                        //    Debug.Log("네모 체크됨");
-                        //    Debug.Log("곡괭이 추가");
-                        //    axe++;
-                        //    isCheckedSquare = false;
-                        //}
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {
@@ -225,7 +219,11 @@ public class PotionBoard : MonoBehaviour
     }
 
     // Update에서 마우스 클릭 뗐을 때 각도 계산하여 해당 위치 블럭과 스왑 진행 후 선택한 블럭 해제
-    private void Swipe()
+    // TODO : 1. 클릭만 했을 때(스와이프 X) Potion이 갖고 있는 swipeAngle을 어떻게 처리할지
+    //          -> 처음에 swipeAngle이 0이라서 오른쪽으로 스와이프됨. 0인 경우 처리하기
+    //      : 2. swipe 처리 후 swipeAngle 초기화 필요 -> 0으로 하고 0인 경우에는 클릭된 것으로 하는게 좋을 거 같긴 함
+    //          -> 아니면 초기값을 45도(거의 조작이 안일어날 확률이 높은 값)로 하는게 좋을지?
+    private void RunInput()
     {
         float swipeAngle = selectedPotion.swipeAngle;
         int originX = selectedPotion.xIndex;
@@ -282,6 +280,7 @@ public class PotionBoard : MonoBehaviour
         }
 
         selectedPotion = null;
+        targetedPotion = null;
     }
 
     // 벽에 부딫히는 경우
@@ -488,7 +487,6 @@ public class PotionBoard : MonoBehaviour
             makeBlockTypeIndex = Random.Range(0, normalBlockLength);
         } else
         {
-            Debug.Log((int)potionType);
             makeBlockTypeIndex = (int)potionType;
         }
         GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
@@ -561,6 +559,7 @@ public class PotionBoard : MonoBehaviour
         return PotionType.DrillVertical;
     }
 
+    // 곡괭이 생성 위치는 논의
     private PotionType MakePick()
     {
         Debug.Log("곡괭이 생성");
