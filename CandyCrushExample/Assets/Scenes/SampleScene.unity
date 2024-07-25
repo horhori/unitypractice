@@ -1535,7 +1535,7 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1756802270}
   victoryPanel: {fileID: 392116405}
   losePanel: {fileID: 1214384969}
-  goal: 30
+  goal: 100
   points: 0
   stageNumber: 1
   min: 0
@@ -1762,11 +1762,6 @@ MonoBehaviour:
   selectedPotion: {fileID: 0}
   targetedPotion: {fileID: 0}
   isProcessingMove: 0
-  drillHorizontalBlock: {fileID: 6374337627133068288, guid: 6be8c92bcb4d6734598a32b66084fa6d, type: 3}
-  drillVerticalBlock: {fileID: 5192727067900508847, guid: 92783e9139a50404bbee350c8bf7300a, type: 3}
-  pickBlock: {fileID: 0}
-  prismBlock: {fileID: 0}
-  bombBlock: {fileID: 8013583354852745770, guid: b9f12af6a5cfc2e4ca2e2c57981bd535, type: 3}
   arrayLayout:
     rows:
     - row: 00000000000000

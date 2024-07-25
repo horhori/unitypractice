@@ -28,10 +28,18 @@ public class Potion : MonoBehaviour
 
     public bool isMoving;
 
+    // 특수블럭 체크
+    //public bool isBomb;
+    //public bool isDrillVertical;
+    //public bool isDrillVertical;
+    //public bool isDrillVertical;  
+    //public bool isDrillVertical;
+
     public Potion(int _x, int _y)
     {
         xIndex = _x;
         yIndex = _y;
+        isMoving = false;
     }
 
     public void SetIndicies(int _x, int _y)
@@ -105,11 +113,11 @@ public class Potion : MonoBehaviour
 public enum PotionType
 {
     // 기본 블럭
-    BlueBlock,
-    PurpleBlock,
+    BlueBlock,  
     GreenBlock,
     OrangeBlock,
     PinkBlock,
+    PurpleBlock,
     RedBlock,
     YellowBlock,
     // 특수 블럭

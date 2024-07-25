@@ -32,20 +32,17 @@ public class PotionBoard : MonoBehaviour
 
     // unity 상에서 선택된 블럭 확인할 수 있게 SerializeField(직렬화) 사용
     // SerializeField : private이여도 unity에서 확인할 수 있음
-    [SerializeField]
-    private Potion selectedPotion;
-
-    [SerializeField]
-    private Potion targetedPotion;
+    public Potion selectedPotion;
+    public Potion targetedPotion;
 
     [SerializeField]
     private bool isProcessingMove;
 
-    public GameObject drillHorizontalBlock;
-    public GameObject drillVerticalBlock;
-    public GameObject pickBlock;
-    public GameObject prismBlock;
-    public GameObject bombBlock;
+    //public GameObject drillHorizontalBlock;
+    //public GameObject drillVerticalBlock;
+    //public GameObject pickBlock;
+    //public GameObject prismBlock;
+    //public GameObject bombBlock;
 
 
     // 추가해야 할 곡괭이 수
@@ -125,6 +122,7 @@ public class PotionBoard : MonoBehaviour
                     GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
                     potion.transform.SetParent(potionParent.transform);
                     potion.transform.name = "[" + x + ", " + y + "]" + potion.name;
+                    potion.GetComponent<Potion>().potionType = (PotionType)randomIndex;
 
                     potion.GetComponent<Potion>().SetIndicies(x, y);
                     potionBoard[x, y] = new Node(true, potion);
@@ -254,58 +252,62 @@ public class PotionBoard : MonoBehaviour
             SwapPotion(selectedPotion, targetedPotion);
         }
         // 벽에 부딫히는 경우
-        else if (swipeAngle > -45 && swipeAngle <= 45 && originX == width - 1)
-        {
-            // 오른쪽
-            Vector3 tempDirection = new Vector3(1, 0);
-            BounceEdge(selectedPotion, tempDirection);
-        }
-        else if (swipeAngle > 45 && swipeAngle <= 135 && originY == height - 1)
-        {
-            // 위쪽
-            Vector3 tempDirection = new Vector3(0, 1);
-            BounceEdge(selectedPotion, tempDirection);
-        }
-        else if ((swipeAngle > 135 || swipeAngle <= -135) && originX == 0)
-        {
-            // 왼쪽
-            Vector3 tempDirection = new Vector3(-1, 0);
-            BounceEdge(selectedPotion, tempDirection);
-        }
-        else if (swipeAngle < -45 && swipeAngle >= -135 && originY == 0)
-        {
-            // 아래쪽
-            Vector3 tempDirection = new Vector3(0, -1);
-            BounceEdge(selectedPotion, tempDirection);
-        }
+        //else if (swipeAngle > -45 && swipeAngle <= 45 && originX == width - 1)
+        //{
+        //    // 오른쪽
+        //    Vector3 tempDirection = new Vector3(1, 0);
+        //    BounceEdge(selectedPotion, tempDirection);
+        //}
+        //else if (swipeAngle > 45 && swipeAngle <= 135 && originY == height - 1)
+        //{
+        //    // 위쪽
+        //    Vector3 tempDirection = new Vector3(0, 1);
+        //    BounceEdge(selectedPotion, tempDirection);
+        //}
+        //else if ((swipeAngle > 135 || swipeAngle <= -135) && originX == 0)
+        //{
+        //    // 왼쪽
+        //    Vector3 tempDirection = new Vector3(-1, 0);
+        //    BounceEdge(selectedPotion, tempDirection);
+        //}
+        //else if (swipeAngle < -45 && swipeAngle >= -135 && originY == 0)
+        //{
+        //    // 아래쪽
+        //    Vector3 tempDirection = new Vector3(0, -1);
+        //    BounceEdge(selectedPotion, tempDirection);
+        //}
 
-        selectedPotion = null;
-        targetedPotion = null;
+        //selectedPotion = null;
+        //targetedPotion = null;
+
+        //// 특수블럭 체크때문에 여기에서 특수블럭 체크 후 선택, 타켓 블럭 해제 넣음
+        //board.selectedPotion = null;
+        //board.targetedPotion = null;
     }
 
     // 벽에 부딫히는 경우
     // TODO : 1. 벽에 부딫히는 경우 튕겨 돌아와야 함
     //           -> 240718 부분 완료. 부딫혔을 때 속도, 거리 조절 필요
-    private void BounceEdge(Potion _currentPotion, Vector3 _targetDirection)
-    {
-        Vector2 originPosition = _currentPotion.transform.position;
-        Vector2 targetPosition = _currentPotion.transform.position + _targetDirection;
+    //private void BounceEdge(Potion _currentPotion, Vector3 _targetDirection)
+    //{
+    //    Vector2 originPosition = _currentPotion.transform.position;
+    //    Vector2 targetPosition = _currentPotion.transform.position + _targetDirection;
 
-        isProcessingMove = true;
+    //    isProcessingMove = true;
 
-        _currentPotion.MoveToTarget(targetPosition);
+    //    _currentPotion.MoveToTarget(targetPosition);
 
-        StartCoroutine(ProcessBounce(_currentPotion, originPosition));
-    }
+    //    StartCoroutine(ProcessBounce(_currentPotion, originPosition));
+    //}
 
-    private IEnumerator ProcessBounce(Potion _currentPotion, Vector2 _originPosition)
-    {
-        yield return new WaitForSeconds(0.2f);
+    //private IEnumerator ProcessBounce(Potion _currentPotion, Vector2 _originPosition)
+    //{
+    //    yield return new WaitForSeconds(0.2f);
 
-        _currentPotion.MoveToTarget(_originPosition);
+    //    _currentPotion.MoveToTarget(_originPosition);
 
-        isProcessingMove = false;
-    }
+    //    isProcessingMove = false;
+    //}
 
     // 블럭을 인접한 블럭과 위치 바꿈
     private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
@@ -316,7 +318,7 @@ public class PotionBoard : MonoBehaviour
         // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
         isProcessingMove = true;
 
-        // TODO : 1. 선택한 블럭이 특수 블럭이면 매칭 체크 전 특수블럭 효과 발동
+        // TODO : 1. 선택한 블럭이 특수 블럭이면 매칭 체크 하면서 특수블럭 효과 발동
 
         // startCoroutine ProcessMatches.
         StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
@@ -475,22 +477,14 @@ public class PotionBoard : MonoBehaviour
 
         Vector2 position = new Vector2(x - spacingX, height - spacingY);
 
-        int makeBlockTypeIndex;
-
         // TODO : 1. 특수블럭 생성되어야 할 경우 우선 생성
-        PotionType potionType = MakeSpecialBlock();
-        // 일반 블럭인 경우
-        if (potionType == PotionType.BlueBlock)
-        {
-            // get a random potion
-            // 일반 블럭 인덱스 0~6까지
-            makeBlockTypeIndex = Random.Range(0, normalBlockLength);
-        } else
-        {
-            makeBlockTypeIndex = (int)potionType;
-        }
+        //          -> 
+        int makeBlockTypeIndex = MakeBlock();
+
         GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
         newPotion.transform.SetParent(potionParent.transform);
+
+        newPotion.GetComponent<Potion>().potionType = (PotionType)makeBlockTypeIndex;
 
         // set indicies
         newPotion.GetComponent<Potion>().SetIndicies(x, index);
@@ -518,8 +512,9 @@ public class PotionBoard : MonoBehaviour
     #endregion
     
     // FindMatches가 가지고 있는 특수 블록 생성 여부에 따라서 해당 블럭 우선 생성
-    private PotionType MakeSpecialBlock()
+    private int MakeBlock()
     {
+        // 특수 블럭인 경우
         if (findMatches.isCheckedHorizontal_4)
         {
             return MakeDrillHorizontal();
@@ -540,45 +535,45 @@ public class PotionBoard : MonoBehaviour
         {
             return MakeBomb();
         }
+        // 일반 블럭인 경우
 
-        // 일반 블럭인 경우 blueblock 타입으로 반환
-        return PotionType.BlueBlock;
+        return Random.Range(0, normalBlockLength);
     }
 
-    private PotionType MakeDrillHorizontal()
+    private int MakeDrillHorizontal()
     {
         Debug.Log("가로 드릴 생성");
         findMatches.isCheckedHorizontal_4 = false;
-        return PotionType.DrillHorizontal;
+        return (int)PotionType.DrillHorizontal;
     }
 
-    private PotionType MakeDrillVertical()
+    private int MakeDrillVertical()
     {
         Debug.Log("세로 드릴 생성");
         findMatches.isCheckedVertical_4 = false;
-        return PotionType.DrillVertical;
+        return (int)PotionType.DrillVertical;
     }
 
     // 곡괭이 생성 위치는 논의
-    private PotionType MakePick()
+    private int MakePick()
     {
         Debug.Log("곡괭이 생성");
         findMatches.isCheckedSquare = false;
-        return PotionType.Pick;
+        return (int)PotionType.Pick;
     }
 
-    private PotionType MakePrism()
+    private int MakePrism()
     {
         Debug.Log("프리즘 생성");
         findMatches.isCheckedMatched_5 = false;
-        return PotionType.Prism;
+        return (int)PotionType.Prism;
     }
 
-    private PotionType MakeBomb()
+    private int MakeBomb()
     {
         Debug.Log("폭탄 생성");
         findMatches.isCheckedSuper = false;
-        return PotionType.Bomb;
+        return (int)PotionType.Bomb;
     }
 
 
