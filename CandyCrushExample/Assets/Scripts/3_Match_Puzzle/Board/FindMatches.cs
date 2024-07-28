@@ -475,9 +475,10 @@ public class FindMatches : MonoBehaviour
                 return MatchPiecesOfColor(_anotherPotion.potionType);
 
                 // TODO : 1. 곡괭이 고쳐야함
+                //  임시로 대각선(오른쪽) 기능 발동
             case PotionType.Pick:
                 Debug.Log("곡괭이 기능 발동");
-                return null;
+                return GetDiagonalPieces(_potion.xIndex, _potion.yIndex);
         }
 
         return null;
@@ -527,7 +528,8 @@ public class FindMatches : MonoBehaviour
     }
 
     // 폭탄 기능
-    // TODO : 1. 주변 2칸 거리 1 3 5 3 1 체크로 바꿔야함
+    // TODO : 1. 주변 2칸 거리 1 3 5 3 1 체크로 바꿔야함 v
+    //        -> 동작 테스트 필요
     List<Potion> Get2DistancePieces(int _xIndex, int  _yIndex)
     {
         List<Potion> blocks = new List<Potion>();
@@ -539,12 +541,90 @@ public class FindMatches : MonoBehaviour
             for (int j = _yIndex - 1; j <= _yIndex + 1; j++)
             {
                 // Check if the piece is inside the board 모서리 체크
-                if (i >= 0 && i < board.width && j >= 0 && j < board.height && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
+                if (i >= 0 && i < board.width && j >= 0 && j < board.height && board.potionBoard[i, j] != null && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
                 {
                     blocks.Add(board.potionBoard[i, j].potion.GetComponent<Potion>());
                     //board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched = true;
                 }
             }
+        }
+
+        if (_xIndex >= 2)
+        {
+            blocks.Add(board.potionBoard[_xIndex - 2, _yIndex].potion.GetComponent<Potion>());
+        }
+        if (_xIndex < board.width - 2)
+        {
+            blocks.Add(board.potionBoard[_xIndex + 2, _yIndex].potion.GetComponent<Potion>());
+
+        }
+        if (_yIndex >= 2)
+        {
+            blocks.Add(board.potionBoard[_xIndex, _yIndex - 2].potion.GetComponent<Potion>());
+        }
+        if (_yIndex < board.height - 2)
+        {
+            blocks.Add(board.potionBoard[_xIndex, _yIndex + 2].potion.GetComponent<Potion>());
+        }
+
+        return blocks;
+    }
+
+    // 곡괭이 대각(오른쪽) 기능
+    List<Potion> GetDiagonalPieces(int _xIndex, int _yIndex)
+    {
+        List<Potion> blocks = new List<Potion>();
+
+        int index = 0;
+
+        while (_xIndex - index >= 0 && _yIndex - index >= 0)
+        {
+            if (board.potionBoard[_xIndex - index, _yIndex - index] != null && !board.potionBoard[_xIndex - index, _yIndex - index].potion.GetComponent<Potion>().isMatched)
+            {
+                blocks.Add(board.potionBoard[_xIndex - index, _yIndex - index].potion.GetComponent<Potion>());
+            }
+            index++;
+        }
+
+        index = 0;
+
+        while (_xIndex + index < board.width && _yIndex + index < board.height)
+        {
+            if (board.potionBoard[_xIndex + index, _yIndex + index] != null && !board.potionBoard[_xIndex + index, _yIndex + index].potion.GetComponent<Potion>().isMatched)
+            {
+                blocks.Add(board.potionBoard[_xIndex + index, _yIndex + index].potion.GetComponent<Potion>());
+            }
+            index++;
+        }
+
+        return blocks;
+    }
+
+    // 곡괭이 역대각(왼쪽) 기능
+    List<Potion> GetReverseDiagonalPieces(int _xIndex, int _yIndex)
+    {
+        List<Potion> blocks = new List<Potion>();
+
+        int index = 0;
+
+        while (_xIndex - index >= 0 && _yIndex + index < board.height)
+        {
+            if (board.potionBoard[_xIndex - index, _yIndex + index] != null && !board.potionBoard[_xIndex - index, _yIndex + index].potion.GetComponent<Potion>().isMatched)
+            {
+                blocks.Add(board.potionBoard[_xIndex - index, _yIndex + index].potion.GetComponent<Potion>());
+            }
+            index++;
+        }
+
+        index = 0;
+
+        while (_xIndex + index < board.width && _yIndex - index >= 0)
+        {
+            if (board.potionBoard[_xIndex + index, _yIndex - index] != null && !board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>().isMatched)
+            {
+                blocks.Add(board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>());
+            }
+            index++;
         }
 
         return blocks;

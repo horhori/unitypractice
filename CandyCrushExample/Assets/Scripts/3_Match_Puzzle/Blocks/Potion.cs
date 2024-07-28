@@ -125,12 +125,8 @@ public enum PotionType
     DrillVertical, // 드릴 세로
     DrillHorizontal, // 드릴 가로
     Pick, // 곡괭이
+    //PickLeft, // 곡괭이 역대각(왼쪽 기울임)
+    //PickRight, // 곡괭이 대각(오른쪽 기울임)
     Prism, // 프리즘
     
-}
-
-// 바구니 제작중...
-public struct Bag
-{
-    public PotionType potionType;
 }

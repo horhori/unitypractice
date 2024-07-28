@@ -98,11 +98,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d63315151cf69ab4fa04e0003329da24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  potionType: 0
+  potionType: 10
   xIndex: 0
   yIndex: 0
   isMatched: 0
   swipeAngle: 0
+  swipeResist: 0
   isMoving: 0
 --- !u!61 &552940053301921765
 BoxCollider2D:

@@ -38,6 +38,13 @@ public class PotionBoard : MonoBehaviour
     [SerializeField]
     private bool isProcessingMove;
 
+    // 바구니 임시 세팅
+    // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
+    private int bag1SubtractCount = 0; // BlueBlock
+    private int bag2SubtractCount = 0; // GreenBlock
+    private int bag3SubtractCount = 0; // PinkBlock
+    private int bag4SubtractCount = 0; // RedBlock
+
     //public GameObject drillHorizontalBlock;
     //public GameObject drillVerticalBlock;
     //public GameObject pickBlock;
@@ -379,7 +386,11 @@ public class PotionBoard : MonoBehaviour
         RemoveAndRefill(findMatches.potionsToRemove);
 
         // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-        GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves);
+        GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
+        bag1SubtractCount = 0;
+        bag2SubtractCount = 0;
+        bag3SubtractCount = 0;
+        bag4SubtractCount = 0;
         yield return new WaitForSeconds(0.4f);
 
         if (findMatches.FindAllMatches())
@@ -395,6 +406,22 @@ public class PotionBoard : MonoBehaviour
         // Removing the potion and clearing the board at that location
         foreach (Potion potion in _potionsToRemove)
         {
+            if (potion.potionType == PotionType.BlueBlock)
+            {
+                bag1SubtractCount++;
+            }
+            if (potion.potionType == PotionType.GreenBlock)
+            {
+                bag2SubtractCount++;
+            }
+            if (potion.potionType == PotionType.PinkBlock)
+            {
+                bag3SubtractCount++;
+            }
+            if (potion.potionType == PotionType.RedBlock)
+            {
+                bag4SubtractCount++;
+            }
             // getting it's x and y indicies and storing them
             int _xIndex = potion.xIndex;
             int _yIndex = potion.yIndex;
