@@ -199,7 +199,7 @@ public class GameManager : MonoBehaviour
         bag3CurrentCount -= _bag3SubtractCount;
         bag4CurrentCount -= _bag4SubtractCount;
 
-        // TODO : 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
+        // TODO : 1. 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
         if (points >= goal)
         {
             // win game

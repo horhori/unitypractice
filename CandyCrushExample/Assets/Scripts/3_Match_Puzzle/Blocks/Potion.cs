@@ -81,9 +81,7 @@ public class Potion : MonoBehaviour
     }
 
     // TODO : 1. 블럭 바뀌는 시간 자연스럽게 조절
-    //        2. 벽에 부딫혔을 때 속도, 거리 조절 필요 -> 벽에 부딫혔을 때 따로 메서드 만들어야 할듯
-    //           -> UI 적용 후 벽과 거리 측정해서 작업 예정
-    //        3. 새로 블럭 생성되어 빈 자리에 떨어지는 것도 여기서 처리하는데 따로 메서드 만들어야 할듯
+    //        2. 새로 블럭 생성되어 빈 자리에 떨어지는 것도 여기서 처리하는데 따로 메서드 만들어야 할듯
     private IEnumerator MoveCoroutine(Vector2 _targetPos)
     {
         isMoving = true;
@@ -124,9 +122,9 @@ public enum PotionType
     Bomb, // 폭탄
     DrillVertical, // 드릴 세로
     DrillHorizontal, // 드릴 가로
-    Pick, // 곡괭이
-    //PickLeft, // 곡괭이 역대각(왼쪽 기울임)
-    //PickRight, // 곡괭이 대각(오른쪽 기울임)
+    //Pick, // 곡괭이
+    PickLeft, // 곡괭이 역대각(왼쪽 기울임)
+    PickRight, // 곡괭이 대각(오른쪽 기울임)
     Prism, // 프리즘
     
 }

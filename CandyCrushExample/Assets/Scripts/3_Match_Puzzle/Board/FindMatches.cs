@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static Unity.Collections.AllocatorManager;
-using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
+
+
 
 public class FindMatches : MonoBehaviour
 {
@@ -62,7 +62,7 @@ public class FindMatches : MonoBehaviour
         {
             if (currentPotion.potionType == PotionType.Bomb || currentPotion.potionType == PotionType.DrillHorizontal ||
                 currentPotion.potionType == PotionType.DrillVertical || currentPotion.potionType == PotionType.Prism ||
-                currentPotion.potionType == PotionType.Pick)
+                currentPotion.potionType == PotionType.PickRight)
             {
                 potionsToRemove.AddRange(RunSpecialBlock(currentPotion, targetPotion));
                 hasMatched = true;
@@ -70,7 +70,7 @@ public class FindMatches : MonoBehaviour
 
             if (targetPotion.potionType == PotionType.Bomb ||
                 targetPotion.potionType == PotionType.DrillHorizontal || targetPotion.potionType == PotionType.DrillVertical ||
-                targetPotion.potionType == PotionType.Prism || targetPotion.potionType == PotionType.Pick)
+                targetPotion.potionType == PotionType.Prism || targetPotion.potionType == PotionType.PickRight)
             {
                 potionsToRemove.AddRange(RunSpecialBlock(targetPotion, currentPotion));
                 hasMatched = true;
@@ -472,11 +472,11 @@ public class FindMatches : MonoBehaviour
 
             case PotionType.Prism:
                 Debug.Log("프리즘 기능 발동");
-                return MatchPiecesOfColor(_anotherPotion.potionType);
+                return MatchPiecesOfColor(_potion.xIndex, _potion.yIndex, _anotherPotion.potionType);
 
                 // TODO : 1. 곡괭이 고쳐야함
                 //  임시로 대각선(오른쪽) 기능 발동
-            case PotionType.Pick:
+            case PotionType.PickRight:
                 Debug.Log("곡괭이 기능 발동");
                 return GetDiagonalPieces(_potion.xIndex, _potion.yIndex);
         }
@@ -528,14 +528,11 @@ public class FindMatches : MonoBehaviour
     }
 
     // 폭탄 기능
-    // TODO : 1. 주변 2칸 거리 1 3 5 3 1 체크로 바꿔야함 v
-    //        -> 동작 테스트 필요
     List<Potion> Get2DistancePieces(int _xIndex, int  _yIndex)
     {
         List<Potion> blocks = new List<Potion>();
 
         // 3x3 가운데 dot 기준으로 왼쪽 아래 점부터 오른쪽 위 점까지만 루프
-        // TODO : 1. 주변 2칸 거리 1 3 5 3 1 체크로 바꿔야함
         for (int i = _xIndex - 1; i <= _xIndex + 1; i++)
         {
             for (int j = _yIndex - 1; j <= _yIndex + 1; j++)
@@ -631,9 +628,15 @@ public class FindMatches : MonoBehaviour
     }
 
     // 프리즘 기능
-    List<Potion> MatchPiecesOfColor(PotionType _targetPotionType)
+    List<Potion> MatchPiecesOfColor(int _xIndex, int _yIndex, PotionType _targetPotionType)
     {
         List<Potion> blocks = new List<Potion>();
+
+        // Prism 블럭 추가
+        if (board.potionBoard[_xIndex, _yIndex] != null && !board.potionBoard[_xIndex, _xIndex].potion.GetComponent<Potion>().isMatched)
+        {
+            blocks.Add(board.potionBoard[_xIndex, _yIndex].potion.GetComponent<Potion>());
+        }
 
         for (int i = 0; i < board.width; i++)
         {

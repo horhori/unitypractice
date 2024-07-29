@@ -552,7 +552,7 @@ public class PotionBoard : MonoBehaviour
         }
         else if (findMatches.isCheckedSquare)
         {
-            return MakePick();
+            return MakePickRight();
         }
         else if (findMatches.isCheckedMatched_5)
         {
@@ -569,36 +569,37 @@ public class PotionBoard : MonoBehaviour
 
     private int MakeDrillHorizontal()
     {
-        Debug.Log("가로 드릴 생성");
         findMatches.isCheckedHorizontal_4 = false;
         return (int)PotionType.DrillHorizontal;
     }
 
     private int MakeDrillVertical()
     {
-        Debug.Log("세로 드릴 생성");
         findMatches.isCheckedVertical_4 = false;
         return (int)PotionType.DrillVertical;
     }
 
-    // 곡괭이 생성 위치는 논의
-    private int MakePick()
+    private int MakePickLeft()
     {
-        Debug.Log("곡괭이 생성");
         findMatches.isCheckedSquare = false;
-        return (int)PotionType.Pick;
+        return (int)PotionType.PickLeft;
+    }
+
+    // 곡괭이 생성 위치는 논의
+    private int MakePickRight()
+    {
+        findMatches.isCheckedSquare = false;
+        return (int)PotionType.PickRight;
     }
 
     private int MakePrism()
     {
-        Debug.Log("프리즘 생성");
         findMatches.isCheckedMatched_5 = false;
         return (int)PotionType.Prism;
     }
 
     private int MakeBomb()
     {
-        Debug.Log("폭탄 생성");
         findMatches.isCheckedSuper = false;
         return (int)PotionType.Bomb;
     }
@@ -617,8 +618,7 @@ public class MatchResult
 //        
 // 4배열 네모는 터지는 경우가 아님
 
-// TODO : 1. 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 족보 만들어야 함
-//        2. 특수 블럭 로직 추가
+// TODO : 1. 특수 블럭 조합 로직 추가
 
 public enum MatchDirection
 {
