@@ -2592,6 +2592,7 @@ MonoBehaviour:
   potionParent: {fileID: 894325663}
   selectedPotion: {fileID: 0}
   targetedPotion: {fileID: 0}
+  isSwipeable: 0
   isProcessingMove: 0
   arrayLayout:
     rows:

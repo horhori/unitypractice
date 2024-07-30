@@ -35,6 +35,8 @@ public class PotionBoard : MonoBehaviour
     public Potion selectedPotion;
     public Potion targetedPotion;
 
+    public bool isSwipeable;
+
     [SerializeField]
     private bool isProcessingMove;
 
@@ -89,8 +91,19 @@ public class PotionBoard : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) && selectedPotion)
         {
+
             // 입력값(각도)을 계산하여 Run
-            RunInput();
+            if (selectedPotion.currentSwipeable)
+            {
+                RunInput();
+            } else
+            {
+                if (selectedPotion.potionType == PotionType.Bomb || selectedPotion.potionType == PotionType.DrillHorizontal || selectedPotion.potionType == PotionType.DrillVertical || selectedPotion.potionType == PotionType.PickLeft || selectedPotion.potionType == PotionType.PickRight || selectedPotion.potionType == PotionType.Prism)
+                {
+                    isProcessingMove = true;
+                    StartCoroutine(ProcessOriginMatches(selectedPotion));
+                }
+            }
         }
     }
 
@@ -228,9 +241,13 @@ public class PotionBoard : MonoBehaviour
     //          -> 처음에 swipeAngle이 0이라서 오른쪽으로 스와이프됨. 0인 경우 처리하기
     //      : 2. swipe 처리 후 swipeAngle 초기화 필요 -> 0으로 하고 0인 경우에는 클릭된 것으로 하는게 좋을 거 같긴 함
     //          -> 아니면 초기값을 45도(거의 조작이 안일어날 확률이 높은 값)로 하는게 좋을지?
+    //        -> 240730 완료
+    //        드래그 시점에서의 마우스 거리 계산해서 임계값 0.2f가 넘으면 selectPotion한테 currentSwipeable true로 줘서 
+    //        드래그 많이 움직인 경우에만 스왑처리,
     private void RunInput()
     {
         float swipeAngle = selectedPotion.swipeAngle;
+        selectedPotion.currentSwipeable = false;
         int originX = selectedPotion.xIndex;
         int originY = selectedPotion.yIndex;
 
@@ -238,6 +255,7 @@ public class PotionBoard : MonoBehaviour
         {
             // Right Swipe
             targetedPotion = potionBoard[originX + 1, originY].potion.GetComponent<Potion>();
+            
             SwapPotion(selectedPotion, targetedPotion);
         }
         else if (swipeAngle > 45 && swipeAngle <= 135 && originY != height - 1)
@@ -328,7 +346,7 @@ public class PotionBoard : MonoBehaviour
         // TODO : 1. 선택한 블럭이 특수 블럭이면 매칭 체크 하면서 특수블럭 효과 발동
 
         // startCoroutine ProcessMatches.
-        StartCoroutine(ProcessMatches(_currentPotion, _targetPotion));
+        StartCoroutine(ProcessSwapMatches(_currentPotion, _targetPotion));
     }
 
     // TODO : 1. 바꾸는 속도 조절
@@ -353,7 +371,7 @@ public class PotionBoard : MonoBehaviour
 
     }
 
-    private IEnumerator ProcessMatches(Potion _currentPotion, Potion _targetPotion)
+    private IEnumerator ProcessSwapMatches(Potion _currentPotion, Potion _targetPotion)
     {
         yield return new WaitForSeconds(0.2f);
 
@@ -367,6 +385,20 @@ public class PotionBoard : MonoBehaviour
         {
             // 매칭이 일어나지 않은 경우 다시 스왑
             DoSwap(_currentPotion, _targetPotion);
+        }
+
+        isProcessingMove = false;
+    }
+
+    private IEnumerator ProcessOriginMatches(Potion _currentPotion)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        // 매칭 체크 후 3매치 이상이 일어나면 제거 시작
+        if (findMatches.FindSpecialMatches())
+        {
+            // Start a coroutine that is going to process our matches in our turn.
+            StartCoroutine(ProcessTurnOnMatchedBoard(true));
         }
 
         isProcessingMove = false;

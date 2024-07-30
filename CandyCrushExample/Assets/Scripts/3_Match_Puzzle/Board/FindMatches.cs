@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-
 
 
 public class FindMatches : MonoBehaviour
@@ -29,6 +29,87 @@ public class FindMatches : MonoBehaviour
     void Awake()
     {
         board = FindObjectOfType<PotionBoard>();
+    }
+
+    // 제자리 클릭 시 특수블럭 효과 처리
+    public bool FindSpecialMatches()
+    {
+        if (GameManager.Instance.isGameEnded)
+        {
+            return false;
+        }
+
+        bool hasMatched = false;
+
+        potionsToRemove.Clear();
+
+        foreach (Node nodePotion in board.potionBoard)
+        {
+            if (nodePotion.potion != null)
+            {
+                nodePotion.potion.GetComponent<Potion>().isMatched = false;
+            }
+        }
+
+        Potion currentPotion = board.selectedPotion;
+        //Potion targetPotion = board.targetedPotion;
+
+        // 특수블럭 체크
+        // 선택, 타켓된 포션이 있는 경우(최초로 스와이프 했을 때) 특수 블럭 체크 후 이 메서드 맨 아래에서 board가 가진 currentPotion, targetPotion 없앰
+        if (currentPotion != null)
+        {
+            if (currentPotion.potionType == PotionType.Bomb || currentPotion.potionType == PotionType.DrillHorizontal ||
+                currentPotion.potionType == PotionType.DrillVertical || currentPotion.potionType == PotionType.Prism ||
+                currentPotion.potionType == PotionType.PickRight)
+            {
+                
+                potionsToRemove.AddRange(RunSpecialBlock(currentPotion));
+                hasMatched = true;
+            }
+        }
+
+
+        for (int x = 0; x < board.width; x++)
+        {
+            for (int y = 0; y < board.height; y++)
+            {
+                // checking if potion node is usable
+                if (board.potionBoard[x, y].isUsable)
+                {
+                    // then proceed to get potion class in node.
+                    Potion potion = board.potionBoard[x, y].potion.GetComponent<Potion>();
+
+                    // ensure its not matched
+                    if (!potion.isMatched)
+                    {
+                        // run some matching logic
+
+                        MatchResult matchedPotions = IsConnected(potion);
+
+                        if (matchedPotions.connectedPotions.Count >= 3)
+                        {
+                            // complex matching...
+                            MatchResult superMatchedPotions = FindSuperMatch(matchedPotions);
+
+                            potionsToRemove.AddRange(superMatchedPotions.connectedPotions);
+
+                            foreach (Potion pot in superMatchedPotions.connectedPotions)
+                            {
+                                pot.isMatched = true;
+                            }
+
+                            hasMatched = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 특수블럭 체크때문에 여기에서 특수블럭 체크 후 선택, 타켓 블럭 해제 넣음
+        // 최초의 경우에만 특수블럭 있는지 체크
+        board.selectedPotion = null;
+
+        return hasMatched;
     }
 
     // 보드에 매칭되어 있는게 있는지 체크
@@ -454,6 +535,38 @@ public class FindMatches : MonoBehaviour
         }
     }
 
+    public List<Potion> RunSpecialBlock(Potion _potion)
+    {
+        switch (_potion.potionType)
+        {
+            case PotionType.DrillVertical:
+                Debug.Log("드릴(세로) 기능 발동");
+                return GetColumnPieces(_potion.xIndex);
+
+            case PotionType.DrillHorizontal:
+                Debug.Log("드릴(가로) 기능 발동");
+                return GetRowPieces(_potion.yIndex);
+
+            case PotionType.Bomb:
+                Debug.Log("폭탄 기능 발동");
+                return Get2DistancePieces(_potion.xIndex, _potion.yIndex);
+
+            case PotionType.Prism:
+                Debug.Log("프리즘 기능 발동");
+                return MatchPiecesOfColor(_potion.xIndex, _potion.yIndex);
+
+            case PotionType.PickLeft:
+                Debug.Log("곡괭이(역대각) 기능 발동");
+                return GetReverseDiagonalPieces(_potion.xIndex, _potion.yIndex);
+
+            case PotionType.PickRight:
+                Debug.Log("곡괭이(대각) 기능 발동");
+                return GetDiagonalPieces(_potion.xIndex, _potion.yIndex);
+        }
+
+        return null;
+    }
+
     public List<Potion> RunSpecialBlock(Potion _potion, Potion _anotherPotion)
     {
         switch (_potion.potionType)
@@ -474,10 +587,12 @@ public class FindMatches : MonoBehaviour
                 Debug.Log("프리즘 기능 발동");
                 return MatchPiecesOfColor(_potion.xIndex, _potion.yIndex, _anotherPotion.potionType);
 
-                // TODO : 1. 곡괭이 고쳐야함
-                //  임시로 대각선(오른쪽) 기능 발동
+            case PotionType.PickLeft:
+                Debug.Log("곡괭이(역대각) 기능 발동");
+                return GetReverseDiagonalPieces(_potion.xIndex, _potion.yIndex);
+
             case PotionType.PickRight:
-                Debug.Log("곡괭이 기능 발동");
+                Debug.Log("곡괭이(대각) 기능 발동");
                 return GetDiagonalPieces(_potion.xIndex, _potion.yIndex);
         }
 
@@ -622,6 +737,76 @@ public class FindMatches : MonoBehaviour
                 blocks.Add(board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>());
             }
             index++;
+        }
+
+        return blocks;
+    }
+
+    // 제자리 프리즘 기능
+    List<Potion> MatchPiecesOfColor(int _xIndex, int _yIndex)
+    {
+        List<Potion> blocks = new List<Potion>();
+
+        // Enumerable.Repeat<int>(0, board.normalBlockLength).ToArray<int>()
+        // 선언하면서 0으로 length만큼 초기화
+        // (초기화하고 싶은 값, 길이)
+        int[] blockCounts = Enumerable.Repeat<int>(0, board.normalBlockLength).ToArray<int>();
+
+        // 가장 많은 색상 찾아주는 
+        for (int i=0; i<board.width; i++)
+        {
+            for (int j=0; j<board.height; j++)
+            {
+                if (board.potionBoard[i, j] != null)
+                {
+                    if (board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.BlueBlock || board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.GreenBlock ||
+                        board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.OrangeBlock || board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.PinkBlock ||
+                        board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.PurpleBlock || board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.RedBlock ||
+                        board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == PotionType.YellowBlock)
+                    blockCounts[(int)board.potionBoard[i, j].potion.GetComponent<Potion>().potionType]++;
+                }
+
+            }
+        }
+
+        // 가장 많은 색상 potionType 찾음
+        // TODO : 1. 가장 많은 색상이 동일한 경우 처리
+        int maxIndex = 0;
+        int max = 0;
+
+        for (int i=0; i<blockCounts.Length; i++)
+        {
+            if (max < blockCounts[i])
+            {
+                max = blockCounts[i];
+                maxIndex = i;
+            }
+        }
+
+        PotionType _targetPotionType = (PotionType)maxIndex;
+
+        // Prism 블럭 추가
+        if (board.potionBoard[_xIndex, _yIndex] != null && !board.potionBoard[_xIndex, _xIndex].potion.GetComponent<Potion>().isMatched)
+        {
+            blocks.Add(board.potionBoard[_xIndex, _yIndex].potion.GetComponent<Potion>());
+        }
+
+        for (int i = 0; i < board.width; i++)
+        {
+            for (int j = 0; j < board.height; j++)
+            {
+                // Check if that piece exists
+                if (board.potionBoard[i, j] != null && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
+                {
+                    // Check the tag on that dot
+                    if (board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == _targetPotionType)
+                    {
+                        // Set that dot to be matched
+                        blocks.Add(board.potionBoard[i, j].potion.GetComponent<Potion>());
+                        //board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched = true;
+                    }
+                }
+            }
         }
 
         return blocks;

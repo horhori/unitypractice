@@ -23,10 +23,15 @@ public class Potion : MonoBehaviour
 
     private Vector2 currentPos; // firstTouchPosition
     private Vector2 targetPos; // finalTouchPosition
+    public bool currentSwipeable;
     public float swipeAngle = 0;
-    public float swipeResist = 1f;
+    public float swipeResist = 0.2f;
 
     public bool isMoving;
+
+    // 클릭했을 때 이미지 변경하기 위한 Sprite 모음
+    [SerializeField]
+    private Sprite[] sprites = new Sprite[2];
 
     // 특수블럭 체크
     //public bool isBomb;
@@ -39,6 +44,7 @@ public class Potion : MonoBehaviour
     {
         xIndex = _x;
         yIndex = _y;
+        currentSwipeable = false;
         isMoving = false;
     }
 
@@ -56,22 +62,41 @@ public class Potion : MonoBehaviour
         }
     }
 
+    public void OnMouseDrag()
+    {
+        if (!isMoving)
+        {
+            if (sprites.Length == 2)
+            {
+                GetComponent<SpriteRenderer>().sprite = sprites[1];
+            }
+        }
+    }
+
     public void OnMouseUp()
     {
         if (!isMoving)
         {
+            if (sprites.Length == 2)
+            {
+                GetComponent<SpriteRenderer>().sprite = sprites[0];
+            }
             targetPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            CalculateAngle();
+            currentSwipeable = CalculateAngle();
         }
     }
 
-    void CalculateAngle()
+    bool CalculateAngle()
     {
         // swipeResist 이상의 입력을 했을 때만 적용
+        // swipeResist : 1f = 보석 전체 거리 0.5f = 보석 절반 거리
+        // swipeResist : 0.2f로 설정했음.
         if (Mathf.Abs(targetPos.y - currentPos.y) > swipeResist || Mathf.Abs(targetPos.x - currentPos.x) > swipeResist)
         {
             swipeAngle = Mathf.Atan2(targetPos.y - currentPos.y, targetPos.x - currentPos.x) * 180 / Mathf.PI;
         }
+
+        return Mathf.Abs(targetPos.y - currentPos.y) > swipeResist || Mathf.Abs(targetPos.x - currentPos.x) > swipeResist;
     }
 
     public void MoveToTarget(Vector2 _targetPos)

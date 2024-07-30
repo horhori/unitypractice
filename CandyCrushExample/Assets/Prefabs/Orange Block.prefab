@@ -102,9 +102,13 @@ MonoBehaviour:
   xIndex: 0
   yIndex: 0
   isMatched: 0
+  currentSwipeable: 0
   swipeAngle: 0
   swipeResist: 0
   isMoving: 0
+  sprites:
+  - {fileID: 21300000, guid: bc96101b64351534da0019b482f5153d, type: 3}
+  - {fileID: 21300000, guid: 99efee0c8d6d0494e9c5fbf41707fd94, type: 3}
 --- !u!61 &8404577134932475248
 BoxCollider2D:
   m_ObjectHideFlags: 0
