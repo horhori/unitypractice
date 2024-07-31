@@ -101,10 +101,16 @@ MonoBehaviour:
   potionType: 10
   xIndex: 0
   yIndex: 0
+  spacingX: 3
+  spacingY: 3
+  targetX: 0
+  targetY: 0
   isMatched: 0
+  currentSwipeable: 0
   swipeAngle: 0
   swipeResist: 0
   isMoving: 0
+  sprites: []
 --- !u!61 &552940053301921765
 BoxCollider2D:
   m_ObjectHideFlags: 0

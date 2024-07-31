@@ -305,9 +305,6 @@ MonoBehaviour:
   - {fileID: 7223206215871020899, guid: 71a39704ca6b15d4fa55613aad9f2713, type: 3}
   - {fileID: 8480648580388222843, guid: 626f1eed02f9e874889154b8c23333c3, type: 3}
   - {fileID: 2028427029964720647, guid: 3ce95620389acdf40b2ff5ea7b9d89e0, type: 3}
-  - {fileID: 3685867481437075591, guid: dff6b8edafbddb343a1054c8119a8c8e, type: 3}
-  - {fileID: 1345234637040937531, guid: 9fdffdc995246a34ca847997edd21301, type: 3}
-  - {fileID: 513616534341131676, guid: 78cdf6337e2f04d4887dcce82a3a584c, type: 3}
   destroyEffect: {fileID: 4594660995424350032, guid: 25692c09d7177d94d98e8d180a0f7657, type: 3}
   currentDot: {fileID: 0}
 --- !u!1 &2102190978

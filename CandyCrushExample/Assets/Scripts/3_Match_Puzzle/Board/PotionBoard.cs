@@ -410,7 +410,6 @@ public class PotionBoard : MonoBehaviour
     #endregion
 
     #region Cascading Potions
-
     public IEnumerator ProcessTurnOnMatchedBoard(bool _subtractMoves)
     {
         // 클리어했을 때 에러나서 if문 삭제
@@ -418,30 +417,30 @@ public class PotionBoard : MonoBehaviour
         //{
         // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
         //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
-            isProcessingMove = true;
+        isProcessingMove = true;
 
-            foreach (Potion potionToRemove in findMatches.potionsToRemove)
-            {
-                potionToRemove.isMatched = false;
-            }
+        foreach (Potion potionToRemove in findMatches.potionsToRemove)
+        {
+            potionToRemove.isMatched = false;
+        }
 
-            RemoveBlock(findMatches.potionsToRemove);
+        RemoveBlock(findMatches.potionsToRemove);
 
-            // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-            GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
-            bag1SubtractCount = 0;
-            bag2SubtractCount = 0;
-            bag3SubtractCount = 0;
-            bag4SubtractCount = 0;
+        //yield return new WaitForSeconds(0.4f);
 
-            yield return new WaitForSeconds(0.4f);
+        RefillBlock();
 
-            RefillBlock();
+        // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
+        GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
+        bag1SubtractCount = 0;
+        bag2SubtractCount = 0;
+        bag3SubtractCount = 0;
+        bag4SubtractCount = 0;
 
-            isProcessingMove = false;
-
-            yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.4f);
         //}
+
+        isProcessingMove = false;
 
         if (findMatches.FindAllMatches())
         {
@@ -559,52 +558,6 @@ public class PotionBoard : MonoBehaviour
             }
         }
     }
-
-    // RefillPotions
-    //private void RefillPotion(int x, int y)
-    //{
-    //    // y offset
-    //    int yOffset = 1;
-
-    //    // while the cell above our current cell is null and we're below the height of the board
-    //    while (y + yOffset < height && potionBoard[x, y + yOffset].potion == null)
-    //    {
-    //        // increment y offset
-    //        //Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
-    //        yOffset++;
-    //    }
-
-    //    // we've either hit the top of the board or we found a potion
-
-    //    if (y + yOffset < height && potionBoard[x, y + yOffset].potion != null)
-    //    {
-    //        // we've found a potion
-
-    //        Potion potionAbove = potionBoard[x, y + yOffset].potion.GetComponent<Potion>();
-
-    //        // Move it to the correct location
-    //        Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
-    //        //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
-
-    //        //Move to location
-    //        potionAbove.MoveToTarget(targetPos);
-
-    //        // update incidices
-    //        potionAbove.SetIndicies(x, y);
-    //        // update our potionBoard
-    //        potionBoard[x, y] = potionBoard[x, y + yOffset];
-
-    //        // set the location the potion came from to null
-    //        potionBoard[x, y + yOffset] = new Node(true, null);
-    //    }
-
-    //    // if we're hit the top of the board without finding a potion
-    //    if (y + yOffset == height)
-    //    {
-    //        //Debug.Log("I've reached the top of the board without finding a potion");
-    //        SpawnPotionAtTop(x);
-    //    }
-    //}
 
     // 현재 블럭을 새로 만들고 내림
     // TODO : 1. 미리 생성된 블럭이 내려오게 변경

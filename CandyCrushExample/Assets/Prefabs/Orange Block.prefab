@@ -101,6 +101,10 @@ MonoBehaviour:
   potionType: 2
   xIndex: 0
   yIndex: 0
+  spacingX: 3
+  spacingY: 3
+  targetX: 0
+  targetY: 0
   isMatched: 0
   currentSwipeable: 0
   swipeAngle: 0

@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 // Potion -> Block
 // 이름 변경 시 메모리 부족 발생
@@ -15,6 +17,16 @@ public class Potion : MonoBehaviour
     // 좌표를 의미하는게 아니라 번째임
     public int xIndex;
     public int yIndex;
+
+    // TODO : 1. PotionBoard의 해당 값을 가져와야 함(현재는 임시로 unity GUI로 3 설정(7x7이니까 3임)
+    //        2. 스테이지 세팅하면서 PotionBoard와 여기서의 spacingX, Y 값 Manager로 관리
+    public int spacingX = 3;
+    public int spacingY = 3;
+
+    private int targetX;
+    private int targetY;
+
+    private Vector2 tempPosition;
 
     public bool isMatched;
 
@@ -52,6 +64,49 @@ public class Potion : MonoBehaviour
     {
         xIndex = _x;
         yIndex = _y;
+    }
+
+    private void Update()
+    {
+        //targetX = xIndex - spacingX;
+        //targetY = yIndex - spacingY;
+
+        //if (Mathf.Abs(targetX - transform.position.x) > .1)
+        //{
+        //    // Move Towards the target
+        //    tempPosition = new Vector2(targetX, transform.position.y);
+        //    transform.position = Vector2.Lerp(transform.position, tempPosition, .05f);
+        //    //if (board.allDots[column, row] != this.gameObject)
+        //    //{
+        //    //    board.allDots[column, row] = this.gameObject;
+        //    //}
+        //    //findMatches.FindAllMatches();
+        //}
+        //else
+        //{
+        //    // Directly set the position
+        //    tempPosition = new Vector2(targetX, transform.position.y);
+        //    transform.position = tempPosition;
+
+        //}
+
+        //if (Mathf.Abs(targetY - transform.position.y) > .1)
+        //{
+        //    // Move Towards the target
+        //    tempPosition = new Vector2(transform.position.x, targetY);
+        //    transform.position = Vector2.Lerp(transform.position, tempPosition, .05f);
+        //    //if (board.allDots[column, row] != this.gameObject)
+        //    //{
+        //    //    board.allDots[column, row] = this.gameObject;
+        //    //}
+        //    //findMatches.FindAllMatches();
+        //}
+        //else
+        //{
+        //    // Directly set the position
+        //    tempPosition = new Vector2(transform.position.x, targetY);
+        //    transform.position = tempPosition;
+        //}
     }
 
     public void OnMouseDown()
@@ -113,10 +168,15 @@ public class Potion : MonoBehaviour
     private IEnumerator MoveCoroutine(Vector2 _targetPos)
     {
         isMoving = true;
-        // 스왑 애니메이션 지속 시간임
-        float duration = 0.2f;
 
         Vector2 startPosition = transform.position;
+
+        float distance = Vector2.Distance(startPosition, _targetPos);
+        // 스왑 애니메이션 지속 시간임
+        // 속력 = 거리 / 0.1f * distance 하여 속력 일정하게
+        // 기존에 시간 0.2f였는데 느려서 0.1f * distance로 조정
+        float duration = 0.1f * distance;
+
         float elaspedTime = 0f;
 
         // 움직이는 속도 일정하게 여기서
