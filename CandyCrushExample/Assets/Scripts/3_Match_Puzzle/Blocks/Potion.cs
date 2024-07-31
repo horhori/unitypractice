@@ -99,9 +99,12 @@ public class Potion : MonoBehaviour
         return Mathf.Abs(targetPos.y - currentPos.y) > swipeResist || Mathf.Abs(targetPos.x - currentPos.x) > swipeResist;
     }
 
+    // 스테이지 클리어 시 에러 발생했는데 원인 아직 못찾음?
+    // TODO : 1. 제거 & 생성 코루틴 도중 게임 클리어되면 여기서 에러남
+    //        2. 제거 중간에 조작하면 되버림
     public void MoveToTarget(Vector2 _targetPos)
     {
-
+        //Debug.Log("move : [" + transform.position.x + ", " + transform.position.y + "] -> [" + _targetPos.x + ", " + _targetPos.y + "]");
         StartCoroutine(MoveCoroutine(_targetPos));
     }
 
@@ -116,15 +119,20 @@ public class Potion : MonoBehaviour
         Vector2 startPosition = transform.position;
         float elaspedTime = 0f;
 
+        // 움직이는 속도 일정하게 여기서
         while (elaspedTime < duration)
         {
             float t = elaspedTime / duration;
+
+            //Debug.Log("potion : " + this);
+            //Debug.Log("time : " + t);
 
             transform.position = Vector2.Lerp(startPosition, _targetPos, t);
 
             elaspedTime += Time.deltaTime;
 
             yield return null;
+            //yield return new WaitForSeconds(0.01f);
         }
 
         transform.position = _targetPos;

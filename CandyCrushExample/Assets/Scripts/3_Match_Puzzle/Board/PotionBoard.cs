@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -96,7 +98,8 @@ public class PotionBoard : MonoBehaviour
             if (selectedPotion.currentSwipeable)
             {
                 RunInput();
-            } else
+            }
+            else
             {
                 if (selectedPotion.potionType == PotionType.Bomb || selectedPotion.potionType == PotionType.DrillHorizontal || selectedPotion.potionType == PotionType.DrillVertical || selectedPotion.potionType == PotionType.PickLeft || selectedPotion.potionType == PotionType.PickRight || selectedPotion.potionType == PotionType.Prism)
                 {
@@ -255,7 +258,7 @@ public class PotionBoard : MonoBehaviour
         {
             // Right Swipe
             targetedPotion = potionBoard[originX + 1, originY].potion.GetComponent<Potion>();
-            
+
             SwapPotion(selectedPotion, targetedPotion);
         }
         else if (swipeAngle > 45 && swipeAngle <= 135 && originY != height - 1)
@@ -410,20 +413,35 @@ public class PotionBoard : MonoBehaviour
 
     public IEnumerator ProcessTurnOnMatchedBoard(bool _subtractMoves)
     {
-        foreach (Potion potionToRemove in findMatches.potionsToRemove)
-        {
-            potionToRemove.isMatched = false;
-        }
+        // 클리어했을 때 에러나서 if문 삭제
+        //if (findMatches.potionsToRemove.Count > 0)
+        //{
+        // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
+        //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
+            isProcessingMove = true;
 
-        RemoveAndRefill(findMatches.potionsToRemove);
+            foreach (Potion potionToRemove in findMatches.potionsToRemove)
+            {
+                potionToRemove.isMatched = false;
+            }
 
-        // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-        GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
-        bag1SubtractCount = 0;
-        bag2SubtractCount = 0;
-        bag3SubtractCount = 0;
-        bag4SubtractCount = 0;
-        yield return new WaitForSeconds(0.4f);
+            RemoveBlock(findMatches.potionsToRemove);
+
+            // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
+            GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
+            bag1SubtractCount = 0;
+            bag2SubtractCount = 0;
+            bag3SubtractCount = 0;
+            bag4SubtractCount = 0;
+
+            yield return new WaitForSeconds(0.4f);
+
+            RefillBlock();
+
+            isProcessingMove = false;
+
+            yield return new WaitForSeconds(0.4f);
+        //}
 
         if (findMatches.FindAllMatches())
         {
@@ -433,7 +451,7 @@ public class PotionBoard : MonoBehaviour
 
     // 블럭 지워지고 다시 생성
 
-    private void RemoveAndRefill(List<Potion> _potionsToRemove)
+    private void RemoveBlock(List<Potion> _potionsToRemove)
     {
         // Removing the potion and clearing the board at that location
         foreach (Potion potion in _potionsToRemove)
@@ -464,77 +482,258 @@ public class PotionBoard : MonoBehaviour
             // Create a blank node on the potion board
             potionBoard[_xIndex, _yIndex] = new Node(true, null);
         }
+    }
 
+    private void RefillBlock()
+    {
+        int[] xIndexNullCounts = Enumerable.Repeat<int>(0, width).ToArray<int>();
+
+        // 채우기 전에 x 인덱스마다 비어있는 개수 찾음
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 if (potionBoard[x, y].potion == null)
                 {
+                    xIndexNullCounts[x]++;
+                }
+            }
+        }
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                // 해당 보드의 블럭이 비어있으면
+                if (potionBoard[x, y].potion == null)
+                {
                     //Debug.Log("The location X: " + x + "Y: " + y + " is empty, attempting to refill it.");
-                    RefillPotion(x, y);
+                    // y offset 
+                    // 비어있는 자리 위의 블럭을 지정
+                    int yOffset = 1;
+
+                    // while the cell above our current cell is null and we're below the height of the board
+                    // 그 위의 블럭이 비어있으면 그 위를 지정
+                    while (y + yOffset < height && potionBoard[x, y + yOffset].potion == null)
+                    {
+                        // increment y offset
+                        //Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
+                        yOffset++;
+                    }
+
+                    // we've either hit the top of the board or we found a potion
+                    // 비어있는 블럭 위의 블럭을 찾았으면 빈 위치로 이동시킴
+                    if (y + yOffset < height && potionBoard[x, y + yOffset].potion != null)
+                    {
+                        // we've found a potion
+
+                        Potion potionAbove = potionBoard[x, y + yOffset].potion.GetComponent<Potion>();
+
+                        // Move it to the correct location
+                        Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
+                        //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
+
+                        //Debug.Log(targetPos);
+
+                        //Move to location
+                        potionAbove.MoveToTarget(targetPos);
+
+                        // update incidices
+                        potionAbove.SetIndicies(x, y);
+                        // update our potionBoard
+                        potionBoard[x, y] = potionBoard[x, y + yOffset];
+
+                        // set the location the potion came from to null
+                        potionBoard[x, y + yOffset] = new Node(true, null);
+                    }
+
+                    // if we're hit the top of the board without finding a potion
+                    // 비어있는 자리 위 블럭이 없었다면 블럭 생성
+                    if (y + yOffset == height)
+                    {
+                        //Debug.Log("I've reached the top of the board without finding a potion");
+                        // 비어있는 자리 개수 값 넘겨줌
+                        SpawnPotionAtTop(x, y, ref xIndexNullCounts);
+                    }
                 }
             }
         }
     }
 
     // RefillPotions
-    private void RefillPotion(int x, int y)
-    {
-        // y offset
-        int yOffset = 1;
+    //private void RefillPotion(int x, int y)
+    //{
+    //    // y offset
+    //    int yOffset = 1;
 
-        // while the cell above our current cell is null and we're below the height of the board
-        while (y + yOffset < height && potionBoard[x, y + yOffset].potion == null)
-        {
-            // increment y offset
-            //Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
-            yOffset++;
-        }
+    //    // while the cell above our current cell is null and we're below the height of the board
+    //    while (y + yOffset < height && potionBoard[x, y + yOffset].potion == null)
+    //    {
+    //        // increment y offset
+    //        //Debug.Log("The potion above me is null, but i'm not at the top of the board yet, so add to my yOffset and try again, Current Offset is : " + yOffset + " I'm about to add 1.");
+    //        yOffset++;
+    //    }
 
-        // we've either hit the top of the board or we found a potion
+    //    // we've either hit the top of the board or we found a potion
 
-        if (y + yOffset < height && potionBoard[x, y + yOffset].potion != null)
-        {
-            // we've found a potion
+    //    if (y + yOffset < height && potionBoard[x, y + yOffset].potion != null)
+    //    {
+    //        // we've found a potion
 
-            Potion potionAbove = potionBoard[x, y + yOffset].potion.GetComponent<Potion>();
+    //        Potion potionAbove = potionBoard[x, y + yOffset].potion.GetComponent<Potion>();
 
-            // Move it to the correct location
-            Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
-            //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
+    //        // Move it to the correct location
+    //        Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
+    //        //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
 
-            //Move to location
-            potionAbove.MoveToTarget(targetPos);
+    //        //Move to location
+    //        potionAbove.MoveToTarget(targetPos);
 
-            // update incidices
-            potionAbove.SetIndicies(x, y);
-            // update our potionBoard
-            potionBoard[x, y] = potionBoard[x, y + yOffset];
+    //        // update incidices
+    //        potionAbove.SetIndicies(x, y);
+    //        // update our potionBoard
+    //        potionBoard[x, y] = potionBoard[x, y + yOffset];
 
-            // set the location the potion came from to null
-            potionBoard[x, y + yOffset] = new Node(true, null);
-        }
+    //        // set the location the potion came from to null
+    //        potionBoard[x, y + yOffset] = new Node(true, null);
+    //    }
 
-        // if we're hit the top of the board without finding a potion
-        if (y + yOffset == height)
-        {
-            //Debug.Log("I've reached the top of the board without finding a potion");
-            SpawnPotionAtTop(x);
-        }
-    }
+    //    // if we're hit the top of the board without finding a potion
+    //    if (y + yOffset == height)
+    //    {
+    //        //Debug.Log("I've reached the top of the board without finding a potion");
+    //        SpawnPotionAtTop(x);
+    //    }
+    //}
 
     // 현재 블럭을 새로 만들고 내림
     // TODO : 1. 미리 생성된 블럭이 내려오게 변경
     //        2. 모든 블럭이 일정한 속도로 내려오게(현재는 같은 시간에 한번에 내려오고 있음)
-    private void SpawnPotionAtTop(int x)
+    private void SpawnPotionAtTop(int _x, int _y, ref int[] _xIndexNullCounts)
     {
-        int index = FindIndexOfLowestNull(x);
-        
-        int locationToMoveTo = height - index;
+        int index = FindIndexOfLowestNull(_x); // TODO : _y로 대체가능한듯??
+
+        // index 6              = y 7 nullcount 1
+        // index 5 6            = y 7 8 nullcount 2
+        // index 4 5 6          = y 7 8 9 nullcount 3
+        // index 3 4 5 6        = y 7 8 9 10 nullcount 4
+        // index 2 3 4 5 6      = y 7 8 9 10 11 nullcount 5
+        // index 1 2 3 4 5 6    = y 7 8 9 10 11 12 nullcount 6
+        // index 0 1 2 3 4 5 6  = y 7 8 9 10 11 12 13 nullcount 7
+        int positionY = height;
+
+        // 비어있는 자리 개수에 따라서 생성되는 y위치 값 설정
+        // TODO : 1. 해당 부분 리팩토링
+        switch (_xIndexNullCounts[_x])
+        {
+            case 1:
+                break;
+            case 2:
+                if (index == 6)
+                {
+                    positionY = height + 1;
+                }
+                break;
+            case 3:
+                if (index == 5)
+                {
+                    positionY = height + 1;
+                }
+                else if (index == 6)
+                {
+                    positionY = height + 2;
+                }
+                break;
+            case 4:
+
+                if (index == 4)
+                {
+                    positionY = height + 1;
+                }
+                else if (index == 5)
+                {
+                    positionY = height + 2;
+                }
+                else if (index == 6)
+                {
+                    positionY = height + 3;
+                }
+                break;
+            case 5:
+
+                if (index == 3)
+                {
+                    positionY = height + 1;
+                }
+                else if (index == 4)
+                {
+                    positionY = height + 2;
+                }
+                else if (index == 5)
+                {
+                    positionY = height + 3;
+                }
+                else if (index == 6)
+                {
+                    positionY = height + 4;
+                }
+                break;
+            case 6:
+
+                if (index == 2)
+                {
+                    positionY = height + 1;
+                }
+                else if (index == 3)
+                {
+                    positionY = height + 2;
+                }
+                else if (index == 4)
+                {
+                    positionY = height + 3;
+                }
+                else if (index == 5)
+                {
+                    positionY = height + 4;
+                }
+                else if (index == 6)
+                {
+                    positionY = height + 5;
+                }
+                break;
+            case 7:
+
+                if (index == 1)
+                {
+                    positionY = height + 1;
+                }
+                else if (index == 2)
+                {
+                    positionY = height + 2;
+                }
+                else if (index == 3)
+                {
+                    positionY = height + 3;
+                }
+                else if (index == 4)
+                {
+                    positionY = height + 4;
+                }
+                else if (index == 5)
+                {
+                    positionY = height + 5;
+                }
+                else if (index == 6)
+                {
+                    positionY = height + 6;
+                }
+                break;
+        }
+
+        int locationToMoveTo = positionY - index;
         //Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
 
-        Vector2 position = new Vector2(x - spacingX, height - spacingY);
+        Vector2 position = new Vector2(_x - spacingX, positionY - spacingY);
 
         // TODO : 1. 특수블럭 생성되어야 할 경우 우선 생성
         //          -> 
@@ -546,12 +745,14 @@ public class PotionBoard : MonoBehaviour
         newPotion.GetComponent<Potion>().potionType = (PotionType)makeBlockTypeIndex;
 
         // set indicies
-        newPotion.GetComponent<Potion>().SetIndicies(x, index);
+        newPotion.GetComponent<Potion>().SetIndicies(_x, index);
+
         // set it on the potion board
-        potionBoard[x, index] = new Node(true, newPotion);
+        potionBoard[_x, index] = new Node(true, newPotion);
         // move it to that location
         Vector3 targetPosition = new Vector3(newPotion.transform.position.x, newPotion.transform.position.y - locationToMoveTo, newPotion.transform.position.z);
         // 아래로 떨어지는 부분
+        // TODO : 1. 채워야할 개수에 따라 속도가 다름 일정하게 필요
         newPotion.GetComponent<Potion>().MoveToTarget(targetPosition);
     }
 
@@ -569,7 +770,7 @@ public class PotionBoard : MonoBehaviour
     }
 
     #endregion
-    
+
     // FindMatches가 가지고 있는 특수 블록 생성 여부에 따라서 해당 블럭 우선 생성
     private int MakeBlock()
     {
