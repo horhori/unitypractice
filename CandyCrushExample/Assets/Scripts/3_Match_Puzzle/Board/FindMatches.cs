@@ -178,7 +178,6 @@ public class FindMatches : MonoBehaviour
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {
-                            // complex matching...
                             MatchResult superMatchedPotions = FindSuperMatch(matchedPotions);
 
                             potionsToRemove.AddRange(superMatchedPotions.connectedPotions);
@@ -215,15 +214,15 @@ public class FindMatches : MonoBehaviour
         // do we have 2 or more extra matches.
         // we've made a super match - return a new matchresult of type super
         // return extra matches
+        // TODO : 1. 족보 우선순위 적용
         if (_matchedResults.direction == MatchDirection.Horizontal_3 || _matchedResults.direction == MatchDirection.Horizontal_4 || _matchedResults.direction == MatchDirection.LongHorizontal)
         {
             foreach (Potion pot in _matchedResults.connectedPotions)
             {
                 List<Potion> extraConnectedPotions = new();
 
-                CheckDirection(pot, new Vector2Int(0, 1), extraConnectedPotions);
-                // 오른쪽 체크했는데 왼쪽 체크 필요한지 테스트 필요
-                CheckDirection(pot, new Vector2Int(0, -1), extraConnectedPotions);
+                CheckSuperDirection(pot, new Vector2Int(0, 1), extraConnectedPotions);
+                CheckSuperDirection(pot, new Vector2Int(0, -1), extraConnectedPotions);
 
                 if (extraConnectedPotions.Count >= 2)
                 {
@@ -234,7 +233,7 @@ public class FindMatches : MonoBehaviour
                     return new MatchResult
                     {
                         connectedPotions = extraConnectedPotions,
-                        direction = MatchDirection.Super
+                        direction = _matchedResults.direction == MatchDirection.LongHorizontal ? MatchDirection.LongHorizontal : MatchDirection.Super
                     };
                 }
             }
@@ -259,8 +258,8 @@ public class FindMatches : MonoBehaviour
             {
                 List<Potion> extraConnectedPotions = new();
 
-                CheckDirection(pot, new Vector2Int(1, 0), extraConnectedPotions);
-                CheckDirection(pot, new Vector2Int(-1, 0), extraConnectedPotions);
+                CheckSuperDirection(pot, new Vector2Int(1, 0), extraConnectedPotions);
+                CheckSuperDirection(pot, new Vector2Int(-1, 0), extraConnectedPotions);
 
                 if (extraConnectedPotions.Count >= 2)
                 {
@@ -270,7 +269,7 @@ public class FindMatches : MonoBehaviour
                     return new MatchResult
                     {
                         connectedPotions = extraConnectedPotions,
-                        direction = MatchDirection.Super
+                        direction = _matchedResults.direction == MatchDirection.LongVertical ? MatchDirection.LongVertical : MatchDirection.Super
                     };
                 }
             }
@@ -280,7 +279,13 @@ public class FindMatches : MonoBehaviour
                 direction = _matchedResults.direction
             };
         }
-        return null;
+
+        // _matchedResult.direction == MatchDirection.Square인 경우 그대로 넘김
+        return new MatchResult
+        {
+            connectedPotions = _matchedResults.connectedPotions,
+            direction = _matchedResults.direction
+        };
     }
 
     // 블럭 타입이 일치하는지 확인 후 Match 결과 반환
@@ -294,43 +299,9 @@ public class FindMatches : MonoBehaviour
         // 가로 체크
         CheckHorizontalMatch(potion, connectedPotions);
 
-        // check right
-        //CheckDirection(potion, new Vector2Int(1, 0), connectedPotions);
-
-        // check left -- 없어도 될듯? 체크 필요
-        //CheckDirection(potion, new Vector2Int(-1, 0), connectedPotions);
-
-        // TODO : 1. 네모 체크
-        //if (connectedPotions.Count >= 2)
-        //{
-        //    CheckSquare(potion, connectedPotions);
-        //}
-
-        // have we made a 3 match? (Horizontal match)
-        if (connectedPotions.Count == 3)
-        {
-            //Debug.Log("I have a horizontal_3 match, the color of my match is : " + connectedPotions[0].potionType);
-
-            return new MatchResult
-            {
-                connectedPotions = connectedPotions,
-                direction = MatchDirection.Horizontal_3
-            };
-        }
-        // 4 이상 가로 매치
-        else if (connectedPotions.Count == 4)
-        {
-            //Debug.Log("I have a horizontal_4 match, the color of my match is : " + connectedPotions[0].potionType);
-            isCheckedHorizontal_4 = true;
-
-            return new MatchResult
-            {
-                connectedPotions = connectedPotions,
-                direction = MatchDirection.Horizontal_4
-            };
-        }
-        // 5 이상 가로 매치
-        else if (connectedPotions.Count >= 5)
+        // 우선 순위 적용
+        // 1. 5 이상 가로 매치
+        if (connectedPotions.Count >= 5)
         {
             //Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
             isCheckedMatched_5 = true;
@@ -341,6 +312,80 @@ public class FindMatches : MonoBehaviour
                 direction = MatchDirection.LongHorizontal
             };
         }
+
+        // 2. 4 가로 매치
+        // TODO : 1. 네모 체크 안해야함
+
+        else if (connectedPotions.Count == 4)
+        {
+            // 4 이상 가로 매치
+            // TODO : 1. 4 이상 가로 매치인 경우 네모 체크 안함
+            if (isCheckedSquare)
+            {
+                return new MatchResult
+                {
+                    connectedPotions = connectedPotions,
+                    direction = MatchDirection.Square
+                };
+            }
+            else
+            {
+                isCheckedHorizontal_4 = true;
+
+                return new MatchResult
+                {
+                    connectedPotions = connectedPotions,
+                    direction = MatchDirection.Horizontal_4
+                };
+            }
+        }
+
+        // 3. 3 가로 매치
+        // TODO : 1. 네모 + 3매치된 경우 네모만 사라지는중
+        else if (connectedPotions.Count == 3)
+        {
+            //Debug.Log("네모 체크 : 3 가로 매치");
+            //CheckSquareMatch(potion, connectedPotions);
+
+            //if (isCheckedSquare)
+            //{
+            //    return new MatchResult
+            //    {
+            //        connectedPotions = connectedPotions,
+            //        direction = MatchDirection.Square
+            //    };
+            //} else
+            //{
+            //    return new MatchResult
+            //    {
+            //        connectedPotions = connectedPotions,
+            //        direction = MatchDirection.Horizontal_3
+            //    };
+            //}
+
+            return new MatchResult
+            {
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Square
+            };
+
+        }
+
+        // 4. 2 가로 매치
+        //else if (connectedPotions.Count == 2)
+        //{
+        //    Debug.Log("네모 체크 : 2 가로 매치");
+        //    CheckSquareMatch(potion, connectedPotions);
+
+        //    if (isCheckedSquare)
+        //    {
+        //        return new MatchResult
+        //        {
+        //            connectedPotions = connectedPotions,
+        //            direction = MatchDirection.Square
+        //        };
+        //    }
+        //}
 
         // clear out the connectedpotions
         connectedPotions.Clear();
@@ -357,19 +402,20 @@ public class FindMatches : MonoBehaviour
         // check down -- 없어도 될듯? 체크 필요
         //CheckDirection(potion, new Vector2Int(0, -1), connectedPotions);
 
-
-        // 3 세로 매치
-        if (connectedPotions.Count == 3)
+        // 우선 순위 적용
+        // 1. 5 이상 세로 매치
+        if (connectedPotions.Count >= 5)
         {
-            //Debug.Log("I have a Vertical_3 match, the color of my match is : " + connectedPotions[0].potionType);
+            //Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+            isCheckedMatched_5 = true;
 
             return new MatchResult
             {
                 connectedPotions = connectedPotions,
-                direction = MatchDirection.Vertical_3
+                direction = MatchDirection.LongVertical
             };
         }
-        // 4 세로 매치
+        // 2. 4 세로 매치
         else if (connectedPotions.Count == 4)
         {
             //Debug.Log("I have a Vertical_4 match, the color of my match is : " + connectedPotions[0].potionType);
@@ -381,18 +427,18 @@ public class FindMatches : MonoBehaviour
                 direction = MatchDirection.Vertical_4
             };
         }
-        // 5 이상 세로 매치
-        else if (connectedPotions.Count >= 5)
+        // 3. 3 세로 매치
+        else if (connectedPotions.Count == 3)
         {
-            //Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
-            isCheckedMatched_5 = true;
-
             return new MatchResult
             {
                 connectedPotions = connectedPotions,
-                direction = MatchDirection.LongVertical
+                direction = MatchDirection.Vertical_3
             };
+
         }
+
+        // 가로 체크에서 네모 항상 발견해서 여기서는 네모 체크 제외
         else
         {
             return new MatchResult
@@ -422,15 +468,21 @@ public class FindMatches : MonoBehaviour
                     connectedPotions.Add(neighbourPotion);
 
                     // 네모 추가 체크
+                    // TODO : 1. 가로, 세로 매치가 2, 3인 경우만 네모 체크 메서드 따로
+
                     if (!isCheckedSquare && y < board.height - 1 && board.potionBoard[x - 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x - 1, y + 1].isUsable)
                     {
-                        PotionType leftNeighbourPotionType = board.potionBoard[x - 1, y].potion.GetComponent<Potion>().potionType;
-                        PotionType upNeighbourPotionType = board.potionBoard[x, y + 1].potion.GetComponent<Potion>().potionType;
-                        PotionType leftupNeighbourPotionType = board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>().potionType;
+                        // left는 무조건 같음
+                        //PotionType leftNeighbourPotionType = board.potionBoard[x - 1, y].potion.GetComponent<Potion>().potionType;
+                        Potion upNeighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
+                        Potion leftupNeighbourPotion = board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>();
 
-                        if (neighbourPotion.potionType == leftNeighbourPotionType && neighbourPotion.potionType == upNeighbourPotionType && neighbourPotion.potionType == leftupNeighbourPotionType)
+                        // 왼쪽, 위, 왼쪽위 블럭 같은지 체크
+                        if (neighbourPotion.potionType == upNeighbourPotion.potionType && neighbourPotion.potionType == leftupNeighbourPotion.potionType)
                         {
                             isCheckedSquare = true;
+                            connectedPotions.Add(upNeighbourPotion);
+                            connectedPotions.Add(leftupNeighbourPotion);
                         }
                     }
 
@@ -497,11 +549,44 @@ public class FindMatches : MonoBehaviour
         }
     }
 
-    // 세로, 가로 방향(direction) 매칭 체크
-    // 기존 체크 기능 -> 네모 체크 때문에 위에 새로 만들었고 
-    // Super 매칭때 해당 메서드 사용중이라 우선 남겨놓음
+
+    // 네모 추가 체크
+    // 가로 체크의 경우에만 해당 메서드 실행중
+    // TODO : 1. 메모리 에러나는중...
+    void CheckSquareMatch(Potion pot, List<Potion> connectedPotions)
+    {
+        PotionType potionType = pot.potionType;
+        int x = pot.xIndex;
+        int y = pot.yIndex;
+
+        // 무조건 되는 경우에만 되서 될 거 같은데
+        Potion neighbourPotion = board.potionBoard[x + 1, y].potion.GetComponent<Potion>();
+
+        if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
+        {
+            connectedPotions.Add(neighbourPotion);
+
+            if (!isCheckedSquare && y < board.height - 1 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x + 1, y + 1].isUsable)
+            {
+                // left는 무조건 같음
+                //PotionType leftNeighbourPotionType = board.potionBoard[x - 1, y].potion.GetComponent<Potion>().potionType;
+                Potion upNeighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
+                Potion rightupNeighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
+
+                // 왼쪽, 위, 왼쪽위 블럭 같은지 체크
+                if (neighbourPotion.potionType == upNeighbourPotion.potionType && neighbourPotion.potionType == rightupNeighbourPotion.potionType)
+                {
+                    isCheckedSquare = true;
+                    connectedPotions.Add(upNeighbourPotion);
+                    connectedPotions.Add(rightupNeighbourPotion);
+                }
+            }
+        }
+    }
+
+    // 세로, 가로 방향(direction) Super 매칭(L자)되나 체크
     // 매개 변수로 준 direction 방향으로 같으면 계속 체크함
-    void CheckDirection(Potion pot, Vector2Int direction, List<Potion> connectedPotions)
+    void CheckSuperDirection(Potion pot, Vector2Int direction, List<Potion> connectedPotions)
     {
         PotionType potionType = pot.potionType;
         int x = pot.xIndex + direction.x;
@@ -518,6 +603,20 @@ public class FindMatches : MonoBehaviour
                 if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
                 {
                     connectedPotions.Add(neighbourPotion);
+
+                    // 네모 추가 체크
+                    // 슈퍼매칭때는 없어도 됨 이미 가로 체크에서 체크한거라
+                    //if (!isCheckedSquare && y < board.height - 1 && board.potionBoard[x - 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x - 1, y + 1].isUsable)
+                    //{
+                    //    PotionType leftNeighbourPotionType = board.potionBoard[x - 1, y].potion.GetComponent<Potion>().potionType;
+                    //    PotionType upNeighbourPotionType = board.potionBoard[x, y + 1].potion.GetComponent<Potion>().potionType;
+                    //    PotionType leftupNeighbourPotionType = board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>().potionType;
+
+                    //    if (neighbourPotion.potionType == leftNeighbourPotionType && neighbourPotion.potionType == upNeighbourPotionType && neighbourPotion.potionType == leftupNeighbourPotionType)
+                    //    {
+                    //        isCheckedSquare = true;
+                    //    }
+                    //}
 
                     x += direction.x;
                     y += direction.y;
@@ -540,27 +639,21 @@ public class FindMatches : MonoBehaviour
         switch (_potion.potionType)
         {
             case PotionType.DrillVertical:
-                Debug.Log("드릴(세로) 기능 발동");
                 return GetColumnPieces(_potion.xIndex);
 
             case PotionType.DrillHorizontal:
-                Debug.Log("드릴(가로) 기능 발동");
                 return GetRowPieces(_potion.yIndex);
 
             case PotionType.Bomb:
-                Debug.Log("폭탄 기능 발동");
                 return Get2DistancePieces(_potion.xIndex, _potion.yIndex);
 
             case PotionType.Prism:
-                Debug.Log("프리즘 기능 발동");
                 return MatchPiecesOfColor(_potion.xIndex, _potion.yIndex);
 
             case PotionType.PickLeft:
-                Debug.Log("곡괭이(역대각) 기능 발동");
                 return GetReverseDiagonalPieces(_potion.xIndex, _potion.yIndex);
 
             case PotionType.PickRight:
-                Debug.Log("곡괭이(대각) 기능 발동");
                 return GetDiagonalPieces(_potion.xIndex, _potion.yIndex);
         }
 
@@ -572,27 +665,21 @@ public class FindMatches : MonoBehaviour
         switch (_potion.potionType)
         {
             case PotionType.DrillVertical :
-                Debug.Log("드릴(세로) 기능 발동");
                 return GetColumnPieces(_potion.xIndex);
 
             case PotionType.DrillHorizontal:
-                Debug.Log("드릴(가로) 기능 발동");
                 return GetRowPieces(_potion.yIndex);
 
             case PotionType.Bomb:
-                Debug.Log("폭탄 기능 발동");
                 return Get2DistancePieces(_potion.xIndex, _potion.yIndex);
 
             case PotionType.Prism:
-                Debug.Log("프리즘 기능 발동");
                 return MatchPiecesOfColor(_potion.xIndex, _potion.yIndex, _anotherPotion.potionType);
 
             case PotionType.PickLeft:
-                Debug.Log("곡괭이(역대각) 기능 발동");
                 return GetReverseDiagonalPieces(_potion.xIndex, _potion.yIndex);
 
             case PotionType.PickRight:
-                Debug.Log("곡괭이(대각) 기능 발동");
                 return GetDiagonalPieces(_potion.xIndex, _potion.yIndex);
         }
 
@@ -600,6 +687,10 @@ public class FindMatches : MonoBehaviour
     }
 
     // 드릴(세로) 기능
+    // 조합 효과
+    // 1. + 드릴(가로, 세로 상관없음) : 조합된 부분에서 십자 방향에 있는 모든 블럭 제거
+    // 2. + 곡괭이 : 조합된 곡괭이 블럭 모양에 맞춘 방향의 모든 블럭 제거(기획서 P63 참고)
+    // 3. + 프리즘 : 필드에 존재하는 블럭 중 가장 많은 수의 블럭을 조합된 드릴로 바꿈
     List<Potion> GetColumnPieces(int _xIndex)
     {
         List<Potion> blocks = new List<Potion>();
@@ -622,6 +713,10 @@ public class FindMatches : MonoBehaviour
 
 
     // 드릴(가로) 기능
+    // 조합 효과
+    // 1. + 드릴(가로, 세로 상관없음) : 조합된 부분에서 십자 방향에 있는 모든 블럭 제거
+    // 2. + 곡괭이 : 조합된 곡괭이 블럭 모양에 맞춘 방향의 모든 블럭 제거(기획서 P63 참고)
+    // 3. + 프리즘 : 필드에 존재하는 블럭 중 가장 많은 수의 블럭을 조합된 드릴로 바꿈
     List<Potion> GetRowPieces(int _yIndex)
     {
         List<Potion> blocks = new List<Potion>();
@@ -643,6 +738,12 @@ public class FindMatches : MonoBehaviour
     }
 
     // 폭탄 기능
+    // 조합 효과
+    // 1. + 폭탄 : 조작하여 조합된 부분에서 3칸 떨어진 모든 블럭 제거
+    // 2. + 드릴 : 드릴 블럭과 같은 가로 or 세로줄에 있는 모든 블럭을 3칸 너비로 제거
+    // 3. + 곡괭이 : 곡괭이 블럭과 같은 대각 or 역대각줄에 있는 모든 블럭을 3칸 너비로 제거
+    // 4. + 프리즘 : 필드에 존재하는 블럭 중 가장 많은 수의 블럭을 폭탄으로 바꿈
+    //               바뀐 폭탄 효과는 왼쪽 위부터 발생
     List<Potion> Get2DistancePieces(int _xIndex, int  _yIndex)
     {
         List<Potion> blocks = new List<Potion>();
@@ -683,6 +784,9 @@ public class FindMatches : MonoBehaviour
     }
 
     // 곡괭이 대각(오른쪽) 기능
+    // 조합 효과
+    // 1. + 곡괭이(대각, 역대각 상관없음) : X 방향 블럭 제거
+    // 2. + 프리즘 : 필드에 존재하는 블럭 중 가장 많은 수의 블럭을 조합된 곡괭이로 바꿈
     List<Potion> GetDiagonalPieces(int _xIndex, int _yIndex)
     {
         List<Potion> blocks = new List<Potion>();
@@ -713,6 +817,9 @@ public class FindMatches : MonoBehaviour
     }
 
     // 곡괭이 역대각(왼쪽) 기능
+    // 조합 효과
+    // 1. + 곡괭이(대각, 역대각 상관없음) : X 방향 블럭 제거
+    // 2. + 프리즘 : 필드에 존재하는 블럭 중 가장 많은 수의 블럭을 조합된 곡괭이로 바꿈
     List<Potion> GetReverseDiagonalPieces(int _xIndex, int _yIndex)
     {
         List<Potion> blocks = new List<Potion>();
@@ -813,6 +920,8 @@ public class FindMatches : MonoBehaviour
     }
 
     // 프리즘 기능
+    // 조합 효과
+    // 1. + 프리즘 : 화면에 보이는 모든 블럭을 제거
     List<Potion> MatchPiecesOfColor(int _xIndex, int _yIndex, PotionType _targetPotionType)
     {
         List<Potion> blocks = new List<Potion>();

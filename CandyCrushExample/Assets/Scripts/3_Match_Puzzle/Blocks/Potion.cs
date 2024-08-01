@@ -23,11 +23,6 @@ public class Potion : MonoBehaviour
     public int spacingX = 3;
     public int spacingY = 3;
 
-    private int targetX;
-    private int targetY;
-
-    private Vector2 tempPosition;
-
     public bool isMatched;
 
     // TODO : 1. 해당 블럭이 스왑되면 매칭이 되는지 여부 (true면 발광, 위아래로 살짝 움직임 적용)
@@ -64,49 +59,6 @@ public class Potion : MonoBehaviour
     {
         xIndex = _x;
         yIndex = _y;
-    }
-
-    private void Update()
-    {
-        //targetX = xIndex - spacingX;
-        //targetY = yIndex - spacingY;
-
-        //if (Mathf.Abs(targetX - transform.position.x) > .1)
-        //{
-        //    // Move Towards the target
-        //    tempPosition = new Vector2(targetX, transform.position.y);
-        //    transform.position = Vector2.Lerp(transform.position, tempPosition, .05f);
-        //    //if (board.allDots[column, row] != this.gameObject)
-        //    //{
-        //    //    board.allDots[column, row] = this.gameObject;
-        //    //}
-        //    //findMatches.FindAllMatches();
-        //}
-        //else
-        //{
-        //    // Directly set the position
-        //    tempPosition = new Vector2(targetX, transform.position.y);
-        //    transform.position = tempPosition;
-
-        //}
-
-        //if (Mathf.Abs(targetY - transform.position.y) > .1)
-        //{
-        //    // Move Towards the target
-        //    tempPosition = new Vector2(transform.position.x, targetY);
-        //    transform.position = Vector2.Lerp(transform.position, tempPosition, .05f);
-        //    //if (board.allDots[column, row] != this.gameObject)
-        //    //{
-        //    //    board.allDots[column, row] = this.gameObject;
-        //    //}
-        //    //findMatches.FindAllMatches();
-        //}
-        //else
-        //{
-        //    // Directly set the position
-        //    tempPosition = new Vector2(transform.position.x, targetY);
-        //    transform.position = tempPosition;
-        //}
     }
 
     public void OnMouseDown()
