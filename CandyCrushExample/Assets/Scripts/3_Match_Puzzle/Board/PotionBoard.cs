@@ -279,63 +279,7 @@ public class PotionBoard : MonoBehaviour
             targetedPotion = potionBoard[originX, originY - 1].potion.GetComponent<Potion>();
             SwapPotion(selectedPotion, targetedPotion);
         }
-        // 벽에 부딫히는 경우
-        //else if (swipeAngle > -45 && swipeAngle <= 45 && originX == width - 1)
-        //{
-        //    // 오른쪽
-        //    Vector3 tempDirection = new Vector3(1, 0);
-        //    BounceEdge(selectedPotion, tempDirection);
-        //}
-        //else if (swipeAngle > 45 && swipeAngle <= 135 && originY == height - 1)
-        //{
-        //    // 위쪽
-        //    Vector3 tempDirection = new Vector3(0, 1);
-        //    BounceEdge(selectedPotion, tempDirection);
-        //}
-        //else if ((swipeAngle > 135 || swipeAngle <= -135) && originX == 0)
-        //{
-        //    // 왼쪽
-        //    Vector3 tempDirection = new Vector3(-1, 0);
-        //    BounceEdge(selectedPotion, tempDirection);
-        //}
-        //else if (swipeAngle < -45 && swipeAngle >= -135 && originY == 0)
-        //{
-        //    // 아래쪽
-        //    Vector3 tempDirection = new Vector3(0, -1);
-        //    BounceEdge(selectedPotion, tempDirection);
-        //}
-
-        //selectedPotion = null;
-        //targetedPotion = null;
-
-        //// 특수블럭 체크때문에 여기에서 특수블럭 체크 후 선택, 타켓 블럭 해제 넣음
-        //board.selectedPotion = null;
-        //board.targetedPotion = null;
     }
-
-    // 벽에 부딫히는 경우
-    // TODO : 1. 벽에 부딫히는 경우 튕겨 돌아와야 함
-    //           -> 240718 부분 완료. 부딫혔을 때 속도, 거리 조절 필요
-    //private void BounceEdge(Potion _currentPotion, Vector3 _targetDirection)
-    //{
-    //    Vector2 originPosition = _currentPotion.transform.position;
-    //    Vector2 targetPosition = _currentPotion.transform.position + _targetDirection;
-
-    //    isProcessingMove = true;
-
-    //    _currentPotion.MoveToTarget(targetPosition);
-
-    //    StartCoroutine(ProcessBounce(_currentPotion, originPosition));
-    //}
-
-    //private IEnumerator ProcessBounce(Potion _currentPotion, Vector2 _originPosition)
-    //{
-    //    yield return new WaitForSeconds(0.2f);
-
-    //    _currentPotion.MoveToTarget(_originPosition);
-
-    //    isProcessingMove = false;
-    //}
 
     // 블럭을 인접한 블럭과 위치 바꿈
     private void SwapPotion(Potion _currentPotion, Potion _targetPotion)
@@ -413,11 +357,11 @@ public class PotionBoard : MonoBehaviour
     public IEnumerator ProcessTurnOnMatchedBoard(bool _subtractMoves)
     {
         // 클리어했을 때 에러나서 if문 삭제
-        //if (findMatches.potionsToRemove.Count > 0)
-        //{
-        // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
-        //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
-        isProcessingMove = true;
+        if (findMatches.potionsToRemove.Count > 0)
+        {
+            // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
+            //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
+            isProcessingMove = true;
 
         foreach (Potion potionToRemove in findMatches.potionsToRemove)
         {
@@ -438,7 +382,7 @@ public class PotionBoard : MonoBehaviour
         bag4SubtractCount = 0;
 
         yield return new WaitForSeconds(0.4f);
-        //}
+        }
 
         isProcessingMove = false;
 
@@ -689,7 +633,7 @@ public class PotionBoard : MonoBehaviour
         Vector2 position = new Vector2(_x - spacingX, positionY - spacingY);
 
         // TODO : 1. 특수블럭 생성되어야 할 경우 우선 생성
-        //          -> 
+        //          -> 조합된 후 생성될 해당 블럭을 샛ㅇ성되는 특수 블럭으로 교체
         int makeBlockTypeIndex = MakeBlock();
 
         GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
@@ -801,8 +745,6 @@ public class MatchResult
 
 
 // 족보 : 3배열, 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 (시스템 기획서 27P)
-//        
-// 4배열 네모는 터지는 경우가 아님
 
 // TODO : 1. 특수 블럭 조합 로직 추가
 
