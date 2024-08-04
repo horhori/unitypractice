@@ -2510,10 +2510,10 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1756802270}
   victoryPanel: {fileID: 392116405}
   losePanel: {fileID: 1214384969}
-  goal: 100
+  goal: 300
   points: 0
   stageNumber: 1
-  min: 0
+  min: 2
   sec: 30
   isGameRunning: 0
   isGameEnded: 0

@@ -101,12 +101,23 @@ public class PotionBoard : MonoBehaviour
             }
             else
             {
-                if (selectedPotion.potionType == PotionType.Bomb || selectedPotion.potionType == PotionType.DrillHorizontal || selectedPotion.potionType == PotionType.DrillVertical || selectedPotion.potionType == PotionType.PickLeft || selectedPotion.potionType == PotionType.PickRight || selectedPotion.potionType == PotionType.Prism)
+                if (findMatches.IsSpecialBlock(selectedPotion.potionType))
                 {
                     isProcessingMove = true;
                     StartCoroutine(ProcessOriginMatches(selectedPotion));
                 }
             }
+        }
+
+        // 특수 블럭 조합 효과 테스트용
+        if (Input.GetMouseButtonDown(1))
+        {
+            SelectPotion();
+        }
+
+        if (Input.GetMouseButtonUp(1) && selectedPotion)
+        {
+            StartCoroutine(TestProcessOriginSpecialMatches(selectedPotion));
         }
     }
 
@@ -201,10 +212,11 @@ public class PotionBoard : MonoBehaviour
                         // run some matching logic
 
                         // TODO : 1. 초기 생성 IsConnected랑 게임 도중이랑 분리 필요 -> 폭탄 때문에
+                        // 되는게 맞는데 확인중
                         MatchResult matchedPotions = findMatches.IsConnected(potion);
 
                         if (matchedPotions.connectedPotions.Count >= 3)
-                        {
+                        {   
                             hasMatched = true;
                         }
                     }
@@ -353,6 +365,21 @@ public class PotionBoard : MonoBehaviour
 
     #endregion
 
+    // 특수 블럭 효과 테스트용 메서드
+    private IEnumerator TestProcessOriginSpecialMatches(Potion _currentPotion)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        // 매칭 체크 후 3매치 이상이 일어나면 제거 시작
+        if (findMatches.TestFindSpecialMatches())
+        {
+            // Start a coroutine that is going to process our matches in our turn.
+            StartCoroutine(ProcessTurnOnMatchedBoard(true));
+        }
+
+        isProcessingMove = false;
+    }
+
     #region Cascading Potions
     public IEnumerator ProcessTurnOnMatchedBoard(bool _subtractMoves)
     {
@@ -370,7 +397,7 @@ public class PotionBoard : MonoBehaviour
 
         RemoveBlock(findMatches.potionsToRemove);
 
-        //yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.6f);
 
         RefillBlock();
 
@@ -381,7 +408,7 @@ public class PotionBoard : MonoBehaviour
         bag3SubtractCount = 0;
         bag4SubtractCount = 0;
 
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.6f);
         }
 
         isProcessingMove = false;
@@ -633,7 +660,7 @@ public class PotionBoard : MonoBehaviour
         Vector2 position = new Vector2(_x - spacingX, positionY - spacingY);
 
         // TODO : 1. 특수블럭 생성되어야 할 경우 우선 생성
-        //          -> 조합된 후 생성될 해당 블럭을 샛ㅇ성되는 특수 블럭으로 교체
+        //          -> 조합된 후 생성될 해당 블럭을 생성되는 특수 블럭으로 교체
         int makeBlockTypeIndex = MakeBlock();
 
         GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);

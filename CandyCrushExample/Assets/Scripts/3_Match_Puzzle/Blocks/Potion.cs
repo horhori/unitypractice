@@ -127,8 +127,8 @@ public class Potion : MonoBehaviour
         float distance = Vector2.Distance(startPosition, _targetPos);
         // 스왑 애니메이션 지속 시간임
         // 속력 = 거리 / 0.1f * distance 하여 속력 일정하게
-        // 기존에 시간 0.2f였는데 느려서 0.1f * distance로 조정
-        float duration = 0.1f * distance;
+        // 기존에 시간 0.2f였는데 느려서 0.06f * distance로 조정
+        float duration = 0.06f * distance;
 
         float elaspedTime = 0f;
 
