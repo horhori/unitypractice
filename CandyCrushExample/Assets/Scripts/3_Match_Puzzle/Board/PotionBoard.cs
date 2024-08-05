@@ -213,7 +213,7 @@ public class PotionBoard : MonoBehaviour
 
                         // TODO : 1. 초기 생성 IsConnected랑 게임 도중이랑 분리 필요 -> 폭탄 때문에
                         // 되는게 맞는데 확인중
-                        MatchResult matchedPotions = findMatches.IsConnected(potion);
+                        MatchResult matchedPotions = findMatches.TestIsConnected(potion);
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {   
@@ -380,7 +380,7 @@ public class PotionBoard : MonoBehaviour
         isProcessingMove = false;
     }
 
-    #region Cascading Potions
+    #region 블럭 제거
     public IEnumerator ProcessTurnOnMatchedBoard(bool _subtractMoves)
     {
         // 클리어했을 때 에러나서 if문 삭제
@@ -695,6 +695,8 @@ public class PotionBoard : MonoBehaviour
 
     #endregion
 
+    #region 특수블럭 생성
+
     // FindMatches가 가지고 있는 특수 블록 생성 여부에 따라서 해당 블럭 우선 생성
     private int MakeBlock()
     {
@@ -761,6 +763,7 @@ public class PotionBoard : MonoBehaviour
         return (int)PotionType.Bomb;
     }
 
+    #endregion
 
 }
 

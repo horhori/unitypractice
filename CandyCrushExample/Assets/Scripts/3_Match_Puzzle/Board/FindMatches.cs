@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using static Unity.Collections.AllocatorManager;
@@ -220,7 +221,7 @@ public class FindMatches : MonoBehaviour
                     {
                         // run some matching logic
 
-                        MatchResult matchedPotions = IsConnected(potion);
+                        MatchResult matchedPotions = TestIsConnected(potion);
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {
@@ -335,17 +336,173 @@ public class FindMatches : MonoBehaviour
     }
 
     // 블럭 타입이 일치하는지 확인 후 Match 결과 반환
-    public MatchResult IsConnected(Potion potion)
+    //public MatchResult IsConnected(Potion potion)
+    //{
+    //    List<Potion> connectedPotions = new()
+    //    {
+    //        potion
+    //    };
+
+    //    // 가로 체크
+    //    CheckHorizontalMatch(potion, connectedPotions);
+
+    //    // 우선 순위 적용
+    //    // 1. 5 이상 가로 매치
+    //    if (connectedPotions.Count >= 5)
+    //    {
+    //        //Debug.Log("I have a Long horizontal match, the color of my match is : " + connectedPotions[0].potionType);
+    //        isCheckedMatched_5 = true;
+
+    //        return new MatchResult
+    //        {
+    //            connectedPotions = connectedPotions,
+    //            direction = MatchDirection.LongHorizontal
+    //        };
+    //    }
+
+    //    // 2. 4 가로 매치
+
+    //    else if (connectedPotions.Count == 4)
+    //    {
+    //        // 4 이상 가로 매치
+
+    //        isCheckedHorizontal_4 = true;
+
+    //        return new MatchResult
+    //        {
+    //            connectedPotions = connectedPotions,
+    //            direction = MatchDirection.Horizontal_4
+    //        };
+    //    }
+
+    //    // 3. 3 가로 매치
+    //    else if (connectedPotions.Count == 3)
+    //    {
+    //        if (CheckHorizontalSquareMatch(potion, connectedPotions))
+    //        {
+    //            return new MatchResult
+    //            {
+    //                connectedPotions = connectedPotions,
+    //                direction = MatchDirection.Square
+    //            };
+    //        }
+    //        else
+    //        {
+    //            return new MatchResult
+    //            {
+    //                connectedPotions = connectedPotions,
+    //                direction = MatchDirection.Horizontal_3
+    //            };
+    //        }
+    //    }
+
+    //    // 4. 2 가로 매치
+    //    else if (connectedPotions.Count == 2)
+    //    {
+    //        if (CheckHorizontalSquareMatch(potion, connectedPotions))
+    //        {
+    //            return new MatchResult
+    //            {
+    //                connectedPotions = connectedPotions,
+    //                direction = MatchDirection.Square
+    //            };
+    //        }
+    //    }
+
+    //    // clear out the connectedpotions
+    //    connectedPotions.Clear();
+
+    //    // read our initial potion
+    //    connectedPotions.Add(potion);
+
+    //    // 세로 체크
+    //    CheckVerticalMatch(potion, connectedPotions);
+
+    //    // check up
+    //    //CheckDirection(potion, new Vector2Int(0, 1), connectedPotions);
+
+    //    // check down -- 없어도 될듯? 체크 필요
+    //    //CheckDirection(potion, new Vector2Int(0, -1), connectedPotions);
+
+    //    // 우선 순위 적용
+    //    // 1. 5 이상 세로 매치
+    //    if (connectedPotions.Count >= 5)
+    //    {
+    //        //Debug.Log("I have a Long Vertical match, the color of my match is : " + connectedPotions[0].potionType);
+    //        isCheckedMatched_5 = true;
+
+    //        return new MatchResult
+    //        {
+    //            connectedPotions = connectedPotions,
+    //            direction = MatchDirection.LongVertical
+    //        };
+    //    }
+    //    // 2. 4 세로 매치
+    //    else if (connectedPotions.Count == 4)
+    //    {
+    //        //Debug.Log("I have a Vertical_4 match, the color of my match is : " + connectedPotions[0].potionType);
+    //        isCheckedVertical_4 = true;
+
+    //        return new MatchResult
+    //        {
+    //            connectedPotions = connectedPotions,
+    //            direction = MatchDirection.Vertical_4
+    //        };
+    //    }
+    //    // 3. 3 세로 매치
+    //    // TODO : 1. xOO
+    //    //           OOO 해당 배치를 세로로
+    //    else if (connectedPotions.Count == 3)
+    //    {
+    //        //return new MatchResult
+    //        //{
+    //        //    connectedPotions = connectedPotions,
+    //        //    direction = MatchDirection.Vertical_3
+    //        //};
+
+    //        if (CheckVerticalSquareMatch(potion, connectedPotions))
+    //        {
+    //            return new MatchResult
+    //            {
+    //                connectedPotions = connectedPotions,
+    //                direction = MatchDirection.Square
+    //            };
+    //        }
+    //        else
+    //        {
+    //            return new MatchResult
+    //            {
+    //                connectedPotions = connectedPotions,
+    //                direction = MatchDirection.Vertical_3
+    //            };
+    //        }
+    //    }
+
+    //    // 가로 체크에서 네모 항상 발견해서 여기서는 네모 체크 제외
+    //    else
+    //    {
+    //        return new MatchResult
+    //        {
+    //            connectedPotions = connectedPotions,
+    //            direction = MatchDirection.None
+    //        };
+    //    }
+    //}
+
+    // 블럭 타입이 일치하는지 확인 후 Match 결과 반환
+    public MatchResult TestIsConnected(Potion potion)
     {
         List<Potion> connectedPotions = new()
         {
             potion
         };
 
+        // 우선 순위 적용
+
+
         // 가로 체크
         CheckHorizontalMatch(potion, connectedPotions);
 
-        // 우선 순위 적용
         // 1. 5 이상 가로 매치
         if (connectedPotions.Count >= 5)
         {
@@ -377,36 +534,25 @@ public class FindMatches : MonoBehaviour
         // 3. 3 가로 매치
         else if (connectedPotions.Count == 3)
         {
-            if (CheckHorizontalSquareMatch(potion, connectedPotions))
+            return new MatchResult
             {
-                return new MatchResult
-                {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Square
-                };
-            }
-            else
-            {
-                return new MatchResult
-                {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Horizontal_3
-                };
-            }
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Horizontal_3
+            };
         }
 
         // 4. 2 가로 매치
-        else if (connectedPotions.Count == 2)
-        {
-            if (CheckHorizontalSquareMatch(potion, connectedPotions))
-            {
-                return new MatchResult
-                {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Square
-                };
-            }
-        }
+        //else if (connectedPotions.Count == 2)
+        //{
+        //    if (CheckHorizontalSquareMatch(potion, connectedPotions))
+        //    {
+        //        return new MatchResult
+        //        {
+        //            connectedPotions = connectedPotions,
+        //            direction = MatchDirection.Square
+        //        };
+        //    }
+        //}
 
         // clear out the connectedpotions
         connectedPotions.Clear();
@@ -459,25 +605,33 @@ public class FindMatches : MonoBehaviour
             //    direction = MatchDirection.Vertical_3
             //};
 
-            if (CheckVerticalSquareMatch(potion, connectedPotions))
+            return new MatchResult
             {
-                return new MatchResult
-                {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Square
-                };
-            }
-            else
-            {
-                return new MatchResult
-                {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Vertical_3
-                };
-            }
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Vertical_3
+            };
         }
 
-        // 가로 체크에서 네모 항상 발견해서 여기서는 네모 체크 제외
+        // clear out the connectedpotions
+        connectedPotions.Clear();
+
+        // read our initial potion
+        connectedPotions.Add(potion);
+
+        // 4 이상 네모
+        CheckSquareMatch(potion, connectedPotions);
+
+        if (connectedPotions.Count >= 4)
+        {
+            isCheckedSquare = true;
+
+            return new MatchResult
+            {
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Square
+            };
+        }
+
         else
         {
             return new MatchResult
@@ -502,9 +656,10 @@ public class FindMatches : MonoBehaviour
                 Potion neighbourPotion = board.potionBoard[x, y].potion.GetComponent<Potion>();
 
                 // does our potionType Match? it must also not be matched
-                if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
+                if (neighbourPotion.potionType == potionType)
                 {
                     connectedPotions.Add(neighbourPotion);
+                    //neighbourPotion.isMatched = true;
 
                     x += 1;
                 }
@@ -535,9 +690,10 @@ public class FindMatches : MonoBehaviour
                 Potion neighbourPotion = board.potionBoard[x, y].potion.GetComponent<Potion>();
 
                 // does our potionType Match? it must also not be matched
-                if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
+                if (neighbourPotion.potionType == potionType)
                 {
                     connectedPotions.Add(neighbourPotion);
+                    //neighbourPotion.isMatched = true;
 
                     y += 1;
                 }
@@ -554,109 +710,220 @@ public class FindMatches : MonoBehaviour
         }
     }
 
+    // TODO : 1. XOO
+    //           OOO 블록같은 경우 왼쪽 column부터 체크를 하기 때문에 3매치 직선만 처리되는중..
+    void CheckSquareMatch(Potion pot, List<Potion> connectedPotions)
+    {
+        PotionType potionType = pot.potionType;
+        int x = pot.xIndex;
+        int y = pot.yIndex;
+
+        if (x < board.width - 1 && y < board.height - 1 && board.potionBoard[x + 1, y].isUsable)
+        {
+            Potion rightneighbourPotion = board.potionBoard[x + 1, y].potion.GetComponent<Potion>();
+
+            if (!rightneighbourPotion.isMatched && rightneighbourPotion.potionType == potionType)
+            {
+                // 위, 오른족 위 블럭 같은지 체크
+                if (
+                    board.potionBoard[x, y + 1].isUsable &&
+                    board.potionBoard[x + 1, y + 1].isUsable)
+                {
+                    Potion upNeighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
+                    Potion rightupNeighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
+
+                    if (rightneighbourPotion.potionType == upNeighbourPotion.potionType && rightneighbourPotion.potionType == rightupNeighbourPotion.potionType)
+                    {
+                        connectedPotions.Add(rightneighbourPotion);
+                        connectedPotions.Add(upNeighbourPotion);
+                        connectedPotions.Add(rightupNeighbourPotion);
+                        //rightneighbourPotion.isMatched = true;
+                        //upNeighbourPotion.isMatched = true;
+                        //rightupNeighbourPotion.isMatched = true;
+
+                        // 사각형을 발견하면 추가 연결 체크 = 추가 연결은 OtherPotion으로 일단 명명했음
+
+                        // 아래 왼쪽
+                        if (y > 0 && board.potionBoard[x, y - 1].isUsable && board.potionBoard[x, y - 1].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion leftdownOtherPotion = board.potionBoard[x, y - 1].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(leftdownOtherPotion);
+                            //leftdownOtherPotion.isMatched = true;
+                        }
+
+                        // 아래 오른쪽
+                        if (y > 0 && board.potionBoard[x + 1, y - 1].isUsable && board.potionBoard[x + 1, y - 1].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion rightdownOtherPotion = board.potionBoard[x + 1, y - 1].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(rightdownOtherPotion);
+                            //rightdownOtherPotion.isMatched = true;
+                        }
+
+                        // 왼쪽
+                        if (x > 0 && board.potionBoard[x - 1, y].isUsable && board.potionBoard[x - 1, y].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion leftOtherPotion = board.potionBoard[x - 1, y].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(leftOtherPotion);
+                            //leftOtherPotion.isMatched = true;
+                        }
+
+                        // 왼쪽 위
+                        if (x > 0 && board.potionBoard[x - 1, y + 1].isUsable && board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion leftupOtherPotion = board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(leftupOtherPotion);
+                            //leftupOtherPotion.isMatched = true;
+                        }
+
+                        // 먼 위 왼쪽
+                        if (y < board.height - 2 && board.potionBoard[x, y + 2].isUsable && board.potionBoard[x, y + 2].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion farupleftOtherPotion = board.potionBoard[x, y + 2].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(farupleftOtherPotion);
+                            //farupleftOtherPotion.isMatched = true;
+                        }
+
+                        // 먼 위 오른쪽
+                        if (y < board.height - 2 && board.potionBoard[x + 1, y + 2].isUsable && board.potionBoard[x + 1, y + 2].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion faruprightOtherPotion = board.potionBoard[x + 1, y + 2].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(faruprightOtherPotion);
+                            //faruprightOtherPotion.isMatched = true;
+                        }
+
+                        // 먼 오른쪽
+                        if (x < board.width - 2 && board.potionBoard[x + 2, y].isUsable && board.potionBoard[x + 2, y].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion farrightOtherPotion = board.potionBoard[x + 2, y].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(farrightOtherPotion);
+                            //farrightOtherPotion.isMatched = true;
+                        }
+
+                        // 먼 오른쪽 위
+                        if (x < board.width - 2 && board.potionBoard[x + 2, y + 1].isUsable && board.potionBoard[x + 2, y + 1].potion.GetComponent<Potion>().potionType == potionType)
+                        {
+                            Potion farrightupOtherPotion = board.potionBoard[x + 2, y + 1].potion.GetComponent<Potion>();
+
+                            connectedPotions.Add(farrightupOtherPotion);
+                            //farrightupOtherPotion.isMatched = true;
+                        }
+
+                    }
+                }
+            }
+        } 
+    }
+
 
     // 네모 추가 체크
     // 가로 체크의 경우에만 해당 메서드 실행중
     // TODO : 1. 가로의 경우에만 네모 체크중
     //        2. 세로 3줄과 함께 네모되는 경우 네모만 사라지는중 -> 세로 3줄에서도 네모 체크해야함
     //        3. 가로 위쪽에 3줄, 세로 오른쪽 3줄에서도 네모만 사라짐 -> neighbourPotion 기준으로도 반대쪽 네모 체크해야함
-    bool CheckHorizontalSquareMatch(Potion pot, List<Potion> connectedPotions)
-    {
-        PotionType potionType = pot.potionType;
-        int x = pot.xIndex;
-        int y = pot.yIndex;
+    //bool CheckHorizontalSquareMatch(Potion pot, List<Potion> connectedPotions)
+    //{
+    //    PotionType potionType = pot.potionType;
+    //    int x = pot.xIndex;
+    //    int y = pot.yIndex;
 
-        Potion neighbourPotion = board.potionBoard[x + 1, y].potion.GetComponent<Potion>();
+    //    Potion neighbourPotion = board.potionBoard[x + 1, y].potion.GetComponent<Potion>();
 
-        // 오른쪽 블럭 같은지 체크
-        if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
-        {
-            // 위, 오른족 위 블럭 같은지 체크
-            if (!isCheckedSquare && y < board.height - 1 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x + 1, y + 1].isUsable)
-            {
-                Potion upNeighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
-                Potion rightupNeighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
+    //    // 오른쪽 블럭 같은지 체크
+    //    if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
+    //    {
+    //        // 위, 오른족 위 블럭 같은지 체크
+    //        if (!isCheckedSquare && y < board.height - 1 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x + 1, y + 1].isUsable)
+    //        {
+    //            Potion upNeighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
+    //            Potion rightupNeighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
 
-                if (neighbourPotion.potionType == upNeighbourPotion.potionType && neighbourPotion.potionType == rightupNeighbourPotion.potionType)
-                {
-                    isCheckedSquare = true;
-                    connectedPotions.Add(upNeighbourPotion);
-                    connectedPotions.Add(rightupNeighbourPotion);
+    //            if (neighbourPotion.potionType == upNeighbourPotion.potionType && neighbourPotion.potionType == rightupNeighbourPotion.potionType)
+    //            {
+    //                isCheckedSquare = true;
+    //                connectedPotions.Add(upNeighbourPotion);
+    //                connectedPotions.Add(rightupNeighbourPotion);
 
-                    return true;
-                }
-            }
+    //                return true;
+    //            }
+    //        }
 
-            //// 아래, 오른쪽 아래 블럭 같은지 체크
-            //if (!isCheckedSquare && y > 0 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y - 1].isUsable && board.potionBoard[x + 1, y - 1].isUsable)
-            //{
-            //    Potion downNeighbourPotion = board.potionBoard[x, y - 1].potion.GetComponent<Potion>();
-            //    Potion rightdownNeighbourPotion = board.potionBoard[x + 1, y - 1].potion.GetComponent<Potion>();
+    //        //// 아래, 오른쪽 아래 블럭 같은지 체크
+    //        //if (!isCheckedSquare && y > 0 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y - 1].isUsable && board.potionBoard[x + 1, y - 1].isUsable)
+    //        //{
+    //        //    Potion downNeighbourPotion = board.potionBoard[x, y - 1].potion.GetComponent<Potion>();
+    //        //    Potion rightdownNeighbourPotion = board.potionBoard[x + 1, y - 1].potion.GetComponent<Potion>();
 
-            //    if (neighbourPotion.potionType == downNeighbourPotion.potionType && neighbourPotion.potionType == rightdownNeighbourPotion.potionType)
-            //    {
-            //        isCheckedSquare = true;
-            //        connectedPotions.Add(downNeighbourPotion);
-            //        connectedPotions.Add(rightdownNeighbourPotion);
+    //        //    if (neighbourPotion.potionType == downNeighbourPotion.potionType && neighbourPotion.potionType == rightdownNeighbourPotion.potionType)
+    //        //    {
+    //        //        isCheckedSquare = true;
+    //        //        connectedPotions.Add(downNeighbourPotion);
+    //        //        connectedPotions.Add(rightdownNeighbourPotion);
 
-            //        return true;
-            //    }
-            //}
-        }
+    //        //        return true;
+    //        //    }
+    //        //}
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     //// 세로 체크용
     /// 가로 2 체크때 스퀘어 체크됨
-    bool CheckVerticalSquareMatch(Potion pot, List<Potion> connectedPotions)
-    {
-        PotionType potionType = pot.potionType;
-        int x = pot.xIndex;
-        int y = pot.yIndex;
+    //bool CheckVerticalSquareMatch(Potion pot, List<Potion> connectedPotions)
+    //{
+    //    PotionType potionType = pot.potionType;
+    //    int x = pot.xIndex;
+    //    int y = pot.yIndex;
 
-        Potion neighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
+    //    Potion neighbourPotion = board.potionBoard[x, y + 1].potion.GetComponent<Potion>();
 
-        // 위 블럭 같은지 체크
-        if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
-        {
-            // 오른쪽, 오른쪽위 블럭 같은지 체크
-            if (!isCheckedSquare && x < board.width - 1 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x + 1, y + 1].isUsable)
-            {
-                Potion rightNeighbourPotion = board.potionBoard[x + 1, y].potion.GetComponent<Potion>();
-                Potion rightupNeighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
+    //    // 위 블럭 같은지 체크
+    //    if (!neighbourPotion.isMatched && neighbourPotion.potionType == potionType)
+    //    {
+    //        // 오른쪽, 오른쪽위 블럭 같은지 체크
+    //        if (!isCheckedSquare && x < board.width - 1 && board.potionBoard[x + 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x + 1, y + 1].isUsable)
+    //        {
+    //            Potion rightNeighbourPotion = board.potionBoard[x + 1, y].potion.GetComponent<Potion>();
+    //            Potion rightupNeighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
 
-                // 오른쪽, 오른쪽위 블럭 같은지 체크
-                if (neighbourPotion.potionType == rightNeighbourPotion.potionType && neighbourPotion.potionType == rightupNeighbourPotion.potionType)
-                {
-                    isCheckedSquare = true;
-                    connectedPotions.Add(rightNeighbourPotion);
-                    connectedPotions.Add(rightupNeighbourPotion);
+    //            // 오른쪽, 오른쪽위 블럭 같은지 체크
+    //            if (neighbourPotion.potionType == rightNeighbourPotion.potionType && neighbourPotion.potionType == rightupNeighbourPotion.potionType)
+    //            {
+    //                isCheckedSquare = true;
+    //                connectedPotions.Add(rightNeighbourPotion);
+    //                connectedPotions.Add(rightupNeighbourPotion);
 
-                    return true;
-                }
-            }
+    //                return true;
+    //            }
+    //        }
 
-            //// 왼쪽, 왼쪽위 블럭 같은지 체크
-            //if (!isCheckedSquare && x > 0 && board.potionBoard[x - 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x - 1, y + 1].isUsable)
-            //{
-            //    Potion leftNeighbourPotion = board.potionBoard[x - 1, y].potion.GetComponent<Potion>();
-            //    Potion leftupNeighbourPotion = board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>();
+    //        //// 왼쪽, 왼쪽위 블럭 같은지 체크
+    //        //if (!isCheckedSquare && x > 0 && board.potionBoard[x - 1, y].isUsable && board.potionBoard[x, y + 1].isUsable && board.potionBoard[x - 1, y + 1].isUsable)
+    //        //{
+    //        //    Potion leftNeighbourPotion = board.potionBoard[x - 1, y].potion.GetComponent<Potion>();
+    //        //    Potion leftupNeighbourPotion = board.potionBoard[x - 1, y + 1].potion.GetComponent<Potion>();
 
-            //    // 왼쪽, 왼쪽위 블럭 같은지 체크
-            //    if (neighbourPotion.potionType == leftNeighbourPotion.potionType && neighbourPotion.potionType == leftupNeighbourPotion.potionType)
-            //    {
-            //        isCheckedSquare = true;
-            //        connectedPotions.Add(leftNeighbourPotion);
-            //        connectedPotions.Add(leftupNeighbourPotion);
+    //        //    // 왼쪽, 왼쪽위 블럭 같은지 체크
+    //        //    if (neighbourPotion.potionType == leftNeighbourPotion.potionType && neighbourPotion.potionType == leftupNeighbourPotion.potionType)
+    //        //    {
+    //        //        isCheckedSquare = true;
+    //        //        connectedPotions.Add(leftNeighbourPotion);
+    //        //        connectedPotions.Add(leftupNeighbourPotion);
 
-            //        return true;
-            //    }
-            //}
-        }
+    //        //        return true;
+    //        //    }
+    //        //}
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     // 세로, 가로 방향(direction) Super 매칭(L자)되나 체크
     // 매개 변수로 준 direction 방향으로 같으면 계속 체크함
@@ -765,6 +1032,7 @@ public class FindMatches : MonoBehaviour
     // currentPotion, targetPotion 둘다 특수 블럭일 때 발동
     public List<Potion> RunCombineSpecialBlocks(Potion _selectedPotion, Potion _targetedPotion)
     {
+        Debug.Log("둘다 특수");
         switch (_selectedPotion.potionType)
         {
             // 드릴(세로) 기능
@@ -913,14 +1181,12 @@ public class FindMatches : MonoBehaviour
             if (board.potionBoard[_xIndex, i].isUsable && !potion.isMatched)
             {
                 blocks.Add(potion);
-                //board.potionBoard[_xIndex, i].potion.GetComponent<Potion>().isMatched = true;
-
+                potion.isMatched = true;
 
                 if (IsSpecialBlock(potion.potionType))
                 {
                     Debug.Log("potionType" + potion.potionType);
-
-                    //blocks.AddRange(RunSpecialBlock(potion));
+                    blocks.AddRange(RunSpecialBlock(potion));
                 }
             }
         }
@@ -940,12 +1206,12 @@ public class FindMatches : MonoBehaviour
             if (board.potionBoard[i, _yIndex].isUsable && !potion.isMatched)
             {
                 blocks.Add(potion);
-                //board.potionBoard[i, _yIndex].potion.GetComponent<Potion>().isMatched = true;
+                potion.isMatched = true;
 
                 if (IsSpecialBlock(potion.potionType))
                 {
                     Debug.Log("potionType" + potion.potionType);
-                    //blocks.AddRange(RunSpecialBlock(potion));
+                    blocks.AddRange(RunSpecialBlock(potion));
                 }
 
             }
@@ -964,31 +1230,69 @@ public class FindMatches : MonoBehaviour
         {
             for (int j = _yIndex - 1; j <= _yIndex + 1; j++)
             {
-                // Check if the piece is inside the board 모서리 체크
-                if (i >= 0 && i < board.width && j >= 0 && j < board.height && board.potionBoard[i, j] != null && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
-                {
-                    blocks.Add(board.potionBoard[i, j].potion.GetComponent<Potion>());
-                    //board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched = true;
-                }
+
+                    // Check if the piece is inside the board 모서리 체크
+                    if (i >= 0 && i < board.width && j >= 0 && j < board.height && board.potionBoard[i, j].isUsable && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
+                    {
+                        Potion potion = board.potionBoard[i, j].potion.GetComponent<Potion>();
+
+                        blocks.Add(potion);
+                        potion.isMatched = true;
+
+                        if (IsSpecialBlock(potion.potionType))
+                        {
+                            Debug.Log("potionType" + potion.potionType);
+                            blocks.AddRange(RunSpecialBlock(potion));
+                        }
+                    }
+                
             }
         }
 
-        if (_xIndex >= 2 && board.potionBoard[_xIndex - 2, _yIndex] != null && !board.potionBoard[_xIndex - 2, _yIndex].potion.GetComponent<Potion>().isMatched)
+        if (_xIndex >= 2 && board.potionBoard[_xIndex - 2, _yIndex] != null && board.potionBoard[_xIndex - 2, _yIndex].isUsable && !board.potionBoard[_xIndex - 2, _yIndex].potion.GetComponent<Potion>().isMatched)
         {
-            blocks.Add(board.potionBoard[_xIndex - 2, _yIndex].potion.GetComponent<Potion>());
+            Potion potion = board.potionBoard[_xIndex - 2, _yIndex].potion.GetComponent<Potion>();
+            blocks.Add(potion);
+            potion.isMatched = true;
+
+            if (IsSpecialBlock(potion.potionType))
+            {
+                blocks.AddRange(RunSpecialBlock(potion));
+            }
         }
-        if (_xIndex < board.width - 2 && board.potionBoard[_xIndex + 2, _yIndex] != null && !board.potionBoard[_xIndex + 2, _yIndex].potion.GetComponent<Potion>().isMatched)
+        if (_xIndex < board.width - 2 && board.potionBoard[_xIndex + 2, _yIndex] != null && board.potionBoard[_xIndex + 2, _yIndex].isUsable && !board.potionBoard[_xIndex + 2, _yIndex].potion.GetComponent<Potion>().isMatched)
         {
-            blocks.Add(board.potionBoard[_xIndex + 2, _yIndex].potion.GetComponent<Potion>());
+            Potion potion = board.potionBoard[_xIndex + 2, _yIndex].potion.GetComponent<Potion>();
+            blocks.Add(potion);
+            potion.isMatched = true;
+
+            if (IsSpecialBlock(potion.potionType))
+            {
+                blocks.AddRange(RunSpecialBlock(potion));
+            }
 
         }
-        if (_yIndex >= 2 && board.potionBoard[_xIndex, _yIndex - 2] != null && !board.potionBoard[_xIndex, _yIndex - 2].potion.GetComponent<Potion>().isMatched)
+        if (_yIndex >= 2 && board.potionBoard[_xIndex, _yIndex - 2] != null && board.potionBoard[_xIndex, _yIndex - 2].isUsable && !board.potionBoard[_xIndex, _yIndex - 2].potion.GetComponent<Potion>().isMatched)
         {
-            blocks.Add(board.potionBoard[_xIndex, _yIndex - 2].potion.GetComponent<Potion>());
+            Potion potion = board.potionBoard[_xIndex, _yIndex - 2].potion.GetComponent<Potion>();
+            blocks.Add(potion);
+            potion.isMatched = true;
+
+            if (IsSpecialBlock(potion.potionType))
+            {
+                blocks.AddRange(RunSpecialBlock(potion));
+            }
         }
-        if (_yIndex < board.height - 2 && board.potionBoard[_xIndex, _yIndex + 2] != null && !board.potionBoard[_xIndex, _yIndex + 2].potion.GetComponent<Potion>().isMatched)
+        if (_yIndex < board.height - 2 && board.potionBoard[_xIndex, _yIndex + 2] != null && board.potionBoard[_xIndex, _yIndex + 2].isUsable && !board.potionBoard[_xIndex, _yIndex + 2].potion.GetComponent<Potion>().isMatched)
         {
-            blocks.Add(board.potionBoard[_xIndex, _yIndex + 2].potion.GetComponent<Potion>());
+            Potion potion = board.potionBoard[_xIndex, _yIndex + 2].potion.GetComponent<Potion>();
+            blocks.Add(potion);
+            potion.isMatched = true;
+
+            if (IsSpecialBlock(potion.potionType))
+            {
+                blocks.AddRange(RunSpecialBlock(potion));
+            }
         }
 
         return blocks;
@@ -1003,9 +1307,10 @@ public class FindMatches : MonoBehaviour
 
         while (_xIndex - index >= 0 && _yIndex - index >= 0)
         {
-            if (board.potionBoard[_xIndex - index, _yIndex - index] != null && !board.potionBoard[_xIndex - index, _yIndex - index].potion.GetComponent<Potion>().isMatched)
+            if (board.potionBoard[_xIndex - index, _yIndex - index] != null && board.potionBoard[_xIndex - index, _yIndex - index].isUsable && !board.potionBoard[_xIndex - index, _yIndex - index].potion.GetComponent<Potion>().isMatched)
             {
                 blocks.Add(board.potionBoard[_xIndex - index, _yIndex - index].potion.GetComponent<Potion>());
+                //board.potionBoard[_xIndex - index, _yIndex - index].potion.GetComponent<Potion>().isMatched = true;
             }
             index++;
         }
@@ -1014,9 +1319,10 @@ public class FindMatches : MonoBehaviour
 
         while (_xIndex + index < board.width && _yIndex + index < board.height)
         {
-            if (board.potionBoard[_xIndex + index, _yIndex + index] != null && !board.potionBoard[_xIndex + index, _yIndex + index].potion.GetComponent<Potion>().isMatched)
+            if (board.potionBoard[_xIndex + index, _yIndex + index] != null && board.potionBoard[_xIndex + index, _yIndex + index].isUsable && !board.potionBoard[_xIndex + index, _yIndex + index].potion.GetComponent<Potion>().isMatched)
             {
                 blocks.Add(board.potionBoard[_xIndex + index, _yIndex + index].potion.GetComponent<Potion>());
+                //board.potionBoard[_xIndex + index, _yIndex + index].potion.GetComponent<Potion>().isMatched = true;
             }
             index++;
         }
@@ -1033,9 +1339,10 @@ public class FindMatches : MonoBehaviour
 
         while (_xIndex - index >= 0 && _yIndex + index < board.height)
         {
-            if (board.potionBoard[_xIndex - index, _yIndex + index] != null && !board.potionBoard[_xIndex - index, _yIndex + index].potion.GetComponent<Potion>().isMatched)
+            if (board.potionBoard[_xIndex - index, _yIndex + index] != null && board.potionBoard[_xIndex - index, _yIndex + index].isUsable && !board.potionBoard[_xIndex - index, _yIndex + index].potion.GetComponent<Potion>().isMatched)
             {
                 blocks.Add(board.potionBoard[_xIndex - index, _yIndex + index].potion.GetComponent<Potion>());
+                //board.potionBoard[_xIndex - index, _yIndex + index].potion.GetComponent<Potion>().isMatched = true;
             }
             index++;
         }
@@ -1044,9 +1351,10 @@ public class FindMatches : MonoBehaviour
 
         while (_xIndex + index < board.width && _yIndex - index >= 0)
         {
-            if (board.potionBoard[_xIndex + index, _yIndex - index] != null && !board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>().isMatched)
+            if (board.potionBoard[_xIndex + index, _yIndex - index] != null && board.potionBoard[_xIndex + index, _yIndex - index].isUsable && !board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>().isMatched)
             {
                 blocks.Add(board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>());
+                //board.potionBoard[_xIndex + index, _yIndex - index].potion.GetComponent<Potion>().isMatched = true;
             }
             index++;
         }
@@ -1069,7 +1377,7 @@ public class FindMatches : MonoBehaviour
         {
             for (int j=0; j<board.height; j++)
             {
-                if (board.potionBoard[i, j] != null)
+                if (board.potionBoard[i, j] != null && board.potionBoard[i, j].isUsable && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
                 {
                     if (!IsSpecialBlock(board.potionBoard[i, j].potion.GetComponent<Potion>().potionType))
                     blockCounts[(int)board.potionBoard[i, j].potion.GetComponent<Potion>().potionType]++;
@@ -1095,9 +1403,10 @@ public class FindMatches : MonoBehaviour
         PotionType _targetPotionType = (PotionType)maxIndex;
 
         // Prism 블럭 추가
-        if (board.potionBoard[_xIndex, _yIndex] != null && !board.potionBoard[_xIndex, _xIndex].potion.GetComponent<Potion>().isMatched)
+        if (board.potionBoard[_xIndex, _yIndex] != null && board.potionBoard[_xIndex, _xIndex].isUsable && !board.potionBoard[_xIndex, _xIndex].potion.GetComponent<Potion>().isMatched)
         {
             blocks.Add(board.potionBoard[_xIndex, _yIndex].potion.GetComponent<Potion>());
+            //board.potionBoard[_xIndex, _yIndex].potion.GetComponent<Potion>().isMatched = true;
         }
 
         for (int i = 0; i < board.width; i++)
@@ -1105,7 +1414,7 @@ public class FindMatches : MonoBehaviour
             for (int j = 0; j < board.height; j++)
             {
                 // Check if that piece exists
-                if (board.potionBoard[i, j] != null && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
+                if (board.potionBoard[i, j] != null && board.potionBoard[i, j].isUsable && !board.potionBoard[i, j].potion.GetComponent<Potion>().isMatched)
                 {
                     // Check the tag on that dot
                     if (board.potionBoard[i, j].potion.GetComponent<Potion>().potionType == _targetPotionType)
@@ -1235,19 +1544,22 @@ public class FindMatches : MonoBehaviour
         if (_xIndex >= 3 && board.potionBoard[_xIndex - 3, _yIndex] != null && !board.potionBoard[_xIndex - 3, _yIndex].potion.GetComponent<Potion>().isMatched)
         {
             blocks.Add(board.potionBoard[_xIndex - 3, _yIndex].potion.GetComponent<Potion>());
+            //board.potionBoard[_xIndex - 3, _yIndex].potion.GetComponent<Potion>().isMatched = true;
         }
         if (_xIndex < board.width - 3 && board.potionBoard[_xIndex + 3, _yIndex] != null && !board.potionBoard[_xIndex + 3, _yIndex].potion.GetComponent<Potion>().isMatched)
         {
             blocks.Add(board.potionBoard[_xIndex + 3, _yIndex].potion.GetComponent<Potion>());
-
+            //board.potionBoard[_xIndex + 3, _yIndex].potion.GetComponent<Potion>().isMatched = true;
         }
         if (_yIndex >= 3 && board.potionBoard[_xIndex, _yIndex - 3] != null && !board.potionBoard[_xIndex, _yIndex - 3].potion.GetComponent<Potion>().isMatched)
         {
             blocks.Add(board.potionBoard[_xIndex, _yIndex - 3].potion.GetComponent<Potion>());
+            //board.potionBoard[_xIndex, _yIndex - 3].potion.GetComponent<Potion>().isMatched = true;
         }
         if (_yIndex < board.height - 3 && board.potionBoard[_xIndex, _yIndex + 3] != null && !board.potionBoard[_xIndex, _yIndex + 3].potion.GetComponent<Potion>().isMatched)
         {
             blocks.Add(board.potionBoard[_xIndex, _yIndex + 3].potion.GetComponent<Potion>());
+            //board.potionBoard[_xIndex, _yIndex + 3].potion.GetComponent<Potion>().isMatched = true;
         }
 
         return blocks;
@@ -1307,6 +1619,7 @@ public class FindMatches : MonoBehaviour
                 if (_xIndex - index + i < board.width && board.potionBoard[_xIndex - index + i, _yIndex - index] != null && !board.potionBoard[_xIndex - index + i, _yIndex - index].potion.GetComponent<Potion>().isMatched)
                 {
                     blocks.Add(board.potionBoard[_xIndex - index + i, _yIndex - index].potion.GetComponent<Potion>());
+                    //board.potionBoard[_xIndex - index + i, _yIndex - index].potion.GetComponent<Potion>().isMatched = true;
                 }
  
                 index++;
@@ -1319,6 +1632,8 @@ public class FindMatches : MonoBehaviour
                 if (_xIndex + index + i >= 0 && board.potionBoard[_xIndex + index + i, _yIndex + index] != null && !board.potionBoard[_xIndex + index + i, _yIndex + index].potion.GetComponent<Potion>().isMatched)
                 {
                     blocks.Add(board.potionBoard[_xIndex + index + i, _yIndex + index].potion.GetComponent<Potion>());
+                    //board.potionBoard[_xIndex + index + i, _yIndex + index].potion.GetComponent<Potion>().isMatched = true;
+
                 }
 
                 index++;
@@ -1342,6 +1657,8 @@ public class FindMatches : MonoBehaviour
                 if (_xIndex - index + i < board.width && board.potionBoard[_xIndex - index + i, _yIndex + index] != null && !board.potionBoard[_xIndex - index + i, _yIndex + index].potion.GetComponent<Potion>().isMatched)
                 {
                     blocks.Add(board.potionBoard[_xIndex - index + i, _yIndex + index].potion.GetComponent<Potion>());
+                    //board.potionBoard[_xIndex - index + i, _yIndex + index].potion.GetComponent<Potion>().isMatched = true;
+
                 }
                 index++;
             }
@@ -1353,6 +1670,8 @@ public class FindMatches : MonoBehaviour
                 if (_xIndex + index + i >= 0 && board.potionBoard[_xIndex + index + i, _yIndex - index] != null && !board.potionBoard[_xIndex + index + i, _yIndex - index].potion.GetComponent<Potion>().isMatched)
                 {
                     blocks.Add(board.potionBoard[_xIndex + index + i, _yIndex - index].potion.GetComponent<Potion>());
+                    //board.potionBoard[_xIndex + index + i, _yIndex - index].potion.GetComponent<Potion>().isMatched = true;
+
                 }
                 index++;
             }
@@ -1402,6 +1721,7 @@ public class FindMatches : MonoBehaviour
         if (board.potionBoard[_xIndex, _yIndex] != null && !board.potionBoard[_xIndex, _xIndex].potion.GetComponent<Potion>().isMatched)
         {
             blocks.Add(board.potionBoard[_xIndex, _yIndex].potion.GetComponent<Potion>());
+            //board.potionBoard[_xIndex, _yIndex].potion.GetComponent<Potion>().isMatched = true;
         }
 
         return blocks;

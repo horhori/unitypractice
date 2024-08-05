@@ -23,7 +23,8 @@ public class Potion : MonoBehaviour
     public int spacingX = 3;
     public int spacingY = 3;
 
-    // 현재 사용안하는중
+    // 현재 사용안하는중 -> 사용하도록 바꾸는중
+    // isMatched 체크되면 무조건 지워지는 블럭됨
     public bool isMatched;
 
     // TODO : 1. 해당 블럭이 스왑되면 매칭이 되는지 여부 (true면 발광, 위아래로 살짝 움직임 적용)
