@@ -1,10 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PotionBoard : MonoBehaviour
 {
@@ -211,9 +208,7 @@ public class PotionBoard : MonoBehaviour
                     {
                         // run some matching logic
 
-                        // TODO : 1. 초기 생성 IsConnected랑 게임 도중이랑 분리 필요 -> 폭탄 때문에
-                        // 되는게 맞는데 확인중
-                        MatchResult matchedPotions = findMatches.TestIsConnected(potion);
+                        MatchResult matchedPotions = findMatches.IsConnected(potion);
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {   
@@ -301,8 +296,6 @@ public class PotionBoard : MonoBehaviour
 
         // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
         isProcessingMove = true;
-
-        // TODO : 1. 선택한 블럭이 특수 블럭이면 매칭 체크 하면서 특수블럭 효과 발동
 
         // startCoroutine ProcessMatches.
         StartCoroutine(ProcessSwapMatches(_currentPotion, _targetPotion));

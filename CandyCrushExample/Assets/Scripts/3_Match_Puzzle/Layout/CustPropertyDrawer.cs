@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
 // TODO : 1. 빌드 시 해당 파일 에러남
 
