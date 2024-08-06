@@ -72,11 +72,12 @@ public class Potion : MonoBehaviour
         {
             if (sprites.Length == 2)
             {
-                if (potionType == PotionType.DrillHorizontal || potionType == PotionType.PickLeft || potionType != PotionType.PickRight)
+                if (potionType == PotionType.DrillHorizontal || potionType == PotionType.PickLeft || potionType == PotionType.PickRight)
                 {
                     SpriteRenderer spriteRenderer = GetComponentInChildren<SpriteRenderer>();
                     spriteRenderer.sprite = sprites[1];
-                } else
+                }
+                else
                 {
                     GetComponent<SpriteRenderer>().sprite = sprites[1];
                 }
@@ -90,7 +91,7 @@ public class Potion : MonoBehaviour
         {
             if (sprites.Length == 2)
             {
-                if (potionType == PotionType.DrillHorizontal || potionType == PotionType.PickLeft || potionType != PotionType.PickRight)
+                if (potionType == PotionType.DrillHorizontal || potionType == PotionType.PickLeft || potionType == PotionType.PickRight)
                 {
                     SpriteRenderer spriteRenderer = GetComponentInChildren<SpriteRenderer>();
                     spriteRenderer.sprite = sprites[0];
@@ -168,7 +169,7 @@ public class Potion : MonoBehaviour
 public enum PotionType
 {
     // 기본 블럭
-    BlueBlock,  
+    BlueBlock,
     GreenBlock,
     OrangeBlock,
     PinkBlock,
@@ -183,5 +184,5 @@ public enum PotionType
     PickLeft, // 곡괭이 역대각(왼쪽 기울임)
     PickRight, // 곡괭이 대각(오른쪽 기울임)
     Prism, // 프리즘
-    
+
 }
