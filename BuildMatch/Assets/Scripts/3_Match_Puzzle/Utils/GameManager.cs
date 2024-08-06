@@ -12,8 +12,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance; // static reference;
 
     public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
-    public GameObject victoryPanel; 
-    public GameObject losePanel;
+    //public GameObject victoryPanel; 
+    //public GameObject losePanel;
+    public GameObject clearPanel;
+    public GameObject failedPanel;
 
     public int goal; // the amount of points you need to get to win.
     public int points; // 최대 숫자 9개까지 ex) 999999999
@@ -143,7 +145,7 @@ public class GameManager : MonoBehaviour
             // lose game
             isGameEnded = true;
             backgroundPanel.SetActive(true);
-            losePanel.SetActive(true);
+            failedPanel.SetActive(true);
             PotionBoard.Instance.potionParent.SetActive(false);
             isGameRunning = false;
             return;
@@ -205,7 +207,7 @@ public class GameManager : MonoBehaviour
 
             // Display a victory screen.
             backgroundPanel.SetActive(true);
-            victoryPanel.SetActive(true);
+            clearPanel.SetActive(true);
             PotionBoard.Instance.potionParent.SetActive(false);
             isGameRunning = false;
             return;
@@ -214,6 +216,8 @@ public class GameManager : MonoBehaviour
     }
 
     // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
+    // 현재 결과창 모든 버튼 이거 사용중 : HomeButton, RestartButton, NextButton, MapButton
+    // TODO : 1. 버튼마다 각각 메서드 만들어야 함
     public void WinGame()
     {
         //SceneManager.LoadScene("Main Menu");
@@ -222,10 +226,10 @@ public class GameManager : MonoBehaviour
     }
 
     // 남은 시간이 다 지나면 패배
-    public void LoseGame()
-    {
-        //SceneManager.LoadScene("Main Menu");
-        // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
-        SceneManager.LoadScene(0);
-    }
+    //public void LoseGame()
+    //{
+    //    //SceneManager.LoadScene("Main Menu");
+    //    // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
+    //    SceneManager.LoadScene(0);
+    //}
 }
