@@ -149,15 +149,11 @@ public class Potion : MonoBehaviour
         {
             float t = elaspedTime / duration;
 
-            //Debug.Log("potion : " + this);
-            //Debug.Log("time : " + t);
-
             transform.position = Vector2.Lerp(startPosition, _targetPos, t);
 
             elaspedTime += Time.deltaTime;
 
             yield return null;
-            //yield return new WaitForSeconds(0.01f);
         }
 
         transform.position = _targetPos;
@@ -180,9 +176,7 @@ public enum PotionType
     Bomb, // 폭탄
     DrillVertical, // 드릴 세로
     DrillHorizontal, // 드릴 가로
-    //Pick, // 곡괭이
     PickLeft, // 곡괭이 역대각(왼쪽 기울임)
     PickRight, // 곡괭이 대각(오른쪽 기울임)
     Prism, // 프리즘
-
 }

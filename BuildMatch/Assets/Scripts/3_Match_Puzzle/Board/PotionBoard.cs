@@ -46,16 +46,6 @@ public class PotionBoard : MonoBehaviour
     private int bag3SubtractCount = 0; // PinkBlock
     private int bag4SubtractCount = 0; // RedBlock
 
-    //public GameObject drillHorizontalBlock;
-    //public GameObject drillVerticalBlock;
-    //public GameObject pickBlock;
-    //public GameObject prismBlock;
-    //public GameObject bombBlock;
-
-
-    // 추가해야 할 곡괭이 수
-    //public int pick;
-
     // Unity 상에서 쉽게 특정 위치 안 나오게 
     public ArrayLayout arrayLayout;
     // static Instance
@@ -383,25 +373,25 @@ public class PotionBoard : MonoBehaviour
             //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
             isProcessingMove = true;
 
-        foreach (Potion potionToRemove in findMatches.potionsToRemove)
-        {
-            potionToRemove.isMatched = false;
-        }
+            foreach (Potion potionToRemove in findMatches.potionsToRemove)
+            {
+                potionToRemove.isMatched = false;
+            }
 
-        RemoveBlock(findMatches.potionsToRemove);
+            RemoveBlock(findMatches.potionsToRemove);
 
-        yield return new WaitForSeconds(0.6f);
+            yield return new WaitForSeconds(0.6f);
 
-        RefillBlock();
+            RefillBlock();
 
-        // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-        GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
-        bag1SubtractCount = 0;
-        bag2SubtractCount = 0;
-        bag3SubtractCount = 0;
-        bag4SubtractCount = 0;
+            // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
+            GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
+            bag1SubtractCount = 0;
+            bag2SubtractCount = 0;
+            bag3SubtractCount = 0;
+            bag4SubtractCount = 0;
 
-        yield return new WaitForSeconds(0.6f);
+            yield return new WaitForSeconds(0.6f);
         }
 
         isProcessingMove = false;
@@ -495,8 +485,6 @@ public class PotionBoard : MonoBehaviour
                         // Move it to the correct location
                         Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
                         //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
-
-                        //Debug.Log(targetPos);
 
                         //Move to location
                         potionAbove.MoveToTarget(targetPos);
@@ -760,26 +748,3 @@ public class PotionBoard : MonoBehaviour
 
 }
 
-public class MatchResult
-{
-    public List<Potion> connectedPotions;
-    public MatchDirection direction;
-}
-
-
-// 족보 : 3배열, 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 (시스템 기획서 27P)
-
-// TODO : 1. 특수 블럭 조합 로직 추가
-
-public enum MatchDirection
-{
-    Vertical_3, // 3 세로
-    Horizontal_3, // 3 가로
-    Vertical_4, // 4 세로 : 드릴(세로)
-    Horizontal_4, // 4 가로 : 드릴(가로)
-    LongVertical, // 5 이상 세로 : 프리즘
-    LongHorizontal, // 5 이상 가로 -> 프리즘
-    Super, // 가로 세로 합쳐서 작동중 -> 5배열 L자 추가 로직 적용 : 폭탄
-    Square, // 4배열 네모 : 곡괭이(대각), 곡괭이(역대각)
-    None
-}
