@@ -37,6 +37,9 @@ public class Potion : MonoBehaviour
     [SerializeField]
     private Sprite[] sprites = new Sprite[2];
 
+    // 제거 이펙트 애니메이션 풀
+    private RemoveBlockEffectPool _RemoveBlockEffect = null;
+
     // 특수블럭 체크
     //public bool isBomb;
     //public bool isDrillVertical;
@@ -158,6 +161,35 @@ public class Potion : MonoBehaviour
 
         transform.position = _targetPos;
         isMoving = false;
+    }
+
+    private void OnDestroy()
+    {
+        // 제거 이펙트 재생
+        //IEnumerator BlockEffectDestroy()
+        //{
+        //    _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
+
+        //    _RemoveBlockEffect.PlayEffect(transform.position);
+
+        //    yield return new WaitForSeconds(0.6f);
+
+        //    Destroy(gameObject);
+        //}
+
+        //StartCoroutine(BlockEffectDestroy());
+
+
+
+        _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
+
+        if (_RemoveBlockEffect != null)
+        {
+            _RemoveBlockEffect.PlayEffect(transform.position);
+        }
+
+
+        //Destroy(gameObject);
     }
 }
 

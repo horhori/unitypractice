@@ -15,7 +15,7 @@ public class PotionBoard : MonoBehaviour
     // 일반 블럭 목록
     public GameObject[] potionPrefabs;
     // 일반 블럭 갯수
-    public int normalBlockLength = 7;
+    public int normalBlockLength;
     // 블럭보드
     public Node[,] potionBoard;
     public GameObject potionBoardGO;

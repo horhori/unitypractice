@@ -5960,7 +5960,7 @@ MonoBehaviour:
   - {fileID: 2509573409451358673, guid: 9b2cb542548bfec41bd8191cf684e939, type: 3}
   - {fileID: 2617827014288527008, guid: adf8529175089c54fa626ef1df79ca8d, type: 3}
   - {fileID: 5038854057198368486, guid: b2343b8d2c2e73e45a581a1084bc34e8, type: 3}
-  normalBlockLength: 4
+  normalBlockLength: 7
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
   potionParent: {fileID: 894325663}
@@ -6551,8 +6551,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1522231440}
+  - component: {fileID: 1522231441}
   m_Layer: 0
-  m_Name: RemoveEffect
+  m_Name: RemoveBlockEffectPool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6573,6 +6574,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1522231441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1522231439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc7fd8fbf95fb8f4da29f338023a8e72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RemoveBlockEffect: {fileID: 8068898104476546563, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
 --- !u!1 &1566383876
 GameObject:
   m_ObjectHideFlags: 0
@@ -7728,63 +7742,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1827831515}
   m_CullTransparentMesh: 1
---- !u!1001 &1865926167
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4695582677419416386, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6506415858715596669, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
-      propertyPath: m_Name
-      value: RemoveBlock
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 195b773bbba7fc546b9180319e95bf87, type: 3}
 --- !u!1 &1890846185
 GameObject:
   m_ObjectHideFlags: 0
@@ -8794,5 +8751,4 @@ SceneRoots:
   - {fileID: 1263557208}
   - {fileID: 911737944}
   - {fileID: 2088122908}
-  - {fileID: 1865926167}
   - {fileID: 1522231440}
