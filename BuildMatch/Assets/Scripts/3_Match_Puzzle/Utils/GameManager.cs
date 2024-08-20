@@ -1,6 +1,9 @@
+using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // 게임 스코어, 게임 승리/패배 조건, UI 설정
 
@@ -10,6 +13,10 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // static reference;
+
+    public GameObject warningUI; // 10초 남았을 때 경고 UI
+    private Image warningImage;
+    public float warningSec; // 경고 뜨는 남은 기준 시간 (현재 10초)
 
     public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
     //public GameObject victoryPanel; 
@@ -39,7 +46,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text pointsText;
     public TMP_Text timeText;
 
-    // 나중에 따로 bag 컴포넌트로 관리 필오
+    // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필오
     public Sprite[] bagSprites;
 
     public GameObject bag1;
@@ -73,6 +80,8 @@ public class GameManager : MonoBehaviour
     {
         stageText.text = "Stage " + stageNumber;
         SetUpBag();
+        warningImage = warningUI.GetComponent<Image>();
+        Debug.Log(warningImage.color);
     }
 
     private void SetUpBag()
@@ -135,19 +144,14 @@ public class GameManager : MonoBehaviour
             min -= 1;
             sec = 59f;
         }
-        else if (min == 0 && sec <= 11f && sec >= 10f)
+        // TODO 1. 현재 10초에서 1초만 해당 함수 실행중
+        else if (min == 0 && sec <= warningSec + 1 && sec >= warningSec)
         {
-            timeText.color = Color.red;
-            // TODO : 1. 위험 효과 추가
+            WarningLeftTime();
         }
         else if (min == 0 && sec <= 0f)
         {
-            // lose game
-            isGameEnded = true;
-            backgroundPanel.SetActive(true);
-            failedPanel.SetActive(true);
-            PotionBoard.Instance.potionParent.SetActive(false);
-            isGameRunning = false;
+            LoseGame();
             return;
         }
     }
@@ -215,10 +219,69 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private void WarningLeftTime()
+    {
+        timeText.color = Color.red;
+        // TODO : 1. 위험 효과 추가
+        warningUI.SetActive(true);
+        float duration = 1f; // This will be your time in seconds.
+        float smoothness = 0.2f; // This will determine the smoothness of the lerp. Smaller values are smoother. Really it's the time between updates.
+        Color originColor = warningImage.GetComponent<Image>().color; // This is the state of the color in the current interpolation.
+        Color currentColor = originColor;
+        Color fullColor = new Color(1, 1, 1, 1);
+        bool lerpColorDirection = true; // true일 시 불투명해지는 방향으로
+       
+        //IEnumerator LerpColor()
+        //{
+        //    float progress = 0; //This float will serve as the 3rd parameter of the lerp function.
+        //    float increment = smoothness / duration; //The amount of change to apply.
+        //    if (lerpColorDirection)
+        //    {
+        //        while (progress < 1)
+        //        {
+        //            currentColor = Color.Lerp(originColor, fullColor, progress);
+        //            progress += increment;
+        //            warningUI.GetComponent<Image>().color = currentColor;
+        //            Debug.Log("currentColor : " + currentColor);
+        //            Debug.Log($"progress : {progress}");
+        //            yield return new WaitForSeconds(smoothness);
+        //        }
+        //        lerpColorDirection = false;
+        //    } else
+        //    {
+        //        while (progress > 0)
+        //        {
+        //            currentColor = Color.Lerp(originColor, fullColor, progress);
+        //            progress -= increment;
+        //            warningUI.GetComponent<Image>().color = currentColor;
+        //            Debug.Log("currentColor : " + currentColor);
+        //            Debug.Log($"progress : {progress}");
+
+        //            yield return new WaitForSeconds(smoothness);
+        //        }
+        //        lerpColorDirection = true;
+        //    }
+        //}
+
+        if(lerpColorDirection)
+        {
+            currentColor = Color.Lerp(originColor, fullColor, Time.deltaTime * smoothness);
+            warningUI.GetComponent<Image>().color = currentColor;
+            Debug.Log(currentColor.a);
+            if (currentColor.a == 1)
+            {
+                Debug.Log("1 도달");
+                lerpColorDirection = false;
+            }
+        }
+
+        //StartCoroutine(LerpColor());
+    }
+
     // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
     // 현재 결과창 모든 버튼 이거 사용중 : HomeButton, RestartButton, NextButton, MapButton
     // TODO : 1. 버튼마다 각각 메서드 만들어야 함
-    public void WinGame()
+    private void WinGame()
     {
         //SceneManager.LoadScene("Main Menu");
         // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
@@ -226,10 +289,17 @@ public class GameManager : MonoBehaviour
     }
 
     // 남은 시간이 다 지나면 패배
-    //public void LoseGame()
-    //{
-    //    //SceneManager.LoadScene("Main Menu");
-    //    // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
-    //    SceneManager.LoadScene(0);
-    //}
+    private void LoseGame()
+    {
+        isGameEnded = true;
+        warningUI.SetActive(false);
+        backgroundPanel.SetActive(true);
+        failedPanel.SetActive(true);
+        PotionBoard.Instance.potionParent.SetActive(false);
+        isGameRunning = false;
+
+        //SceneManager.LoadScene("Main Menu");
+        // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
+        //SceneManager.LoadScene(0);
+    }
 }

@@ -162,35 +162,6 @@ public class Potion : MonoBehaviour
         transform.position = _targetPos;
         isMoving = false;
     }
-
-    private void OnDestroy()
-    {
-        // 제거 이펙트 재생
-        //IEnumerator BlockEffectDestroy()
-        //{
-        //    _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
-
-        //    _RemoveBlockEffect.PlayEffect(transform.position);
-
-        //    yield return new WaitForSeconds(0.6f);
-
-        //    Destroy(gameObject);
-        //}
-
-        //StartCoroutine(BlockEffectDestroy());
-
-
-
-        _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
-
-        if (_RemoveBlockEffect != null)
-        {
-            _RemoveBlockEffect.PlayEffect(transform.position);
-        }
-
-
-        //Destroy(gameObject);
-    }
 }
 
 // TODO : 1. 특수 블럭

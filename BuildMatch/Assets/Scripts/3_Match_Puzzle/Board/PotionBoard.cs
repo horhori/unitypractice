@@ -54,6 +54,9 @@ public class PotionBoard : MonoBehaviour
     // 매칭 로직 담당
     public FindMatches findMatches;
 
+    // 제거 이펙트 애니메이션 풀
+    private RemoveBlockEffectPool _RemoveBlockEffect = null;
+
     private void Awake()
     {
         Instance = this;
@@ -431,6 +434,13 @@ public class PotionBoard : MonoBehaviour
 
             // Destroy the potion
             Destroy(potion.gameObject);
+
+            _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
+
+            if (_RemoveBlockEffect != null)
+            {
+                _RemoveBlockEffect.PlayEffect(potion.transform.position);
+            }
 
             // Create a blank node on the potion board
             potionBoard[_xIndex, _yIndex] = new Node(true, null);

@@ -14,7 +14,7 @@ public class RemoveBlockEffectPool : MonoBehaviour
 
     private void Initialize()
     {
-        _RemoveBlockEffectPool = new ObjectPool<RemoveBlockEffect> ();
+        _RemoveBlockEffectPool = new ObjectPool<RemoveBlockEffect>();
     }
 
     // 제거 이펙트 실행

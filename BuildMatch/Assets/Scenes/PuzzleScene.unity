@@ -1303,6 +1303,7 @@ RectTransform:
   - {fileID: 2013271004}
   - {fileID: 2041251537}
   - {fileID: 213823535}
+  - {fileID: 312317615}
   - {fileID: 1756802271}
   - {fileID: 1571796878}
   - {fileID: 1472486501}
@@ -1521,6 +1522,81 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 303132958}
+  m_CullTransparentMesh: 1
+--- !u!1 &312317614
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 312317615}
+  - component: {fileID: 312317617}
+  - component: {fileID: 312317616}
+  m_Layer: 5
+  m_Name: WarningImg
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &312317615
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 312317614}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 270582258}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1080, y: 1920}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &312317616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 312317614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.19607843}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: a3ee27abec823b644b280e25c86b76d5, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &312317617
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 312317614}
   m_CullTransparentMesh: 1
 --- !u!1 &341090952
 GameObject:
@@ -5465,14 +5541,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5e64ddc40c7084d9f6a249a118d56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  warningUI: {fileID: 312317614}
+  warningSec: 10
   backgroundPanel: {fileID: 1756802270}
   clearPanel: {fileID: 1571796877}
   failedPanel: {fileID: 1472486500}
-  goal: 300
+  goal: 50
   points: 0
   stageNumber: 1
-  min: 1
-  sec: 30
+  min: 0
+  sec: 15
   isGameRunning: 0
   isGameEnded: 0
   stageText: {fileID: 1568398321}
@@ -5960,7 +6038,7 @@ MonoBehaviour:
   - {fileID: 2509573409451358673, guid: 9b2cb542548bfec41bd8191cf684e939, type: 3}
   - {fileID: 2617827014288527008, guid: adf8529175089c54fa626ef1df79ca8d, type: 3}
   - {fileID: 5038854057198368486, guid: b2343b8d2c2e73e45a581a1084bc34e8, type: 3}
-  normalBlockLength: 7
+  normalBlockLength: 4
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
   potionParent: {fileID: 894325663}
