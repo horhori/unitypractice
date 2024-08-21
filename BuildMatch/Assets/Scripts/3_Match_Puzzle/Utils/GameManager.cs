@@ -70,18 +70,31 @@ public class GameManager : MonoBehaviour
     private int bag4GoalCount;
     public PotionType bag4Type;
 
+    private Color originWarningColor;
+    private Color fullWarningColor;
+    private bool lerpColorDirection; // true일 시 불투명해지는 방향으로
+
+    private Vector3 firstResultScale;
+    private Vector3 middleResultScale;
+    private Vector3 finalResultScale;
 
     private void Awake()
     {
         Instance = this;
+        warningImage = warningUI.GetComponent<Image>();
+        originWarningColor = warningImage.GetComponent<Image>().color;
+        fullWarningColor = new Color(1, 1, 1, 1);
+        lerpColorDirection = true;
+            
+        firstResultScale = Vector3.zero;
+        middleResultScale = new Vector3(1.2f, 1.2f, 1);
+        finalResultScale = new Vector3(1, 1, 1);
     }
 
     private void Start()
     {
         stageText.text = "Stage " + stageNumber;
         SetUpBag();
-        warningImage = warningUI.GetComponent<Image>();
-        Debug.Log(warningImage.color);
     }
 
     private void SetUpBag()
@@ -115,6 +128,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         UpdatePoint();
+        UpdateTime();
         UpdateBag();
     }
 
@@ -122,15 +136,17 @@ public class GameManager : MonoBehaviour
     {
         pointsText.text = string.Format("{0:D9}", points);
         // move, goal 삭제 예정
-        //movesText.text = "Moves: " + moves.ToString();
-        //goalText.text = "Points: " + goal.ToString();
-        // string.Format({0번째 매개변수:표시자리수}, {1번째 매개변수:표시자리수});
-        // 00:30으로 표시됨
+    }
 
+    private void UpdateTime()
+    {
         if (isGameRunning)
         {
             CheckRemainTime();
         }
+
+        // string.Format({0번째 매개변수:표시자리수}, {1번째 매개변수:표시자리수});
+        // 00:30으로 표시됨
 
         timeText.text = string.Format("{0:D2} : {1:D2}", min, (int)sec);
     }
@@ -144,7 +160,6 @@ public class GameManager : MonoBehaviour
             min -= 1;
             sec = 59f;
         }
-        // TODO 1. 현재 10초에서 1초만 해당 함수 실행중
         else if (min == 0 && sec <= warningSec + 1 && sec >= warningSec)
         {
             WarningLeftTime();
@@ -222,60 +237,43 @@ public class GameManager : MonoBehaviour
     private void WarningLeftTime()
     {
         timeText.color = Color.red;
-        // TODO : 1. 위험 효과 추가
         warningUI.SetActive(true);
-        float duration = 1f; // This will be your time in seconds.
-        float smoothness = 0.2f; // This will determine the smoothness of the lerp. Smaller values are smoother. Really it's the time between updates.
-        Color originColor = warningImage.GetComponent<Image>().color; // This is the state of the color in the current interpolation.
-        Color currentColor = originColor;
-        Color fullColor = new Color(1, 1, 1, 1);
-        bool lerpColorDirection = true; // true일 시 불투명해지는 방향으로
-       
-        //IEnumerator LerpColor()
-        //{
-        //    float progress = 0; //This float will serve as the 3rd parameter of the lerp function.
-        //    float increment = smoothness / duration; //The amount of change to apply.
-        //    if (lerpColorDirection)
-        //    {
-        //        while (progress < 1)
-        //        {
-        //            currentColor = Color.Lerp(originColor, fullColor, progress);
-        //            progress += increment;
-        //            warningUI.GetComponent<Image>().color = currentColor;
-        //            Debug.Log("currentColor : " + currentColor);
-        //            Debug.Log($"progress : {progress}");
-        //            yield return new WaitForSeconds(smoothness);
-        //        }
-        //        lerpColorDirection = false;
-        //    } else
-        //    {
-        //        while (progress > 0)
-        //        {
-        //            currentColor = Color.Lerp(originColor, fullColor, progress);
-        //            progress -= increment;
-        //            warningUI.GetComponent<Image>().color = currentColor;
-        //            Debug.Log("currentColor : " + currentColor);
-        //            Debug.Log($"progress : {progress}");
+        StartCoroutine(LerpWarningColor());
+    }
 
-        //            yield return new WaitForSeconds(smoothness);
-        //        }
-        //        lerpColorDirection = true;
-        //    }
-        //}
-
-        if(lerpColorDirection)
+    // 10초 되면 경고 UI 깜빡깜빡하도록(컬러의 a값(불투명도) 조절)
+    private IEnumerator LerpWarningColor()
+    {
+        while (warningUI.GetComponent<Image>().color != fullWarningColor)
         {
-            currentColor = Color.Lerp(originColor, fullColor, Time.deltaTime * smoothness);
-            warningUI.GetComponent<Image>().color = currentColor;
-            Debug.Log(currentColor.a);
-            if (currentColor.a == 1)
-            {
-                Debug.Log("1 도달");
-                lerpColorDirection = false;
-            }
+            warningUI.GetComponent<Image>().color = Color.Lerp(originWarningColor, fullWarningColor, Mathf.PingPong(Time.time, 1));
+            yield return null;
         }
+    }
 
-        //StartCoroutine(LerpColor());
+    // 실패창 UI 스케일 조절 코루틴
+    //private IEnumerable LerpFailedPanelScale()
+    //{
+
+
+    //    while (failedPanel.GetComponent<GameObject>().transform.localScale != finalResultScale)
+    //    {
+    //        failedPanel.GetComponent<GameObject>().transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, )
+    //    }
+    //}
+
+    // 결과창 크기 조절 작업중
+    private IEnumerator LerpFailedPanelScale()
+    {
+        float progress = 0;
+        float increment = 2f;
+
+        while (progress < 1)
+        {
+            failedPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, progress);
+            progress += increment;
+            yield return new WaitForEndOfFrame();
+        }
     }
 
     // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
@@ -297,7 +295,7 @@ public class GameManager : MonoBehaviour
         failedPanel.SetActive(true);
         PotionBoard.Instance.potionParent.SetActive(false);
         isGameRunning = false;
-
+        StartCoroutine(LerpFailedPanelScale());
         //SceneManager.LoadScene("Main Menu");
         // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
         //SceneManager.LoadScene(0);
