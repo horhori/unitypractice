@@ -19,8 +19,6 @@ public class GameManager : MonoBehaviour
     public float warningSec; // 경고 뜨는 남은 기준 시간 (현재 10초)
 
     public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
-    //public GameObject victoryPanel; 
-    //public GameObject losePanel;
     public GameObject clearPanel;
     public GameObject failedPanel;
 
@@ -40,43 +38,54 @@ public class GameManager : MonoBehaviour
     private bool isGameRunning = false;
 
     // 남은 시간이 종료되었을 때 
-    public bool isGameEnded;
+    public bool isStageEnded;
 
     public TMP_Text stageText;
     public TMP_Text pointsText;
     public TMP_Text timeText;
 
-    // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필오
+    // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
     public Sprite[] bagSprites;
 
     public GameObject bag1;
     private TMP_Text bag1Text;
     private int bag1CurrentCount;
-    private int bag1GoalCount;
+    private int bag1GoalCount; // 1 stage 15
     public PotionType bag1Type;
+    private bool bag1Check; // currentCount == GoalCount 되면 check됨
+
     public GameObject bag2;
     private TMP_Text bag2Text;
     private int bag2CurrentCount;
     private int bag2GoalCount;
     public PotionType bag2Type;
+    private bool bag2Check;
+
     public GameObject bag3;
     private TMP_Text bag3Text;
     private int bag3CurrentCount;
     private int bag3GoalCount;
     public PotionType bag3Type;
+    private bool bag3Check;
+
     public GameObject bag4;
     private TMP_Text bag4Text;
     private int bag4CurrentCount;
     private int bag4GoalCount;
     public PotionType bag4Type;
+    private bool bag4Check;
 
+
+    // 경고 UI 설정 컬러값
     private Color originWarningColor;
     private Color fullWarningColor;
-    private bool lerpColorDirection; // true일 시 불투명해지는 방향으로
 
+    // 결과창 Scale 설정값
     private Vector3 firstResultScale;
     private Vector3 middleResultScale;
-    private Vector3 finalResultScale;
+    private Vector3 lastResultScale;
+
+    float checkTime = 0;
 
     private void Awake()
     {
@@ -84,11 +93,10 @@ public class GameManager : MonoBehaviour
         warningImage = warningUI.GetComponent<Image>();
         originWarningColor = warningImage.GetComponent<Image>().color;
         fullWarningColor = new Color(1, 1, 1, 1);
-        lerpColorDirection = true;
             
         firstResultScale = Vector3.zero;
         middleResultScale = new Vector3(1.2f, 1.2f, 1);
-        finalResultScale = new Vector3(1, 1, 1);
+        lastResultScale = new Vector3(1, 1, 1);
     }
 
     private void Start()
@@ -102,26 +110,33 @@ public class GameManager : MonoBehaviour
         //Sprite[] sprite_1 = Resources.LoadAll<Sprite>("Sprites/Puzzle Blocks Icon Pack/png/blockBlueDimond");
         //Debug.Log("sprite" + sprite_1[0]);
         bag1Text = bag1.GetComponentInChildren<TMP_Text>();
-        bag2Text = bag2.GetComponentInChildren<TMP_Text>();
-        bag3Text = bag3.GetComponentInChildren<TMP_Text>();
-        bag4Text = bag4.GetComponentInChildren<TMP_Text>();
         bag1Type = PotionType.BlueBlock;
-        bag1GoalCount = 25;
-        bag1CurrentCount = bag1GoalCount;
+        bag1GoalCount = 15;
+        bag1CurrentCount = 0;
+        bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
+        bag1Check = false;
+
+        bag2Text = bag2.GetComponentInChildren<TMP_Text>();
         bag2Type = PotionType.GreenBlock;
         bag2GoalCount = 30;
-        bag2CurrentCount = bag2GoalCount;
+        bag2CurrentCount = 0;
+        bag2Text.text = bag2CurrentCount.ToString() + " / " + bag2GoalCount.ToString();
+        bag2Check = false;
+
+        bag3Text = bag3.GetComponentInChildren<TMP_Text>();
         bag3Type = PotionType.PinkBlock;
         bag3GoalCount = 35;
-        bag3CurrentCount = bag3GoalCount;
+        bag3CurrentCount = 0;
+        bag3Text.text = bag3CurrentCount.ToString() + " / " + bag3GoalCount.ToString();
+        bag3Check = false;
+
+        bag4Text = bag4.GetComponentInChildren<TMP_Text>();
         bag4Type = PotionType.RedBlock;
         bag4GoalCount = 40;
-        bag4CurrentCount = bag4GoalCount;
-
-        bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
-        bag2Text.text = bag2CurrentCount.ToString() + " / " + bag2GoalCount.ToString();
-        bag3Text.text = bag3CurrentCount.ToString() + " / " + bag3GoalCount.ToString();
+        bag4CurrentCount = 0;
         bag4Text.text = bag4CurrentCount.ToString() + " / " + bag4GoalCount.ToString();
+        bag4Check = false;
+
     }
 
     // Update is called once per frame
@@ -130,6 +145,7 @@ public class GameManager : MonoBehaviour
         UpdatePoint();
         UpdateTime();
         UpdateBag();
+        TestTime();
     }
 
     private void UpdatePoint()
@@ -166,7 +182,7 @@ public class GameManager : MonoBehaviour
         }
         else if (min == 0 && sec <= 0f)
         {
-            LoseGame();
+            StageFailed();
             return;
         }
     }
@@ -204,7 +220,7 @@ public class GameManager : MonoBehaviour
     }
 
     // TODO : 1. 매개변수 _subtractMoves 삭제 -> 스와이프 횟수 -로 종료조건일 때 했었음 
-    public void ProcessTurn(int _pointsToGain, bool _subtractMoves, int _bag1SubtractCount, int _bag2SubtractCount, int _bag3SubtractCount, int _bag4SubtractCount)
+    public void ProcessTurn(int _pointsToGain, bool _subtractMoves, int _bag1AddCount, int _bag2AddCount, int _bag3AddCount, int _bag4AddCount)
     {
         if (!isGameRunning)
         {
@@ -213,23 +229,36 @@ public class GameManager : MonoBehaviour
 
         points += _pointsToGain;
 
-        bag1CurrentCount -= _bag1SubtractCount;
-        bag2CurrentCount -= _bag2SubtractCount;
-        bag3CurrentCount -= _bag3SubtractCount;
-        bag4CurrentCount -= _bag4SubtractCount;
+
+        bag1CurrentCount += _bag1AddCount;
+        if (bag1CurrentCount >= bag1GoalCount)
+        {
+            bag1CurrentCount = bag1GoalCount;
+            bag1Check = true;
+        }
+
+        bag2CurrentCount += _bag2AddCount;
+        bag3CurrentCount += _bag3AddCount;
+        bag4CurrentCount += _bag4AddCount;
 
         // TODO : 1. 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
-        if (points >= goal)
-        {
-            // win game
-            isGameEnded = true;
+        //if (points >= goal)
+        //{
+        //    // win game
+        //    isGameEnded = true;
 
-            // Display a victory screen.
-            backgroundPanel.SetActive(true);
-            clearPanel.SetActive(true);
-            PotionBoard.Instance.potionParent.SetActive(false);
-            isGameRunning = false;
-            return;
+        //    // Display a victory screen.
+        //    backgroundPanel.SetActive(true);
+        //    clearPanel.SetActive(true);
+        //    PotionBoard.Instance.potionParent.SetActive(false);
+        //    isGameRunning = false;
+        //    StartCoroutine(LerpClearPanelScale());
+        //    return;
+        //}
+
+        if (bag1Check)
+        {
+            StageClear();
         }
 
     }
@@ -251,29 +280,74 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // 실패창 UI 스케일 조절 코루틴
-    //private IEnumerable LerpFailedPanelScale()
-    //{
+    // 결과창 크기 조절
+    private IEnumerator LerpClearPanelScale()
+    {
+        bool firstCheck = false;
+        bool lastCheck = false;
+        float checkTime = 0;
+        float lerpSpeed = 0.2f;
 
+        while (!firstCheck || !lastCheck)
+        {
+            clearPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, Mathf.PingPong(checkTime += lerpSpeed, 1));
+            Debug.Log(checkTime);
+            if (clearPanel.transform.localScale.x >= middleResultScale.x - 0.1f)
+            {
+                firstCheck = true;
+            }
+            if (clearPanel.transform.localScale.x <= lastResultScale.x && firstCheck)
+            {
+                lastCheck = true;
+            }
+            yield return null;
+        }
+    }
 
-    //    while (failedPanel.GetComponent<GameObject>().transform.localScale != finalResultScale)
-    //    {
-    //        failedPanel.GetComponent<GameObject>().transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, )
-    //    }
-    //}
-
-    // 결과창 크기 조절 작업중
     private IEnumerator LerpFailedPanelScale()
     {
-        float progress = 0;
-        float increment = 2f;
+        bool firstCheck = false;
+        bool lastCheck = false;
 
-        while (progress < 1)
+        failedPanel.transform.localScale = Vector3.zero;
+
+        while (!firstCheck || !lastCheck)
         {
-            failedPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, progress);
-            progress += increment;
-            yield return new WaitForEndOfFrame();
+            failedPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, Mathf.PingPong(Time.time, 1));
+            Debug.Log(Mathf.PingPong(Time.time, 1));
+            if (failedPanel.transform.localScale.x >= middleResultScale.x - 0.1f)
+            {
+                firstCheck = true;
+            }
+            if (failedPanel.transform.localScale.x <= lastResultScale.x && firstCheck)
+            {
+                lastCheck = true;
+            }
+            yield return null;
         }
+    }
+
+    private void StageClear()
+    {
+        isStageEnded = true;
+        warningUI.SetActive(false);
+        // Display a victory screen.
+        backgroundPanel.SetActive(true);
+        clearPanel.SetActive(true);
+        PotionBoard.Instance.potionParent.SetActive(false);
+        isGameRunning = false;
+        StartCoroutine(LerpClearPanelScale());
+    }
+
+    private void StageFailed()
+    {
+        isStageEnded = true;
+        warningUI.SetActive(false);
+        backgroundPanel.SetActive(true);
+        failedPanel.SetActive(true);
+        PotionBoard.Instance.potionParent.SetActive(false);
+        isGameRunning = false;
+        StartCoroutine(LerpFailedPanelScale());
     }
 
     // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
@@ -289,15 +363,15 @@ public class GameManager : MonoBehaviour
     // 남은 시간이 다 지나면 패배
     private void LoseGame()
     {
-        isGameEnded = true;
-        warningUI.SetActive(false);
-        backgroundPanel.SetActive(true);
-        failedPanel.SetActive(true);
-        PotionBoard.Instance.potionParent.SetActive(false);
-        isGameRunning = false;
-        StartCoroutine(LerpFailedPanelScale());
+
         //SceneManager.LoadScene("Main Menu");
         // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
         //SceneManager.LoadScene(0);
+    }
+
+    private void TestTime()
+    {
+        //float lerpSpeed = 0.2f;
+        //Debug.Log(Vector3.Lerp(firstResultScale, middleResultScale, Mathf.PingPong(checkTime += lerpSpeed, 1)));
     }
 }
