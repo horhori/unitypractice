@@ -15,8 +15,8 @@ public class Potion : MonoBehaviour
 
     // TODO : 1. PotionBoard의 해당 값을 가져와야 함(현재는 임시로 unity GUI로 3 설정(7x7이니까 3임)
     //        2. 스테이지 세팅하면서 PotionBoard와 여기서의 spacingX, Y 값 Manager로 관리
-    public int spacingX = 3;
-    public int spacingY = 3;
+    public int spacingX;
+    public int spacingY;
 
     // 현재 사용안하는중 -> 사용하도록 바꾸는중
     // isMatched 체크되면 무조건 지워지는 블럭됨
@@ -123,7 +123,8 @@ public class Potion : MonoBehaviour
     }
 
     // 스테이지 클리어 시 에러 발생했는데 원인 아직 못찾음?
-    // TODO : 1. 제거 & 생성 코루틴 도중 게임 클리어되면 여기서 에러남
+    // TODO : 1. 제거 & 생성 코루틴 도중 게임 클리어되면 여기서 에러남 -> 240826 GameManager StageFailed 시 코루틴으로 보드판 무빙 끝나면 블럭 전부 없어지게 함
+    //             -> StageClear 시에 테스트해봐야함
     //        2. 제거 중간에 조작하면 되버림
     public void MoveToTarget(Vector2 _targetPos)
     {

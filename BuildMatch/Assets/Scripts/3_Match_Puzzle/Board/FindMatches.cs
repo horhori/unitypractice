@@ -750,7 +750,6 @@ public class FindMatches : MonoBehaviour
                         return Get3RowPieces(_selectedPotion.xIndex, _selectedPotion.yIndex);
                     case PotionType.PickLeft:
                         return Get3DiagonalPieces(_selectedPotion.xIndex, _selectedPotion.yIndex);
-                    
                     case PotionType.PickRight:
                         // ¿¡·¯³²
                         return Get3ReverseDiagonalPieces(_selectedPotion.xIndex, _selectedPotion.yIndex);
@@ -886,7 +885,7 @@ public class FindMatches : MonoBehaviour
         {
             CheckSpecialChainMatch(_xIndex, _yIndex - 2, blocks);
         }
-        if (_yIndex < board.height - 2 && board.potionBoard[_xIndex, _yIndex + 2] != null && IsUsableAndNotBeforeMatched(_xIndex + 2, _yIndex))
+        if (_yIndex < board.height - 2 && board.potionBoard[_xIndex, _yIndex + 2] != null && IsUsableAndNotBeforeMatched(_xIndex, _yIndex + 2))
         {
             CheckSpecialChainMatch(_xIndex, _yIndex + 2, blocks);
         }

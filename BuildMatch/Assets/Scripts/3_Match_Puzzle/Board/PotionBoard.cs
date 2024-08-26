@@ -34,10 +34,9 @@ public class PotionBoard : MonoBehaviour
     public Potion selectedPotion;
     public Potion targetedPotion;
 
-    public bool isSwipeable;
+    //public bool isSwipeable;
 
-    [SerializeField]
-    private bool isProcessingMove;
+    public bool isProcessMoving; // 동작 이후 블럭 제거 완료될때까지 true, 동작 중이지 않을때 false
 
     // 바구니 임시 세팅
     // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
@@ -93,7 +92,7 @@ public class PotionBoard : MonoBehaviour
             {
                 if (findMatches.IsSpecialBlock(selectedPotion.potionType))
                 {
-                    isProcessingMove = true;
+                    isProcessMoving = true;
                     StartCoroutine(ProcessOriginMatches(selectedPotion));
                 }
             }
@@ -227,7 +226,7 @@ public class PotionBoard : MonoBehaviour
 
         if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
         {
-            if (isProcessingMove)
+            if (isProcessMoving)
             {
                 return;
             }
@@ -288,7 +287,7 @@ public class PotionBoard : MonoBehaviour
         DoSwap(_currentPotion, _targetPotion);
 
         // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
-        isProcessingMove = true;
+        isProcessMoving = true;
 
         // startCoroutine ProcessMatches.
         StartCoroutine(ProcessSwapMatches(_currentPotion, _targetPotion));
@@ -332,7 +331,7 @@ public class PotionBoard : MonoBehaviour
             DoSwap(_currentPotion, _targetPotion);
         }
 
-        isProcessingMove = false;
+        //isProcessingMove = false;
     }
 
     private IEnumerator ProcessOriginMatches(Potion _currentPotion)
@@ -345,8 +344,6 @@ public class PotionBoard : MonoBehaviour
             // Start a coroutine that is going to process our matches in our turn.
             StartCoroutine(ProcessTurnOnMatchedBoard(true));
         }
-
-        isProcessingMove = false;
     }
 
     #endregion
@@ -362,8 +359,6 @@ public class PotionBoard : MonoBehaviour
             // Start a coroutine that is going to process our matches in our turn.
             StartCoroutine(ProcessTurnOnMatchedBoard(true));
         }
-
-        isProcessingMove = false;
     }
 
     #region 블럭 제거
@@ -374,7 +369,7 @@ public class PotionBoard : MonoBehaviour
         {
             // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
             //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
-            isProcessingMove = true;
+            isProcessMoving = true;
 
             foreach (Potion potionToRemove in findMatches.potionsToRemove)
             {
@@ -397,7 +392,7 @@ public class PotionBoard : MonoBehaviour
             yield return new WaitForSeconds(0.6f);
         }
 
-        isProcessingMove = false;
+        isProcessMoving = false;
 
         if (findMatches.FindAllMatches())
         {
@@ -755,6 +750,5 @@ public class PotionBoard : MonoBehaviour
     }
 
     #endregion
-
 }
 

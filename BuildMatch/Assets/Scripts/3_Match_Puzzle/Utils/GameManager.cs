@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // static reference;
 
+    private PotionBoard board;
+
     public GameObject warningUI; // 10초 남았을 때 경고 UI
     private Image warningImage;
     public float warningSec; // 경고 뜨는 남은 기준 시간 (현재 10초)
@@ -50,6 +52,7 @@ public class GameManager : MonoBehaviour
     public GameObject bag1;
     private TMP_Text bag1Text;
     private int bag1CurrentCount;
+    [SerializeField]
     private int bag1GoalCount; // 1 stage 15
     public PotionType bag1Type;
     private bool bag1Check; // currentCount == GoalCount 되면 check됨
@@ -57,6 +60,7 @@ public class GameManager : MonoBehaviour
     public GameObject bag2;
     private TMP_Text bag2Text;
     private int bag2CurrentCount;
+    [SerializeField]
     private int bag2GoalCount;
     public PotionType bag2Type;
     private bool bag2Check;
@@ -64,6 +68,7 @@ public class GameManager : MonoBehaviour
     public GameObject bag3;
     private TMP_Text bag3Text;
     private int bag3CurrentCount;
+    [SerializeField]
     private int bag3GoalCount;
     public PotionType bag3Type;
     private bool bag3Check;
@@ -71,6 +76,7 @@ public class GameManager : MonoBehaviour
     public GameObject bag4;
     private TMP_Text bag4Text;
     private int bag4CurrentCount;
+    [SerializeField]
     private int bag4GoalCount;
     public PotionType bag4Type;
     private bool bag4Check;
@@ -85,11 +91,11 @@ public class GameManager : MonoBehaviour
     private Vector3 middleResultScale;
     private Vector3 lastResultScale;
 
-    float checkTime = 0;
-
     private void Awake()
     {
         Instance = this;
+        board = FindObjectOfType<PotionBoard>();
+
         warningImage = warningUI.GetComponent<Image>();
         originWarningColor = warningImage.GetComponent<Image>().color;
         fullWarningColor = new Color(1, 1, 1, 1);
@@ -111,7 +117,7 @@ public class GameManager : MonoBehaviour
         //Debug.Log("sprite" + sprite_1[0]);
         bag1Text = bag1.GetComponentInChildren<TMP_Text>();
         bag1Type = PotionType.BlueBlock;
-        bag1GoalCount = 15;
+        bag1GoalCount = 25;
         bag1CurrentCount = 0;
         bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
         bag1Check = false;
@@ -145,7 +151,6 @@ public class GameManager : MonoBehaviour
         UpdatePoint();
         UpdateTime();
         UpdateBag();
-        TestTime();
     }
 
     private void UpdatePoint()
@@ -285,44 +290,98 @@ public class GameManager : MonoBehaviour
     {
         bool firstCheck = false;
         bool lastCheck = false;
-        float checkTime = 0;
-        float lerpSpeed = 0.2f;
+        float lerpSpeed = 0.1f;
 
-        while (!firstCheck || !lastCheck)
+        float elaspedTime = 0f;
+
+        float duration = 0.5f;
+
+        // 0에서 1.2까지 커짐
+        while (!firstCheck)
         {
-            clearPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, Mathf.PingPong(checkTime += lerpSpeed, 1));
-            Debug.Log(checkTime);
+            float t = elaspedTime / duration;
+            clearPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, t);
+
+            elaspedTime += Time.deltaTime;
+
             if (clearPanel.transform.localScale.x >= middleResultScale.x - 0.1f)
             {
                 firstCheck = true;
             }
+            
+            yield return null;
+        }
+
+        elaspedTime = 0f;
+
+        // 1.2에서 1까지 줄어듬
+        while (!lastCheck)
+        {
+            float t = elaspedTime / duration;
+            clearPanel.transform.localScale = Vector3.Lerp(middleResultScale, lastResultScale, t);
+
+            elaspedTime += Time.deltaTime;
+
             if (clearPanel.transform.localScale.x <= lastResultScale.x && firstCheck)
             {
                 lastCheck = true;
             }
+
             yield return null;
         }
+
     }
 
     private IEnumerator LerpFailedPanelScale()
     {
+        yield return new WaitWhile(()=>board.isProcessMoving);
+
+        // 기존 StageFailed 내용, 보드판 이동이 끝나면 active 상태 false로 만듬 
+        isStageEnded = true;
+        warningUI.SetActive(false);
+        backgroundPanel.SetActive(true);
+        failedPanel.SetActive(true);
+        PotionBoard.Instance.potionParent.SetActive(false);
+        isGameRunning = false;
+
         bool firstCheck = false;
         bool lastCheck = false;
 
-        failedPanel.transform.localScale = Vector3.zero;
+        float elaspedTime = 0f;
 
-        while (!firstCheck || !lastCheck)
+        float duration = 0.5f;
+
+        // 0에서 1.2까지 커짐
+        while (!firstCheck)
         {
-            failedPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, Mathf.PingPong(Time.time, 1));
-            Debug.Log(Mathf.PingPong(Time.time, 1));
+            float t = elaspedTime / duration;
+            failedPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, t);
+
+            elaspedTime += Time.deltaTime;
+
             if (failedPanel.transform.localScale.x >= middleResultScale.x - 0.1f)
             {
                 firstCheck = true;
             }
+
+            yield return null;
+        }
+
+        elaspedTime = 0f;
+
+        // 1.2에서 1까지 줄어듬
+        while (!lastCheck)
+        {
+            float t = elaspedTime / duration;
+            failedPanel.transform.localScale = Vector3.Lerp(middleResultScale, lastResultScale, t);
+
+            elaspedTime += Time.deltaTime;
+
             if (failedPanel.transform.localScale.x <= lastResultScale.x && firstCheck)
             {
                 lastCheck = true;
             }
+
             yield return null;
         }
     }
@@ -341,13 +400,17 @@ public class GameManager : MonoBehaviour
 
     private void StageFailed()
     {
-        isStageEnded = true;
-        warningUI.SetActive(false);
-        backgroundPanel.SetActive(true);
-        failedPanel.SetActive(true);
-        PotionBoard.Instance.potionParent.SetActive(false);
-        isGameRunning = false;
         StartCoroutine(LerpFailedPanelScale());
+
+        // 아래 주석 내용 코루틴으로 옮김 -> 무빙이 끝난 후 아래 active 상태 false 
+
+        //isStageEnded = true;
+        //warningUI.SetActive(false);
+        //backgroundPanel.SetActive(true);
+        //failedPanel.SetActive(true);
+        //PotionBoard.Instance.potionParent.SetActive(false);
+        //isGameRunning = false;
+
     }
 
     // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
@@ -367,11 +430,5 @@ public class GameManager : MonoBehaviour
         //SceneManager.LoadScene("Main Menu");
         // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
         //SceneManager.LoadScene(0);
-    }
-
-    private void TestTime()
-    {
-        //float lerpSpeed = 0.2f;
-        //Debug.Log(Vector3.Lerp(firstResultScale, middleResultScale, Mathf.PingPong(checkTime += lerpSpeed, 1)));
     }
 }
