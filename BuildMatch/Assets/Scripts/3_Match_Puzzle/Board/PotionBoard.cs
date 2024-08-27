@@ -154,9 +154,16 @@ public class PotionBoard : MonoBehaviour
             }
         }
 
+        // 세팅 시 3개 이상 매칭이 있으면 초기화
         if (CheckInitializeBoard())
         {
             InitializeBoard();
+        }
+        // 매칭 없으면 세팅 끝나고 블럭 크기 조절
+        else
+        {
+            // 블럭 크기 배경이랑 딱 맞게
+            potionParent.transform.localScale = new Vector3(1.016f, 1.016f, 1);
         }
     }
 
@@ -329,6 +336,7 @@ public class PotionBoard : MonoBehaviour
         {
             // 매칭이 일어나지 않은 경우 다시 스왑
             DoSwap(_currentPotion, _targetPotion);
+            isProcessMoving = false;
         }
 
         //isProcessingMove = false;

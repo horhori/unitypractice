@@ -4,6 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // 스테이지 데이터
+// ID       DifficultLevel  MapWidth    MapHeight
+// a10001   1               7           7         
+// a20001   2               7           7         
+// a30001   3               8           8          
+// a40001	4	            8           8
+// a50001	5	            9           9
+
+// 스테이지 등장 블럭 리스트
+//ID	    Distraction     AppearedBlockList                                   DisappearedBlockList
+//a10001    null            { red, orange, yellow, green, blue }                { purple, pink }
+//a20001	중앙 세로 1줄    { red, orange, yellow, purple, pink }               { green, blue }
+//a30001	가로 중앙 2줄    { orange, yellow, green, blue, purple, pink }       { red }
+//a40001	가로 중앙 2줄	{ red, orange, yellow, green, blue, purple, pink }  null
+//a50001	중앙 십자 1줄    { red, orange, yellow, green, blue, purple, pink }  null
 
 // 3매치 목표 데이터
 //ID	    StageLevel	Priority_ID
@@ -46,6 +60,7 @@ using UnityEngine;
 //a40001	5스테이지 해금	
 //a40001	골드	            400
 //a50001	골드	            500
+
 
 [Serializable]
 public class StageData : ScriptableObject

@@ -57,31 +57,6 @@ public class GameManager : MonoBehaviour
     public PotionType bag1Type;
     private bool bag1Check; // currentCount == GoalCount 되면 check됨
 
-    public GameObject bag2;
-    private TMP_Text bag2Text;
-    private int bag2CurrentCount;
-    [SerializeField]
-    private int bag2GoalCount;
-    public PotionType bag2Type;
-    private bool bag2Check;
-
-    public GameObject bag3;
-    private TMP_Text bag3Text;
-    private int bag3CurrentCount;
-    [SerializeField]
-    private int bag3GoalCount;
-    public PotionType bag3Type;
-    private bool bag3Check;
-
-    public GameObject bag4;
-    private TMP_Text bag4Text;
-    private int bag4CurrentCount;
-    [SerializeField]
-    private int bag4GoalCount;
-    public PotionType bag4Type;
-    private bool bag4Check;
-
-
     // 경고 UI 설정 컬러값
     private Color originWarningColor;
     private Color fullWarningColor;
@@ -116,33 +91,11 @@ public class GameManager : MonoBehaviour
         //Sprite[] sprite_1 = Resources.LoadAll<Sprite>("Sprites/Puzzle Blocks Icon Pack/png/blockBlueDimond");
         //Debug.Log("sprite" + sprite_1[0]);
         bag1Text = bag1.GetComponentInChildren<TMP_Text>();
-        bag1Type = PotionType.BlueBlock;
-        bag1GoalCount = 25;
+        bag1Type = PotionType.RedBlock;
+        bag1GoalCount = 15;
         bag1CurrentCount = 0;
         bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
         bag1Check = false;
-
-        bag2Text = bag2.GetComponentInChildren<TMP_Text>();
-        bag2Type = PotionType.GreenBlock;
-        bag2GoalCount = 30;
-        bag2CurrentCount = 0;
-        bag2Text.text = bag2CurrentCount.ToString() + " / " + bag2GoalCount.ToString();
-        bag2Check = false;
-
-        bag3Text = bag3.GetComponentInChildren<TMP_Text>();
-        bag3Type = PotionType.PinkBlock;
-        bag3GoalCount = 35;
-        bag3CurrentCount = 0;
-        bag3Text.text = bag3CurrentCount.ToString() + " / " + bag3GoalCount.ToString();
-        bag3Check = false;
-
-        bag4Text = bag4.GetComponentInChildren<TMP_Text>();
-        bag4Type = PotionType.RedBlock;
-        bag4GoalCount = 40;
-        bag4CurrentCount = 0;
-        bag4Text.text = bag4CurrentCount.ToString() + " / " + bag4GoalCount.ToString();
-        bag4Check = false;
-
     }
 
     // Update is called once per frame
@@ -169,7 +122,7 @@ public class GameManager : MonoBehaviour
         // string.Format({0번째 매개변수:표시자리수}, {1번째 매개변수:표시자리수});
         // 00:30으로 표시됨
 
-        timeText.text = string.Format("{0:D2} : {1:D2}", min, (int)sec);
+        timeText.text = string.Format("{0:D2}:{1:D2}", min, (int)sec);
     }
 
     private void CheckRemainTime()
@@ -200,28 +153,7 @@ public class GameManager : MonoBehaviour
             bag1Text.color = Color.red;
         }
 
-        if (bag2CurrentCount <= 0)
-        {
-            bag2CurrentCount = 0;
-            bag2Text.color = Color.red;
-        }
-
-        if (bag3CurrentCount <= 0)
-        {
-            bag3CurrentCount = 0;
-            bag3Text.color = Color.red;
-        }
-
-        if (bag4CurrentCount <= 0)
-        {
-            bag4CurrentCount = 0;
-            bag4Text.color = Color.red;
-        }
-
         bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
-        bag2Text.text = bag2CurrentCount.ToString() + " / " + bag2GoalCount.ToString();
-        bag3Text.text = bag3CurrentCount.ToString() + " / " + bag3GoalCount.ToString();
-        bag4Text.text = bag4CurrentCount.ToString() + " / " + bag4GoalCount.ToString();
     }
 
     // TODO : 1. 매개변수 _subtractMoves 삭제 -> 스와이프 횟수 -로 종료조건일 때 했었음 
@@ -241,10 +173,6 @@ public class GameManager : MonoBehaviour
             bag1CurrentCount = bag1GoalCount;
             bag1Check = true;
         }
-
-        bag2CurrentCount += _bag2AddCount;
-        bag3CurrentCount += _bag3AddCount;
-        bag4CurrentCount += _bag4AddCount;
 
         // TODO : 1. 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
         //if (points >= goal)
