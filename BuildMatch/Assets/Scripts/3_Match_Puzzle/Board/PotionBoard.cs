@@ -159,12 +159,6 @@ public class PotionBoard : MonoBehaviour
         {
             InitializeBoard();
         }
-        // 매칭 없으면 세팅 끝나고 블럭 크기 조절
-        else
-        {
-            // 블럭 크기 배경이랑 딱 맞게
-            potionParent.transform.localScale = new Vector3(1.016f, 1.016f, 1);
-        }
     }
 
     private void DestroyPotions()
@@ -659,6 +653,7 @@ public class PotionBoard : MonoBehaviour
 
         GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
         newPotion.transform.SetParent(potionParent.transform);
+        newPotion.name = "[" + _x + ", " + (positionY) + "]" + newPotion.name;
 
         newPotion.GetComponent<Potion>().potionType = (PotionType)makeBlockTypeIndex;
 

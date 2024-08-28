@@ -32,7 +32,7 @@ public class FindMatches : MonoBehaviour
     // 테스트용
     public bool TestFindSpecialMatches()
     {
-        if (GameManager.Instance.isStageEnded)
+        if (GameManager.Instance.isGameEnded)
         {
             return false;
         }
@@ -71,7 +71,7 @@ public class FindMatches : MonoBehaviour
     // 제자리 클릭 시 특수블럭 효과 처리
     public bool FindSpecialMatches()
     {
-        if (GameManager.Instance.isStageEnded)
+        if (GameManager.Instance.isGameEnded)
         {
             return false;
         }
@@ -113,7 +113,7 @@ public class FindMatches : MonoBehaviour
     //        2. 일정 시간이 지나고 조작이 없는 경우 매칭되는 블럭 표시
     public bool FindAllMatches()
     {
-        if (GameManager.Instance.isStageEnded)
+        if (GameManager.Instance.isGameEnded)
         {
             return false;
         }

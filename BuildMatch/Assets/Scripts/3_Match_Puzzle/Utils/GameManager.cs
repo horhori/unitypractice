@@ -27,9 +27,6 @@ public class GameManager : MonoBehaviour
     public int goal; // the amount of points you need to get to win.
     public int points; // 최대 숫자 9개까지 ex) 999999999
 
-    // 현재 스테이지
-    public int stageNumber;
-
     // 남은 시간
     public int min;
     public float sec;
@@ -40,7 +37,7 @@ public class GameManager : MonoBehaviour
     private bool isGameRunning = false;
 
     // 남은 시간이 종료되었을 때 
-    public bool isStageEnded;
+    public bool isGameEnded;
 
     public TMP_Text stageText;
     public TMP_Text pointsText;
@@ -51,11 +48,14 @@ public class GameManager : MonoBehaviour
 
     public GameObject bag1;
     private TMP_Text bag1Text;
+    private Image bag1ClearImage;
     private int bag1CurrentCount;
     [SerializeField]
     private int bag1GoalCount; // 1 stage 15
     public PotionType bag1Type;
     private bool bag1Check; // currentCount == GoalCount 되면 check됨
+
+    private Image[] bagImageList;
 
     // 경고 UI 설정 컬러값
     private Color originWarningColor;
@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
         board = FindObjectOfType<PotionBoard>();
 
         warningImage = warningUI.GetComponent<Image>();
@@ -82,7 +83,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        stageText.text = "Stage " + stageNumber;
+        //stageText.text = "Stage " + stageNumber;
         SetUpBag();
     }
 
@@ -95,6 +96,13 @@ public class GameManager : MonoBehaviour
         bag1GoalCount = 15;
         bag1CurrentCount = 0;
         bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
+        bagImageList = bag1.GetComponentsInChildren<Image>();
+        //foreach(Image image in bagImageList)
+        //{
+        //    Debug.Log(image.name);
+        //}
+        bag1ClearImage = bagImageList[2];
+        bag1ClearImage.gameObject.SetActive(false);
         bag1Check = false;
     }
 
@@ -147,13 +155,13 @@ public class GameManager : MonoBehaviour
 
     private void UpdateBag()
     {
-        if (bag1CurrentCount <= 0)
-        {
-            bag1CurrentCount = 0;
-            bag1Text.color = Color.red;
-        }
+        bag1Text.text = bag1CurrentCount.ToString() + "/" + bag1GoalCount.ToString();
 
-        bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
+        if (bag1Check)
+        {
+            bag1Text.gameObject.SetActive(false);
+            bag1ClearImage.gameObject.SetActive(true);
+        }
     }
 
     // TODO : 1. 매개변수 _subtractMoves 삭제 -> 스와이프 횟수 -로 종료조건일 때 했었음 
@@ -265,7 +273,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitWhile(()=>board.isProcessMoving);
 
         // 기존 StageFailed 내용, 보드판 이동이 끝나면 active 상태 false로 만듬 
-        isStageEnded = true;
+        isGameEnded = true;
         warningUI.SetActive(false);
         backgroundPanel.SetActive(true);
         failedPanel.SetActive(true);
@@ -316,7 +324,7 @@ public class GameManager : MonoBehaviour
 
     private void StageClear()
     {
-        isStageEnded = true;
+        isGameEnded = true;
         warningUI.SetActive(false);
         // Display a victory screen.
         backgroundPanel.SetActive(true);
@@ -326,6 +334,11 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LerpClearPanelScale());
     }
 
+    // 클리어 보상 세팅
+    // TODO: 1. 스테이지에 따라서 보상 세팅
+    //       -> 받는 자원, 골드, 각각의 양    
+
+        
     private void StageFailed()
     {
         StartCoroutine(LerpFailedPanelScale());
