@@ -15,7 +15,7 @@ public class PotionBoard : MonoBehaviour
     // 일반 블럭 목록
     public GameObject[] potionPrefabs;
     // 일반 블럭 갯수
-    public int normalBlockLength = 7;
+    public int normalBlockLength;
     // 블럭보드
     public Node[,] potionBoard;
     public GameObject potionBoardGO;
@@ -34,10 +34,9 @@ public class PotionBoard : MonoBehaviour
     public Potion selectedPotion;
     public Potion targetedPotion;
 
-    public bool isSwipeable;
+    //public bool isSwipeable;
 
-    [SerializeField]
-    private bool isProcessingMove;
+    public bool isProcessMoving; // 동작 이후 블럭 제거 완료될때까지 true, 동작 중이지 않을때 false
 
     // 바구니 임시 세팅
     // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
@@ -46,16 +45,6 @@ public class PotionBoard : MonoBehaviour
     private int bag3SubtractCount = 0; // PinkBlock
     private int bag4SubtractCount = 0; // RedBlock
 
-    //public GameObject drillHorizontalBlock;
-    //public GameObject drillVerticalBlock;
-    //public GameObject pickBlock;
-    //public GameObject prismBlock;
-    //public GameObject bombBlock;
-
-
-    // 추가해야 할 곡괭이 수
-    //public int pick;
-
     // Unity 상에서 쉽게 특정 위치 안 나오게 
     public ArrayLayout arrayLayout;
     // static Instance
@@ -63,6 +52,9 @@ public class PotionBoard : MonoBehaviour
 
     // 매칭 로직 담당
     public FindMatches findMatches;
+
+    // 제거 이펙트 애니메이션 풀
+    private RemoveBlockEffectPool _RemoveBlockEffect = null;
 
     private void Awake()
     {
@@ -100,7 +92,7 @@ public class PotionBoard : MonoBehaviour
             {
                 if (findMatches.IsSpecialBlock(selectedPotion.potionType))
                 {
-                    isProcessingMove = true;
+                    isProcessMoving = true;
                     StartCoroutine(ProcessOriginMatches(selectedPotion));
                 }
             }
@@ -162,6 +154,7 @@ public class PotionBoard : MonoBehaviour
             }
         }
 
+        // 세팅 시 3개 이상 매칭이 있으면 초기화
         if (CheckInitializeBoard())
         {
             InitializeBoard();
@@ -234,7 +227,7 @@ public class PotionBoard : MonoBehaviour
 
         if (hit.collider != null && hit.collider.gameObject.GetComponent<Potion>())
         {
-            if (isProcessingMove)
+            if (isProcessMoving)
             {
                 return;
             }
@@ -295,7 +288,7 @@ public class PotionBoard : MonoBehaviour
         DoSwap(_currentPotion, _targetPotion);
 
         // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
-        isProcessingMove = true;
+        isProcessMoving = true;
 
         // startCoroutine ProcessMatches.
         StartCoroutine(ProcessSwapMatches(_currentPotion, _targetPotion));
@@ -337,9 +330,10 @@ public class PotionBoard : MonoBehaviour
         {
             // 매칭이 일어나지 않은 경우 다시 스왑
             DoSwap(_currentPotion, _targetPotion);
+            isProcessMoving = false;
         }
 
-        isProcessingMove = false;
+        //isProcessingMove = false;
     }
 
     private IEnumerator ProcessOriginMatches(Potion _currentPotion)
@@ -352,8 +346,6 @@ public class PotionBoard : MonoBehaviour
             // Start a coroutine that is going to process our matches in our turn.
             StartCoroutine(ProcessTurnOnMatchedBoard(true));
         }
-
-        isProcessingMove = false;
     }
 
     #endregion
@@ -369,8 +361,6 @@ public class PotionBoard : MonoBehaviour
             // Start a coroutine that is going to process our matches in our turn.
             StartCoroutine(ProcessTurnOnMatchedBoard(true));
         }
-
-        isProcessingMove = false;
     }
 
     #region 블럭 제거
@@ -381,30 +371,30 @@ public class PotionBoard : MonoBehaviour
         {
             // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
             //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
-            isProcessingMove = true;
+            isProcessMoving = true;
 
-        foreach (Potion potionToRemove in findMatches.potionsToRemove)
-        {
-            potionToRemove.isMatched = false;
+            foreach (Potion potionToRemove in findMatches.potionsToRemove)
+            {
+                potionToRemove.isMatched = false;
+            }
+
+            RemoveBlock(findMatches.potionsToRemove);
+
+            yield return new WaitForSeconds(0.6f);
+
+            RefillBlock();
+
+            // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
+            GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
+            bag1SubtractCount = 0;
+            bag2SubtractCount = 0;
+            bag3SubtractCount = 0;
+            bag4SubtractCount = 0;
+
+            yield return new WaitForSeconds(0.6f);
         }
 
-        RemoveBlock(findMatches.potionsToRemove);
-
-        yield return new WaitForSeconds(0.6f);
-
-        RefillBlock();
-
-        // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-        GameManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
-        bag1SubtractCount = 0;
-        bag2SubtractCount = 0;
-        bag3SubtractCount = 0;
-        bag4SubtractCount = 0;
-
-        yield return new WaitForSeconds(0.6f);
-        }
-
-        isProcessingMove = false;
+        isProcessMoving = false;
 
         if (findMatches.FindAllMatches())
         {
@@ -441,6 +431,13 @@ public class PotionBoard : MonoBehaviour
 
             // Destroy the potion
             Destroy(potion.gameObject);
+
+            _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
+
+            if (_RemoveBlockEffect != null)
+            {
+                _RemoveBlockEffect.PlayEffect(potion.transform.position);
+            }
 
             // Create a blank node on the potion board
             potionBoard[_xIndex, _yIndex] = new Node(true, null);
@@ -495,8 +492,6 @@ public class PotionBoard : MonoBehaviour
                         // Move it to the correct location
                         Vector3 targetPos = new Vector3(x - spacingX, y - spacingY, potionAbove.transform.position.z);
                         //Debug.Log("I've found a potion when refilling the board and it was in the location: [" + x + "," + (y + yOffset) + "] we have moved it to the location: [" + x + "," + y + "]");
-
-                        //Debug.Log(targetPos);
 
                         //Move to location
                         potionAbove.MoveToTarget(targetPos);
@@ -658,6 +653,7 @@ public class PotionBoard : MonoBehaviour
 
         GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
         newPotion.transform.SetParent(potionParent.transform);
+        newPotion.name = "[" + _x + ", " + (positionY) + "]" + newPotion.name;
 
         newPotion.GetComponent<Potion>().potionType = (PotionType)makeBlockTypeIndex;
 
@@ -757,29 +753,5 @@ public class PotionBoard : MonoBehaviour
     }
 
     #endregion
-
 }
 
-public class MatchResult
-{
-    public List<Potion> connectedPotions;
-    public MatchDirection direction;
-}
-
-
-// 족보 : 3배열, 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 (시스템 기획서 27P)
-
-// TODO : 1. 특수 블럭 조합 로직 추가
-
-public enum MatchDirection
-{
-    Vertical_3, // 3 세로
-    Horizontal_3, // 3 가로
-    Vertical_4, // 4 세로 : 드릴(세로)
-    Horizontal_4, // 4 가로 : 드릴(가로)
-    LongVertical, // 5 이상 세로 : 프리즘
-    LongHorizontal, // 5 이상 가로 -> 프리즘
-    Super, // 가로 세로 합쳐서 작동중 -> 5배열 L자 추가 로직 적용 : 폭탄
-    Square, // 4배열 네모 : 곡괭이(대각), 곡괭이(역대각)
-    None
-}

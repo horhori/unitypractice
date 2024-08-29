@@ -15,8 +15,8 @@ public class Potion : MonoBehaviour
 
     // TODO : 1. PotionBoard의 해당 값을 가져와야 함(현재는 임시로 unity GUI로 3 설정(7x7이니까 3임)
     //        2. 스테이지 세팅하면서 PotionBoard와 여기서의 spacingX, Y 값 Manager로 관리
-    public int spacingX = 3;
-    public int spacingY = 3;
+    public int spacingX;
+    public int spacingY;
 
     // 현재 사용안하는중 -> 사용하도록 바꾸는중
     // isMatched 체크되면 무조건 지워지는 블럭됨
@@ -36,6 +36,9 @@ public class Potion : MonoBehaviour
     // 클릭했을 때 이미지 변경하기 위한 Sprite 모음
     [SerializeField]
     private Sprite[] sprites = new Sprite[2];
+
+    // 제거 이펙트 애니메이션 풀
+    private RemoveBlockEffectPool _RemoveBlockEffect = null;
 
     // 특수블럭 체크
     //public bool isBomb;
@@ -120,7 +123,8 @@ public class Potion : MonoBehaviour
     }
 
     // 스테이지 클리어 시 에러 발생했는데 원인 아직 못찾음?
-    // TODO : 1. 제거 & 생성 코루틴 도중 게임 클리어되면 여기서 에러남
+    // TODO : 1. 제거 & 생성 코루틴 도중 게임 클리어되면 여기서 에러남 -> 240826 GameManager StageFailed 시 코루틴으로 보드판 무빙 끝나면 블럭 전부 없어지게 함
+    //             -> StageClear 시에 테스트해봐야함
     //        2. 제거 중간에 조작하면 되버림
     public void MoveToTarget(Vector2 _targetPos)
     {
@@ -149,15 +153,11 @@ public class Potion : MonoBehaviour
         {
             float t = elaspedTime / duration;
 
-            //Debug.Log("potion : " + this);
-            //Debug.Log("time : " + t);
-
             transform.position = Vector2.Lerp(startPosition, _targetPos, t);
 
             elaspedTime += Time.deltaTime;
 
             yield return null;
-            //yield return new WaitForSeconds(0.01f);
         }
 
         transform.position = _targetPos;
@@ -180,9 +180,7 @@ public enum PotionType
     Bomb, // 폭탄
     DrillVertical, // 드릴 세로
     DrillHorizontal, // 드릴 가로
-    //Pick, // 곡괭이
     PickLeft, // 곡괭이 역대각(왼쪽 기울임)
     PickRight, // 곡괭이 대각(오른쪽 기울임)
     Prism, // 프리즘
-
 }
