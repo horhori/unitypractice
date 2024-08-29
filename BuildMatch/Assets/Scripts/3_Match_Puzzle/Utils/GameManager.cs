@@ -148,6 +148,7 @@ public class GameManager : MonoBehaviour
         }
         else if (min == 0 && sec <= 0f)
         {
+            sec = 0;
             StageFailed();
             return;
         }
@@ -357,19 +358,19 @@ public class GameManager : MonoBehaviour
     // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
     // 현재 결과창 모든 버튼 이거 사용중 : HomeButton, RestartButton, NextButton, MapButton
     // TODO : 1. 버튼마다 각각 메서드 만들어야 함
-    private void WinGame()
+    public void GoPuzzleScene()
     {
-        //SceneManager.LoadScene("Main Menu");
+        SceneManager.LoadScene("PuzzleScene");
         // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
-        SceneManager.LoadScene(0);
+        //SceneManager.LoadScene(0);
     }
 
     // 남은 시간이 다 지나면 패배
-    private void LoseGame()
+    public void GoVillageScene()
     {
 
-        //SceneManager.LoadScene("Main Menu");
+        SceneManager.LoadScene("VillageScene");
         // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
-        //SceneManager.LoadScene(0);
+        //SceneManager.LoadScene(1);
     }
 }
