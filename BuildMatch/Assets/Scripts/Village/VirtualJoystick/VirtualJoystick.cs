@@ -24,13 +24,14 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
 
     private void Update()
     {
+
         _CharacterManager.inputVector = new Vector3(_InputVector.x, 0.0f, _InputVector.y);
     }
 
     void IDragHandler.OnDrag(PointerEventData eventData)
     {
-        float ratio = UnityEngine.Screen.width / 900.0f;
 
+        float ratio = UnityEngine.Screen.width / 1080.0f;
         _InputVector = eventData.position / ratio;
         _InputVector -= rectTransform.offsetMin;
 
@@ -38,6 +39,9 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
 
         _InputVector = (m_JoystickBackground.rectTransform.anchoredPosition - _InputVector) *
             -1.0f / backHalfXSize;
+
+        _InputVector = (_InputVector.magnitude > 1.0f) ?
+            _InputVector.normalized : _InputVector;
 
         m_JoystickImage.rectTransform.anchoredPosition = _InputVector * backHalfXSize;
     }

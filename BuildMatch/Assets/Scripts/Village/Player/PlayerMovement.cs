@@ -32,5 +32,10 @@ public class PlayerMovement : MonoBehaviour, IMovement
         lookDirection = (direction != Vector3.zero) ? direction.normalized : lookDirection;
 
         _PlayerInstance.controller.SimpleMove(direction * m_MoveSpeed);
+
+        if (direction != Vector3.zero)
+        {
+            gameObject.RotateTo(direction);
+        }
     }
 }
