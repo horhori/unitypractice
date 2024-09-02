@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityChan;
 using UnityEngine;
 
 // TODO : 1. 3_Match GameManager와 VillageGameManager 통합 작업
@@ -48,5 +49,18 @@ public class VillageGameManager : MonoBehaviour
             return;
         }
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        SetResolution();
+    }
+
+    public void SetResolution()
+    {
+        int setWidth = 1080;
+        int setHeight = 1920;
+
+        Screen.SetResolution(setWidth, setHeight, false);
     }
 }
