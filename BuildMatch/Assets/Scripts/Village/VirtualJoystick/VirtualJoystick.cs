@@ -16,6 +16,10 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     // 입력 값
     private Vector2 _InputVector = Vector2.zero;
 
+    // 임시 조이스틱 화면 종횡비 추가 값
+    // 원래 화면에 따라서 가로>세로 인 경우 터치 값을 제대로 못읽는중
+    private Vector2 _TempVector = new Vector2(0, 177.8f);
+
     private void Awake()
     {
         _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
@@ -33,7 +37,14 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
 
         float ratio = UnityEngine.Screen.width / 1080.0f;
         _InputVector = eventData.position / ratio;
-        _InputVector -= rectTransform.offsetMin;
+        //_InputVector -= rectTransform.offsetMin;
+        
+        // 임시
+        if (Screen.width > Screen.height)
+        {
+            _InputVector += _TempVector;
+
+        }
 
         float backHalfXSize = m_JoystickBackground.rectTransform.sizeDelta.x * 0.5f;
 

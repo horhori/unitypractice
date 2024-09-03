@@ -23,4 +23,17 @@ public class PlayerInstance : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         controller = GetComponent<CharacterController>();
     }
+
+    private void Update()
+    {
+        // 마우스로 클릭해서 인식 후 대화
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit, 10.0f))
+        {
+            Debug.Log(hit.transform.gameObject);
+            Debug.Log("되라");
+        }
+    }
 }

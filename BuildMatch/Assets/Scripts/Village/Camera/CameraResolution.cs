@@ -29,7 +29,7 @@ public class CameraResolution : MonoBehaviour
             viewportRect.x = (1f - viewportRect.width) / 2f;
         }
 
-        // 조정된 뷰포트 영역을 카메라에 설정하는 코두ㅡ
+        // 조정된 뷰포트 영역을 카메라에 설정하는 코드
         cam.rect = viewportRect;
     }
 }
