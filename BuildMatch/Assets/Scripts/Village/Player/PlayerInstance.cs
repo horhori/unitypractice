@@ -9,6 +9,9 @@ public class PlayerInstance : MonoBehaviour
     // CharacterManager 참조 변수
     private CharacterManager _CharacterManager = null;
 
+    // SoundManager 참조 변수
+    private SoundManager _SoundManager = null;
+
     // PlayerMovement에 대한 프로퍼티
     public PlayerMovement playerMovement { get; private set; }
 
@@ -20,8 +23,15 @@ public class PlayerInstance : MonoBehaviour
         _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
         _CharacterManager.player = this;
 
+        _SoundManager = VillageGameManager.GetManagerClass<SoundManager>();
+
         playerMovement = GetComponent<PlayerMovement>();
         controller = GetComponent<CharacterController>();
+    }
+
+    private void Start()
+    {
+        
     }
 
     private void Update()

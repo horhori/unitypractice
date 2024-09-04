@@ -11,9 +11,16 @@ public class PlayerAnimInstance : MonoBehaviour, IAnimInstance
     // 캐릭터 매니저 변수 참조
     private CharacterManager _CharacterManager = null;
 
+    // 사운드 매니저 변수 참조
+    private SoundManager _SoundManager = null;
+
+    public float SoundCoolTime = 2f;
+
     private void Awake()
     {
         _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
+        _SoundManager = VillageGameManager.GetManagerClass<SoundManager>();
+
         animator = transform.GetComponentInChildren<Animator>();
     }
 
@@ -21,11 +28,16 @@ public class PlayerAnimInstance : MonoBehaviour, IAnimInstance
     {
         _Speed = _CharacterManager.inputVector.magnitude;
         SetFloat("_Speed", _Speed);
+
+        if (_Speed > 0.1f)
+        {
+            _SoundManager.PlayCharacterWalkSound(_CharacterManager.player.transform.position);
+        }
     }
 
-    #region Implemented IAnimInstace
+        #region Implemented IAnimInstace
 
-    public bool SetBool(string paramName, bool value)
+        public bool SetBool(string paramName, bool value)
     {
         animator.SetBool(paramName, value);
         return value;
