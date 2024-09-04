@@ -28,6 +28,7 @@ public class VillageGameManager : MonoBehaviour
         _ManagerClass = new List<IManager>();
 
         RegisterManagerClass<CharacterManager>();
+        RegisterManagerClass<SoundManager>();
     }
 
     private void RegisterManagerClass<T>() where T : IManager
@@ -43,12 +44,13 @@ public class VillageGameManager : MonoBehaviour
 
     private void Awake()
     {
-        if(_GameManagerInstance && _GameManagerInstance != null)
+        if (_GameManagerInstance && _GameManagerInstance != null)
         {
             Destroy(gameObject);
             return;
         }
         DontDestroyOnLoad(gameObject);
+        
     }
 
     private void Start()
