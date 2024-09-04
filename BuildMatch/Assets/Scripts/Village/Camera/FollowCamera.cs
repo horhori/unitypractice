@@ -35,4 +35,9 @@ public class FollowCamera : MonoBehaviour
 
         StartCoroutine( FollowTarget() );
     }
+
+    public void SwitchCamera(Transform transform)
+    {
+        _FollowTargetTransform = transform;
+    }
 }

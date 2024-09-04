@@ -27,13 +27,13 @@ public class PlayerInstance : MonoBehaviour
     private void Update()
     {
         // 마우스로 클릭해서 인식 후 대화
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        // NPCInstance OnMouseDown으로 NPC 클릭 이벤트 처리
+        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //RaycastHit hit;
 
-        if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit, 10.0f))
-        {
-            Debug.Log(hit.transform.gameObject);
-            Debug.Log("되라");
-        }
+        //if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit, 10.0f))
+        //{
+        //    Debug.Log(hit.transform.gameObject);
+        //}
     }
 }
