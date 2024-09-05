@@ -36,8 +36,15 @@ public class FollowCamera : MonoBehaviour
         StartCoroutine( FollowTarget() );
     }
 
-    public void SwitchCamera(Transform transform)
+    public void SwitchTransformCamera(Transform transform)
     {
         _FollowTargetTransform = transform;
+        //gameObject.RotateTo(new Vector3(0, 50, 0));
+    }
+
+    // ¾ÈµÊ
+    public void SwitchTargetCamera(int displayNumber)   
+    {
+        camera.targetDisplay = displayNumber;
     }
 }
