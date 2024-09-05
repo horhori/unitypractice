@@ -43,11 +43,9 @@ public class SoundManager : MonoBehaviour, IManager
 
     public void PlayCharacterWalkSound(Vector3 position)
     {
-        Debug.Log(GameObject.FindObjectsOfType<AudioSource>().Length);
         if (GameObject.FindObjectsOfType<AudioSource>().Length == 1)
         {
             AudioSource.PlayClipAtPoint(audioClips[2], position, 0.7f);
         }
-        //AudioSource.PlayClipAtPoint(audioClips[2], position);
     }
 }

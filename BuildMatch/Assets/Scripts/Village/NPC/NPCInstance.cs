@@ -31,7 +31,11 @@ public class NPCInstance : MonoBehaviour, INPC
     {
         _TempPlayer.SetActive(true);
         _QuestBalloon.SetActive(false);
+        // TODO : 1. NPC 퀘스트 누르면 카메라 전환
         // 각도 바꾸고 UI 창 바꾸면 될듯
-        //_FollowCamera.SwitchCamera(_TempPlayer.transform);
+
+        //_FollowCamera.SwitchTransformCamera(_TempPlayer.transform, _TempPlayer.inputVector);
+
+        //_FollowCamera.SwitchTargetCamera(2);
     }
 }
