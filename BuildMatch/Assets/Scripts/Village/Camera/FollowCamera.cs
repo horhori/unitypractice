@@ -39,7 +39,7 @@ public class FollowCamera : MonoBehaviour
     public void SwitchTransformCamera(Transform transform)
     {
         _FollowTargetTransform = transform;
-        //gameObject.RotateTo(new Vector3(0, 50, 0));
+        gameObject.transform.rotation = transform.rotation;
     }
 
     // ¾ÈµÊ

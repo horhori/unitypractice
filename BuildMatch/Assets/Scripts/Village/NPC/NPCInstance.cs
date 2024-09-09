@@ -14,10 +14,9 @@ public class NPCInstance : MonoBehaviour, INPC
 
     [SerializeField] private GameObject _TempPlayer = null;
 
-    
-
     private void Awake()
     {
+        player = GetComponent<PlayerInstance>();
         _FollowCamera = GameObject.Find("FollowCamera").GetComponent<FollowCamera>();
         _QuestBalloon = GetComponentInChildren<SpriteRenderer>().gameObject;
     }
@@ -29,12 +28,19 @@ public class NPCInstance : MonoBehaviour, INPC
 
     private void OnMouseDown()
     {
+        // TODO : NPC 퀘스트 완성
+
+        // 0. NPC와 거리 체크 후 충분히 가까우면 실행
+        // 1. 컨트롤러 UI 창 비활성화
+        // 2. 대화 UI 창 활성화 -> 퀘스트 상태에 따라 다른 대화 나오게??
+        // 3. NPC 앞 캐릭터 활성화 & 퀘스트말풍선 비활성화
         _TempPlayer.SetActive(true);
         _QuestBalloon.SetActive(false);
-        // TODO : 1. NPC 퀘스트 누르면 카메라 전환
-        // 각도 바꾸고 UI 창 바꾸면 될듯
-
-        //_FollowCamera.SwitchTransformCamera(_TempPlayer.transform, _TempPlayer.inputVector);
+        // 4. 플레이어 캐릭터 비활성화
+        player.gameObject.SetActive(false);
+        // 5. 카메라 NPC한테 위치 맞추기
+        // 6. 나가기 클릭 시 원위치
+        _FollowCamera.SwitchTransformCamera(_TempPlayer.transform);
 
         //_FollowCamera.SwitchTargetCamera(2);
     }

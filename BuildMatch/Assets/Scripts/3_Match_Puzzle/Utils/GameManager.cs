@@ -7,9 +7,8 @@ using UnityEngine.UI;
 
 // 게임 스코어, 게임 승리/패배 조건, UI 설정
 
-// TODO : 1. 승리 / 패배 종료 변경
-//           -> 남은 시간이 다 되었을 때 패배 처리 완료. 바구니가 다 채워지면 클리어되는 것으로는 진행해야 함.
-//        2. 레벨 설정 레벨 당 남은 시간 및 목표 개수
+// TODO : 1. 스테이지 설정 스테이지 당 남은 시간 및 목표 개수
+//        
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // static reference;

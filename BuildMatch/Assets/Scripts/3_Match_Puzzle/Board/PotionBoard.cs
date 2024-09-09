@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class PotionBoard : MonoBehaviour
 {
+    // static Instance
+    public static PotionBoard Instance;
+
     // 가로 세로 블럭 개수 설정
     // 스테이지 따라 width, height 달라짐
     public int width;
@@ -47,8 +50,6 @@ public class PotionBoard : MonoBehaviour
 
     // Unity 상에서 쉽게 특정 위치 안 나오게 
     public ArrayLayout arrayLayout;
-    // static Instance
-    public static PotionBoard Instance;
 
     // 매칭 로직 담당
     public FindMatches findMatches;
@@ -246,7 +247,7 @@ public class PotionBoard : MonoBehaviour
     //          -> 아니면 초기값을 45도(거의 조작이 안일어날 확률이 높은 값)로 하는게 좋을지?
     //        -> 240730 완료
     //        드래그 시점에서의 마우스 거리 계산해서 임계값 0.2f가 넘으면 selectPotion한테 currentSwipeable true로 줘서 
-    //        드래그 많이 움직인 경우에만 스왑처리,
+    //        드래그 많이 움직인 경우에만 스왑처리, -> 가끔 클릭 시 동작 안해야되는데 동작하긴 함
     private void RunInput()
     {
         float swipeAngle = selectedPotion.swipeAngle;
@@ -520,7 +521,6 @@ public class PotionBoard : MonoBehaviour
 
     // 현재 블럭을 새로 만들고 내림
     // TODO : 1. 미리 생성된 블럭이 내려오게 변경
-    //        2. 모든 블럭이 일정한 속도로 내려오게(현재는 같은 시간에 한번에 내려오고 있음)
     private void SpawnPotionAtTop(int _x, int _y, ref int[] _xIndexNullCounts)
     {
         int index = FindIndexOfLowestNull(_x); // TODO : _y로 대체가능한듯??
@@ -643,7 +643,6 @@ public class PotionBoard : MonoBehaviour
         }
 
         int locationToMoveTo = positionY - index;
-        //Debug.Log("About to spawn a potion, ideally i'd like to put it in the index of : " + index);
 
         Vector2 position = new Vector2(_x - spacingX, positionY - spacingY);
 

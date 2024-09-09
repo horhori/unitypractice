@@ -37,9 +37,6 @@ public class Potion : MonoBehaviour
     [SerializeField]
     private Sprite[] sprites = new Sprite[2];
 
-    // 제거 이펙트 애니메이션 풀
-    private RemoveBlockEffectPool _RemoveBlockEffect = null;
-
     // 특수블럭 체크
     //public bool isBomb;
     //public bool isDrillVertical;
@@ -165,7 +162,6 @@ public class Potion : MonoBehaviour
     }
 }
 
-// TODO : 1. 특수 블럭
 public enum PotionType
 {
     // 기본 블럭
