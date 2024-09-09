@@ -10,6 +10,8 @@ public class VillageGameManager : MonoBehaviour
     public static VillageGameManager _GameManagerInstance = null;
     public List<IManager> _ManagerClass = null;
 
+    //public GameObject _QuestUI = null;
+
     public static VillageGameManager gameManager
     {
         get
@@ -44,12 +46,12 @@ public class VillageGameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (_GameManagerInstance && _GameManagerInstance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        DontDestroyOnLoad(gameObject);
+        //if (_GameManagerInstance && _GameManagerInstance != null)
+        //{
+        //    Destroy(gameObject);
+        //    return;
+        //}
+        //DontDestroyOnLoad(gameObject);
         
     }
 

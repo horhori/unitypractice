@@ -18,6 +18,9 @@ public class PlayerInstance : MonoBehaviour
     // CharacterController 프로퍼티
     public CharacterController controller { get; private set; }
 
+    // 퀘스트 대화 진행 여부
+    public bool isQuestEnd { get; set; } = false;
+
     private void Awake()
     {
         _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
@@ -36,14 +39,6 @@ public class PlayerInstance : MonoBehaviour
 
     private void Update()
     {
-        // 마우스로 클릭해서 인식 후 대화
-        // NPCInstance OnMouseDown으로 NPC 클릭 이벤트 처리
-        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //RaycastHit hit;
 
-        //if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit, 10.0f))
-        //{
-        //    Debug.Log(hit.transform.gameObject);
-        //}
     }
 }

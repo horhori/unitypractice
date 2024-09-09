@@ -8,7 +8,7 @@ public class FollowCamera : MonoBehaviour
     [SerializeField] private Transform _FollowTargetTransform = null;
 
     // 추적 속도
-    [SerializeField][Range(0.0f, 10.0f)] private float _FollowSpeed = 5.0f;
+    [SerializeField][Range(0.0f, 1000.0f)] private float _FollowSpeed = 5.0f;
 
     // 카메라
     public Camera camera { get; private set; }
@@ -36,15 +36,17 @@ public class FollowCamera : MonoBehaviour
         StartCoroutine( FollowTarget() );
     }
 
-    public void SwitchTransformCamera(Transform transform)
+    public void SwitchTransformNPCCamera(Transform transform)
     {
+        _FollowSpeed = 1000.0f;
         _FollowTargetTransform = transform;
         gameObject.transform.rotation = transform.rotation;
     }
 
-    // 안됨
-    public void SwitchTargetCamera(int displayNumber)   
+    public void SwitchTransformPlayerCamera(Transform transform)
     {
-        camera.targetDisplay = displayNumber;
+        _FollowTargetTransform = transform;
+        gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+        _FollowSpeed = 50.0f;
     }
 }

@@ -4950,7 +4950,7 @@ MonoBehaviour:
   min: 0
   sec: 30
   isGameRunning: 0
-  isGameEnded: 0
+  isStageEnded: 0
   stageText: {fileID: 1568398321}
   pointsText: {fileID: 1573741871}
   timeText: {fileID: 502402609}
@@ -5677,7 +5677,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1472486501
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6233,7 +6233,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1571796878
 RectTransform:
   m_ObjectHideFlags: 0

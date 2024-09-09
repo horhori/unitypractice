@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     private bool isGameRunning = false;
 
     // 남은 시간이 종료되었을 때 
-    public bool isGameEnded;
+    public bool isStageEnded;
 
     public TMP_Text stageText;
     public TMP_Text pointsText;
@@ -222,6 +222,7 @@ public class GameManager : MonoBehaviour
     }
 
     // 결과창 크기 조절
+    // TODO : 1. 애니메이션으로만 처리
     private IEnumerator LerpClearPanelScale()
     {
         bool firstCheck = false;
@@ -273,7 +274,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitWhile(()=>board.isProcessMoving);
 
         // 기존 StageFailed 내용, 보드판 이동이 끝나면 active 상태 false로 만듬 
-        isGameEnded = true;
+        isStageEnded = true;
         warningUI.SetActive(false);
         backgroundPanel.SetActive(true);
         failedPanel.SetActive(true);
@@ -324,7 +325,7 @@ public class GameManager : MonoBehaviour
 
     private void StageClear()
     {
-        isGameEnded = true;
+        isStageEnded = true;
         warningUI.SetActive(false);
         // Display a victory screen.
         backgroundPanel.SetActive(true);
