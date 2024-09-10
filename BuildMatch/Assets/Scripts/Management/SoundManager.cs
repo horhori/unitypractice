@@ -26,7 +26,7 @@ public class SoundManager : MonoBehaviour, IManager
     //    if (_BGMAudioSource == null)
     //    {
     //        _BGMAudioSource = GameObject.Find("BGMAudioSource").GetComponent<AudioSource>();
-            
+
     //    }
     //    DontDestroyOnLoad(_BGMAudioSource);
     //}

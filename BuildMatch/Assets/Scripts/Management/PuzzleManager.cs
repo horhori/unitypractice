@@ -23,7 +23,7 @@ public class PuzzleManager : MonoBehaviour
     public GameObject clearPanel;
     public GameObject failedPanel;
 
-    public int goal; // the amount of points you need to get to win.
+    //public int goal;
     public int points; // 최대 숫자 9개까지 ex) 999999999
 
     // 남은 시간
@@ -82,24 +82,17 @@ public class PuzzleManager : MonoBehaviour
 
     private void Start()
     {
-        //stageText.text = "Stage " + stageNumber;
         SetUpBag();
     }
 
     private void SetUpBag()
     {
-        //Sprite[] sprite_1 = Resources.LoadAll<Sprite>("Sprites/Puzzle Blocks Icon Pack/png/blockBlueDimond");
-        //Debug.Log("sprite" + sprite_1[0]);
         bag1Text = bag1.GetComponentInChildren<TMP_Text>();
         bag1Type = PotionType.RedBlock;
         bag1GoalCount = 15;
         bag1CurrentCount = 0;
         bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
         bagImageList = bag1.GetComponentsInChildren<Image>();
-        //foreach(Image image in bagImageList)
-        //{
-        //    Debug.Log(image.name);
-        //}
         bag1ClearImage = bagImageList[2];
         bag1ClearImage.gameObject.SetActive(false);
         bag1Check = false;
@@ -182,21 +175,7 @@ public class PuzzleManager : MonoBehaviour
             bag1Check = true;
         }
 
-        // TODO : 1. 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
-        //if (points >= goal)
-        //{
-        //    // win game
-        //    isGameEnded = true;
-
-        //    // Display a victory screen.
-        //    backgroundPanel.SetActive(true);
-        //    clearPanel.SetActive(true);
-        //    PotionBoard.Instance.potionParent.SetActive(false);
-        //    isGameRunning = false;
-        //    StartCoroutine(LerpClearPanelScale());
-        //    return;
-        //}
-
+        // TODO : 1. 스테이지 별 모든 보석 개수 체크 함수 만들기(bag1만 체크하지 말구)
         if (bag1Check)
         {
             StageClear();
@@ -222,12 +201,10 @@ public class PuzzleManager : MonoBehaviour
     }
 
     // 결과창 크기 조절
-    // TODO : 1. 애니메이션으로만 처리
     private IEnumerator LerpClearPanelScale()
     {
         bool firstCheck = false;
         bool lastCheck = false;
-        float lerpSpeed = 0.1f;
 
         float elaspedTime = 0f;
 
@@ -245,7 +222,7 @@ public class PuzzleManager : MonoBehaviour
             {
                 firstCheck = true;
             }
-            
+
             yield return null;
         }
 
@@ -327,7 +304,6 @@ public class PuzzleManager : MonoBehaviour
     {
         isStageEnded = true;
         warningUI.SetActive(false);
-        // Display a victory screen.
         backgroundPanel.SetActive(true);
         clearPanel.SetActive(true);
         PotionBoard.Instance.potionParent.SetActive(false);
@@ -343,34 +319,5 @@ public class PuzzleManager : MonoBehaviour
     private void StageFailed()
     {
         StartCoroutine(LerpFailedPanelScale());
-
-        // 아래 주석 내용 코루틴으로 옮김 -> 무빙이 끝난 후 아래 active 상태 false 
-
-        //isStageEnded = true;
-        //warningUI.SetActive(false);
-        //backgroundPanel.SetActive(true);
-        //failedPanel.SetActive(true);
-        //PotionBoard.Instance.potionParent.SetActive(false);
-        //isGameRunning = false;
-
-    }
-
-    // 남은 시간 내에 바구니에 필요한 블럭 모았을 때 승리
-    // 현재 결과창 모든 버튼 이거 사용중 : HomeButton, RestartButton, NextButton, MapButton
-    // TODO : 1. 버튼마다 각각 메서드 만들어야 함
-    public void GoPuzzleScene()
-    {
-        SceneManager.LoadScene("PuzzleScene");
-        // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
-        //SceneManager.LoadScene(0);
-    }
-
-    // 남은 시간이 다 지나면 패배
-    public void GoVillageScene()
-    {
-
-        SceneManager.LoadScene("VillageScene");
-        // string으로 할 수도 있고 인덱스 줘서 띄울 수도 있음
-        //SceneManager.LoadScene(1);
     }
 }

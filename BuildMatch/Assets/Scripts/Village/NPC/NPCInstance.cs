@@ -8,19 +8,20 @@ public class NPCInstance : MonoBehaviour, INPC
 
     public FollowCamera _FollowCamera = null;
 
+    public VillageUIManager _VillageUIManager = null;
+
     [SerializeField] private GameObject _QuestBalloon { get; set; }
 
     [SerializeField] private GameObject _TempPlayer = null;
 
-    public GameObject _ControllerUI = null;
-    public GameObject _QuestUI = null;
+
 
     private void Awake()
     {
         _PlayerInstance = GameManager.GetManagerClass<CharacterManager>().player;
         _FollowCamera = GameObject.Find("FollowCamera").GetComponent<FollowCamera>();
         _QuestBalloon = GetComponentInChildren<SpriteRenderer>().gameObject;
-        _ControllerUI = GameObject.Find("Canvas");
+        _VillageUIManager = GameObject.Find("VillageUIManager").GetComponent<VillageUIManager>();
     }
 
     private void Update()
@@ -30,13 +31,13 @@ public class NPCInstance : MonoBehaviour, INPC
 
     private void OnMouseDown()
     {
-        // TODO : NPC 퀘스트 완성
+        // TODO : NPC 퀘스트 완성(거리 체크, 대화 UI)
 
         // 0. NPC와 거리 체크 후 충분히 가까우면 실행
         // 1. 컨트롤러 UI 창 비활성화
-        _ControllerUI.SetActive(false);
+        _VillageUIManager._ControllerUI.SetActive(false);
         // 2. 대화 UI 창 활성화 -> 퀘스트 상태에 따라 다른 대화 나오게??
-        _QuestUI.SetActive(true);
+        _VillageUIManager._QuestUI.SetActive(true);
         // 3. NPC 앞 캐릭터 활성화 & 퀘스트말풍선 비활성화
         _TempPlayer.SetActive(true);
         _QuestBalloon.SetActive(false);
@@ -47,7 +48,6 @@ public class NPCInstance : MonoBehaviour, INPC
         // 6. 나가기 클릭 시 원위치
         StartCoroutine(ReturnCamera());
 
-        //_FollowCamera.SwitchTargetCamera(2);
     }
 
     private IEnumerator ReturnCamera()
@@ -61,9 +61,9 @@ public class NPCInstance : MonoBehaviour, INPC
 
         _TempPlayer.SetActive(false);
 
-        _QuestUI.SetActive(false);
+        _VillageUIManager._QuestUI.SetActive(false);
 
-        _ControllerUI.SetActive(true);
+        _VillageUIManager._ControllerUI.SetActive(true);
 
         _PlayerInstance.isQuestEnd = false;
     }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityChan;
 using UnityEngine;
 
-// TODO : 1. 3_Match GameManager와 VillageGameManager 통합 작업
-//         -> 현재 빌리징은 VillageGameManager로 별도 관리중
 public class GameManager : MonoBehaviour
 {
     public static GameManager _GameManagerInstance = null;
@@ -29,6 +27,7 @@ public class GameManager : MonoBehaviour
 
         RegisterManagerClass<CharacterManager>();
         RegisterManagerClass<SoundManager>();
+        RegisterManagerClass<StageManager>();
         RegisterManagerClass<CameraManager>();
     }
 
@@ -45,25 +44,12 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (_GameManagerInstance && _GameManagerInstance != null)
+        if (_GameManagerInstance && _GameManagerInstance != this)
         {
-            //Destroy(gameObject);
+            Destroy(gameObject);
             return;
         }
         DontDestroyOnLoad(gameObject);
 
-    }
-
-    private void Start()
-    {
-        SetResolution();
-    }
-
-    public void SetResolution()
-    {
-        int setWidth = 1080;
-        int setHeight = 1920;
-
-        Screen.SetResolution(setWidth, setHeight, false);
     }
 }
