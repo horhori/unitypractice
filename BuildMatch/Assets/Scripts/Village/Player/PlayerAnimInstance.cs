@@ -18,8 +18,8 @@ public class PlayerAnimInstance : MonoBehaviour, IAnimInstance
 
     private void Awake()
     {
-        _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
-        _SoundManager = VillageGameManager.GetManagerClass<SoundManager>();
+        _CharacterManager = GameManager.GetManagerClass<CharacterManager>();
+        _SoundManager = GameManager.GetManagerClass<SoundManager>();
 
         animator = transform.GetComponentInChildren<Animator>();
     }

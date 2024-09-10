@@ -22,7 +22,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
 
     private void Awake()
     {
-        _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
+        _CharacterManager = GameManager.GetManagerClass<CharacterManager>();
         rectTransform = GetComponent<RectTransform>();
     }
 
