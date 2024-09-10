@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
     private void Awake()
     {
-        _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
+        _CharacterManager = GameManager.GetManagerClass<CharacterManager>();
         _PlayerInstance = GetComponent<PlayerInstance>();
     }
 

@@ -17,7 +17,7 @@ public class NPCInstance : MonoBehaviour, INPC
 
     private void Awake()
     {
-        _PlayerInstance = VillageGameManager.GetManagerClass<CharacterManager>().player;
+        _PlayerInstance = GameManager.GetManagerClass<CharacterManager>().player;
         _FollowCamera = GameObject.Find("FollowCamera").GetComponent<FollowCamera>();
         _QuestBalloon = GetComponentInChildren<SpriteRenderer>().gameObject;
         _ControllerUI = GameObject.Find("Canvas");

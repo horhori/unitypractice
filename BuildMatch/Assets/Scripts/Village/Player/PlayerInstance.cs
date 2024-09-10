@@ -23,10 +23,10 @@ public class PlayerInstance : MonoBehaviour
 
     private void Awake()
     {
-        _CharacterManager = VillageGameManager.GetManagerClass<CharacterManager>();
+        _CharacterManager = GameManager.GetManagerClass<CharacterManager>();
         _CharacterManager.player = this;
 
-        _SoundManager = VillageGameManager.GetManagerClass<SoundManager>();
+        _SoundManager = GameManager.GetManagerClass<SoundManager>();
 
         playerMovement = GetComponent<PlayerMovement>();
         controller = GetComponent<CharacterController>();
