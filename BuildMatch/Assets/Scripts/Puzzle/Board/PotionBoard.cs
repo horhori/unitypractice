@@ -8,6 +8,8 @@ public class PotionBoard : MonoBehaviour
     // static Instance
     public static PotionBoard Instance;
 
+    private StageManager _StageManager = null;
+
     // 가로 세로 블럭 개수 설정
     // 스테이지 따라 width, height 달라짐
     public int width;
@@ -15,10 +17,12 @@ public class PotionBoard : MonoBehaviour
     // X축, Y축 간격
     public float spacingX;
     public float spacingY;
-    // 일반 블럭 목록
+    // 일반 블럭 전체 목록
     public GameObject[] potionPrefabs;
-    // 일반 블럭 갯수
+    // 해당 스테이지 블럭 갯수
     public int normalBlockLength;
+    // 해당 스테이지 세팅되는 블럭 목록
+    public GameObject[] stagePotionPrefabs;
     // 블럭보드
     public Node[,] potionBoard;
     public GameObject potionBoardGO;
@@ -37,13 +41,11 @@ public class PotionBoard : MonoBehaviour
     public Potion selectedPotion;
     public Potion targetedPotion;
 
-    //public bool isSwipeable;
-
     public bool isProcessMoving; // 동작 이후 블럭 제거 완료될때까지 true, 동작 중이지 않을때 false
 
     // 바구니 임시 세팅
     // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
-    private int bag1SubtractCount = 0; // BlueBlock
+    private int bag1SubtractCount = 0; // RedBlock
     private int bag2SubtractCount = 0; // GreenBlock
     private int bag3SubtractCount = 0; // PinkBlock
     private int bag4SubtractCount = 0; // RedBlock
@@ -61,11 +63,26 @@ public class PotionBoard : MonoBehaviour
     {
         Instance = this;
         findMatches = FindObjectOfType<FindMatches>();
+
+        _StageManager = GameManager.GetManagerClass<StageManager>();
     }
 
     void Start()
     {
+        // 스테이지 매니저에서 세팅값 받아옴
+        StageData stageData = _StageManager.stageData;
+        width = stageData.mapWidth;
+        height = stageData.mapHeight;
+        normalBlockLength = stageData.appearedBlockList.Length;
+        stagePotionPrefabs = new GameObject[normalBlockLength];
+        for (int i=0; i<normalBlockLength; i++)
+        {
+            stagePotionPrefabs[i] = potionPrefabs[(int)stageData.appearedBlockList[i]];
+        }
+        
+        // 초기 보드 세팅
         InitializeBoard();
+
         // 초기 생성 때 매칭 로직에서 나중에 할거랑 겹쳐서 임시로 처리
         findMatches.isCheckedVertical_4 = false;
         findMatches.isCheckedHorizontal_4 = false;
@@ -143,7 +160,7 @@ public class PotionBoard : MonoBehaviour
                     // 재료 등급 조정
                     int randomIndex = Random.Range(0, normalBlockLength);
 
-                    GameObject potion = Instantiate(potionPrefabs[randomIndex], position, Quaternion.identity);
+                    GameObject potion = Instantiate(stagePotionPrefabs[randomIndex], position, Quaternion.identity);
                     potion.transform.SetParent(potionParent.transform);
                     potion.transform.name = "[" + x + ", " + y + "]" + potion.name;
                     potion.GetComponent<Potion>().potionType = (PotionType)randomIndex;
@@ -241,13 +258,6 @@ public class PotionBoard : MonoBehaviour
     }
 
     // Update에서 마우스 클릭 뗐을 때 각도 계산하여 해당 위치 블럭과 스왑 진행 후 선택한 블럭 해제
-    // TODO : 1. 클릭만 했을 때(스와이프 X) Potion이 갖고 있는 swipeAngle을 어떻게 처리할지
-    //          -> 처음에 swipeAngle이 0이라서 오른쪽으로 스와이프됨. 0인 경우 처리하기
-    //      : 2. swipe 처리 후 swipeAngle 초기화 필요 -> 0으로 하고 0인 경우에는 클릭된 것으로 하는게 좋을 거 같긴 함
-    //          -> 아니면 초기값을 45도(거의 조작이 안일어날 확률이 높은 값)로 하는게 좋을지?
-    //        -> 240730 완료
-    //        드래그 시점에서의 마우스 거리 계산해서 임계값 0.2f가 넘으면 selectPotion한테 currentSwipeable true로 줘서 
-    //        드래그 많이 움직인 경우에만 스왑처리, -> 가끔 클릭 시 동작 안해야되는데 동작하긴 함
     private void RunInput()
     {
         float swipeAngle = selectedPotion.swipeAngle;
@@ -370,8 +380,6 @@ public class PotionBoard : MonoBehaviour
         // 클리어했을 때 에러나서 if문 삭제
         if (findMatches.potionsToRemove.Count > 0)
         {
-            // TODO : 1. isProcessingMove 깔끔하게 리팩토링(마우스 뗐을 때 한번, 매칭됐을때 한번 체크하고 해제하고 하는중)
-            //          -> 동작 시작 -> isProcessingMove 쭉 true -> 제거되고 생성되고 매칭 체크하고 완전히 동작이 끝났을 때 isProcessingMove false
             isProcessMoving = true;
 
             foreach (Potion potionToRemove in findMatches.potionsToRemove)
@@ -404,25 +412,24 @@ public class PotionBoard : MonoBehaviour
     }
 
     // 블럭 지워지고 다시 생성
-
     private void RemoveBlock(List<Potion> _potionsToRemove)
     {
-        // Removing the potion and clearing the board at that location
+        // TODO: 1.목표 바구니 세팅에 따라 해당 기능 재구성 필요
         foreach (Potion potion in _potionsToRemove)
         {
-            if (potion.potionType == PotionType.BlueBlock)
+            if (potion.potionType == PotionType.RedBlock)
             {
                 bag1SubtractCount++;
             }
-            if (potion.potionType == PotionType.GreenBlock)
+            if (potion.potionType == PotionType.OrangeBlock)
             {
                 bag2SubtractCount++;
             }
-            if (potion.potionType == PotionType.PinkBlock)
+            if (potion.potionType == PotionType.YellowBlock)
             {
                 bag3SubtractCount++;
             }
-            if (potion.potionType == PotionType.RedBlock)
+            if (potion.potionType == PotionType.GreenBlock)
             {
                 bag4SubtractCount++;
             }
@@ -520,10 +527,11 @@ public class PotionBoard : MonoBehaviour
     }
 
     // 현재 블럭을 새로 만들고 내림
-    // TODO : 1. 미리 생성된 블럭이 내려오게 변경
+    // TODO : 1. 일반 블럭만 해당 기능 사용
+    //        2. 특수 블럭은 다른 기능으로 분리
     private void SpawnPotionAtTop(int _x, int _y, ref int[] _xIndexNullCounts)
     {
-        int index = FindIndexOfLowestNull(_x); // TODO : _y로 대체가능한듯??
+        int index = FindIndexOfLowestNull(_x);
 
         // index 6              = y 7 nullcount 1
         // index 5 6            = y 7 8 nullcount 2
@@ -650,7 +658,17 @@ public class PotionBoard : MonoBehaviour
         //          -> 조합된 후 생성될 해당 블럭을 생성되는 특수 블럭으로 교체
         int makeBlockTypeIndex = MakeBlock();
 
-        GameObject newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
+        GameObject newPotion;
+        // 특수 블럭 생성인 경우
+        if(makeBlockTypeIndex >= 7)
+        {
+            newPotion = Instantiate(potionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
+        } 
+        // 일반 블럭 생성인 경우
+        else
+        {
+            newPotion = Instantiate(stagePotionPrefabs[makeBlockTypeIndex], position, Quaternion.identity);
+        }
         newPotion.transform.SetParent(potionParent.transform);
         newPotion.name = "[" + _x + ", " + (positionY) + "]" + newPotion.name;
 
@@ -664,7 +682,6 @@ public class PotionBoard : MonoBehaviour
         // move it to that location
         Vector3 targetPosition = new Vector3(newPotion.transform.position.x, newPotion.transform.position.y - locationToMoveTo, newPotion.transform.position.z);
         // 아래로 떨어지는 부분
-        // TODO : 1. 채워야할 개수에 따라 속도가 다름 일정하게 필요
         newPotion.GetComponent<Potion>().MoveToTarget(targetPosition);
     }
 

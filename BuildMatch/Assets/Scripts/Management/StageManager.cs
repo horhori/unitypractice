@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // TODO : 1. PuzzleManager에 있는 Stage 관련 옮겨오기
@@ -16,11 +17,72 @@ public class StageManager : MonoBehaviour, IManager
     }
 
     // 현재 스테이지
-    public int stageNumber { get; set; }
+    public int stageNumber { get; set; } = 1;
+
+    public StageData stageData { get; set; }
+
+    private void Start()
+    {
+        StageSetup();
+    }
 
     public void StageSetup()
     {
+        int stageLevel = stageNumber;
+        int mapWidth;
+        int mapHeight;
+        PotionType[] appearedBlockList;
+        GoalBag[] goalBags;
+        int rewardGold;
 
+        switch (stageNumber)
+        {
+            case 1:
+                mapWidth = 7;
+                mapHeight = 7;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                rewardGold = 100;
+                break;
+            case 2:
+                mapWidth = 7;
+                mapHeight = 7;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.PurpleBlock, PotionType.PinkBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15), new GoalBag(PotionType.OrangeBlock, 15), new GoalBag(PotionType.YellowBlock, 15) };
+                rewardGold = 200;
+                break;
+            case 3:
+                mapWidth = 7;
+                mapHeight = 7;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                rewardGold = 300;
+                break;
+            case 4:
+                mapWidth = 7;
+                mapHeight = 7;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                rewardGold = 400;
+                break;
+            case 5:
+                mapWidth = 7;
+                mapHeight = 7;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                rewardGold = 500;
+                break;
+            default:
+                mapWidth = 7;
+                mapHeight = 7;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                rewardGold = 100;
+                break;
+
+        }
+
+        stageData = new StageData(stageLevel, mapWidth, mapHeight, appearedBlockList, goalBags, rewardGold);
     }
 
     public void StageClearReward()
@@ -28,6 +90,38 @@ public class StageManager : MonoBehaviour, IManager
         // 왼쪽 위부터 x, y position 값
         // (-238.8, 122), (-79.6, 122), (79.6, 122), (238.8, 122)
         // (-238.8, -59), (-79.6, -59), (79.6, -59), (238.8, -59)
+    }
+}
+
+public struct StageData
+{
+    public int stageLevel { get; set; }
+    public int mapWidth { get; set; }
+    public int mapHeight { get; set; }
+    public PotionType[] appearedBlockList { get; set; }
+    public GoalBag[] goalBags { get; set; }
+    public int rewardGold { get; set; }
+
+    public StageData(int _stageLevel, int _mapWidth, int _mapHeight, PotionType[] _appearedBlockList, GoalBag[] _goalBags, int _rewardGold)
+    {
+        stageLevel = _stageLevel;
+        mapWidth = _mapWidth;
+        mapHeight = _mapHeight;
+        appearedBlockList = _appearedBlockList;
+        goalBags = _goalBags;
+        rewardGold = _rewardGold;
+    }
+}
+
+public struct GoalBag
+{
+    PotionType targetBlock;
+    int targetNumber;
+
+    public GoalBag( PotionType _targetBlock, int _targetNumber )
+    {
+        targetBlock = _targetBlock;
+        targetNumber = _targetNumber;
     }
 }
 

@@ -68,7 +68,7 @@ public class Potion : MonoBehaviour
 
     public void OnMouseDrag()
     {
-        if (!isMoving)
+        if (!isMoving && !PotionBoard.Instance.isProcessMoving)
         {
             if (sprites.Length == 2)
             {
@@ -119,18 +119,13 @@ public class Potion : MonoBehaviour
         return Mathf.Abs(targetPos.y - currentPos.y) > swipeResist || Mathf.Abs(targetPos.x - currentPos.x) > swipeResist;
     }
 
-    // 스테이지 클리어 시 에러 발생했는데 원인 아직 못찾음?
-    // TODO : 1. 제거 & 생성 코루틴 도중 게임 클리어되면 여기서 에러남 -> 240826 GameManager StageFailed 시 코루틴으로 보드판 무빙 끝나면 블럭 전부 없어지게 함
-    //             -> StageClear 시에 테스트해봐야함
-    //        2. 제거 중간에 조작하면 되버림
+    //   TODO : 2. 제거 중간에 조작하면 되버림
     public void MoveToTarget(Vector2 _targetPos)
     {
         //Debug.Log("move : [" + transform.position.x + ", " + transform.position.y + "] -> [" + _targetPos.x + ", " + _targetPos.y + "]");
         StartCoroutine(MoveCoroutine(_targetPos));
     }
-
-    // TODO : 1. 블럭 바뀌는 시간 자연스럽게 조절
-    //        2. 새로 블럭 생성되어 빈 자리에 떨어지는 것도 여기서 처리하는데 따로 메서드 만들어야 할듯
+ 
     private IEnumerator MoveCoroutine(Vector2 _targetPos)
     {
         isMoving = true;
@@ -165,13 +160,13 @@ public class Potion : MonoBehaviour
 public enum PotionType
 {
     // 기본 블럭
-    BlueBlock,
-    GreenBlock,
-    OrangeBlock,
-    PinkBlock,
-    PurpleBlock,
     RedBlock,
+    OrangeBlock,
     YellowBlock,
+    GreenBlock,
+    BlueBlock,
+    PurpleBlock,
+    PinkBlock,
     // 특수 블럭
     Bomb, // 폭탄
     DrillVertical, // 드릴 세로

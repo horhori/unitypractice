@@ -240,7 +240,6 @@ public class FindMatches : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    // TODO : 1. L자 족보 매칭 시 폭탄 생성
                     isCheckedSuper = true;
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
 
@@ -978,7 +977,6 @@ public class FindMatches : MonoBehaviour
         }
 
         // 가장 많은 색상 potionType 찾음
-        // TODO : 1. 가장 많은 색상이 동일한 경우 처리
         int maxIndex = 0;
         int max = 0;
 
@@ -1339,8 +1337,6 @@ public class MatchResult
 
 
 // 족보 : 3배열, 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 (시스템 기획서 27P)
-
-// TODO : 1. 특수 블럭 조합 로직 추가
 
 public enum MatchDirection
 {

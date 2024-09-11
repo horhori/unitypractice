@@ -61,6 +61,13 @@ public class PuzzleUIManager : MonoBehaviour
     // 결과창 크기 조절
     public IEnumerator LerpClearPanelScale()
     {
+        PuzzleManager.Instance.isStageEnded = true;
+        warningUI.SetActive(false);
+        backgroundPanel.SetActive(true);
+        clearPanel.SetActive(true);
+        board.potionParent.SetActive(false);
+        PuzzleManager.Instance.isGameRunning = false;
+
         bool firstCheck = false;
         bool lastCheck = false;
 
@@ -113,7 +120,7 @@ public class PuzzleUIManager : MonoBehaviour
         warningUI.SetActive(false);
         backgroundPanel.SetActive(true);
         failedPanel.SetActive(true);
-        PotionBoard.Instance.potionParent.SetActive(false);
+        board.potionParent.SetActive(false);
         PuzzleManager.Instance.isGameRunning = false;
 
         bool firstCheck = false;

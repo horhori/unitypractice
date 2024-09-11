@@ -12,6 +12,8 @@ public class InventoryManager : MonoBehaviour, IManager
         }
     }
 
+    public int availableStage { get; set; } = 1;
+
     public int meat { get; set; }
 
     public int gold { get; set; }

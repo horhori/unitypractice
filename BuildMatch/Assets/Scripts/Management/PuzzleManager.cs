@@ -17,13 +17,7 @@ public class PuzzleManager : MonoBehaviour
 
     private PotionBoard board;
 
-    //public GameObject warningUI; // 10초 남았을 때 경고 UI
-    //private Image warningImage;
     public float warningSec; // 경고 뜨는 남은 기준 시간 (현재 10초)
-
-    //public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
-    //public GameObject clearPanel;
-    //public GameObject failedPanel;
 
     //public int goal;
     public int points; // 최대 숫자 9개까지 ex) 999999999
@@ -39,10 +33,6 @@ public class PuzzleManager : MonoBehaviour
     // 남은 시간이 종료되었을 때 
     public bool isStageEnded;
 
-    //public TMP_Text stageText;
-    //public TMP_Text pointsText;
-    //public TMP_Text timeText;
-
     // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
     public Sprite[] bagSprites;
 
@@ -57,29 +47,12 @@ public class PuzzleManager : MonoBehaviour
 
     private Image[] bagImageList;
 
-    //// 경고 UI 설정 컬러값
-    //private Color originWarningColor;
-    //private Color fullWarningColor;
-
-    //// 결과창 Scale 설정값
-    //private Vector3 firstResultScale;
-    //private Vector3 middleResultScale;
-    //private Vector3 lastResultScale;
-
     private void Awake()
     {
         Instance = this;
 
         board = FindObjectOfType<PotionBoard>();
         _PuzzleUIManager = GetComponentInChildren<PuzzleUIManager>();
-
-        //warningImage = warningUI.GetComponent<Image>();
-        //originWarningColor = warningImage.GetComponent<Image>().color;
-        //fullWarningColor = new Color(1, 1, 1, 1);
-            
-        //firstResultScale = Vector3.zero;
-        //middleResultScale = new Vector3(1.2f, 1.2f, 1);
-        //lastResultScale = new Vector3(1, 1, 1);
     }
 
     private void Start()
@@ -185,16 +158,8 @@ public class PuzzleManager : MonoBehaviour
 
     }
 
-    
-
     private void StageClear()
     {
-        isStageEnded = true;
-        _PuzzleUIManager.warningUI.SetActive(false);
-        _PuzzleUIManager.backgroundPanel.SetActive(true);
-        _PuzzleUIManager.clearPanel.SetActive(true);
-        PotionBoard.Instance.potionParent.SetActive(false);
-        isGameRunning = false;
         StartCoroutine(_PuzzleUIManager.LerpClearPanelScale());
     }
 

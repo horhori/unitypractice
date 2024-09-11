@@ -3129,7 +3129,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 666667688}
         m_TargetAssemblyTypeName: Button, Assembly-CSharp
-        m_MethodName: OnMapButtonClicked
+        m_MethodName: OnStage1ButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3676,6 +3676,11 @@ MonoBehaviour:
   stageText: {fileID: 0}
   pointsText: {fileID: 1573741871}
   timeText: {fileID: 502402609}
+  originWarningColor: {r: 0, g: 0, b: 0, a: 0}
+  fullWarningColor: {r: 0, g: 0, b: 0, a: 0}
+  firstResultScale: {x: 0, y: 0, z: 0}
+  middleResultScale: {x: 0, y: 0, z: 0}
+  lastResultScale: {x: 0, y: 0, z: 0}
 --- !u!4 &831633115
 Transform:
   m_ObjectHideFlags: 0
@@ -3985,7 +3990,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 860559234}
         m_TargetAssemblyTypeName: Button, Assembly-CSharp
-        m_MethodName: OnMapButtonClicked
+        m_MethodName: OnStage2ButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5347,23 +5352,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5e64ddc40c7084d9f6a249a118d56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  warningUI: {fileID: 312317614}
   warningSec: 10
-  backgroundPanel: {fileID: 1756802270}
-  clearPanel: {fileID: 1571796877}
-  failedPanel: {fileID: 1472486500}
   points: 0
   min: 0
   sec: 30
   isGameRunning: 0
   isStageEnded: 0
-  stageText: {fileID: 1568398321}
-  pointsText: {fileID: 1573741871}
-  timeText: {fileID: 502402609}
   bagSprites: []
   bag1: {fileID: 1131860511}
   bag1GoalCount: 15
-  bag1Type: 5
+  bag1Type: 0
 --- !u!4 &1263557208
 Transform:
   m_ObjectHideFlags: 0
@@ -5839,6 +5837,7 @@ MonoBehaviour:
   - {fileID: 2617827014288527008, guid: adf8529175089c54fa626ef1df79ca8d, type: 3}
   - {fileID: 5038854057198368486, guid: b2343b8d2c2e73e45a581a1084bc34e8, type: 3}
   normalBlockLength: 6
+  stagePotionPrefabs: []
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
   potionParent: {fileID: 894325663}

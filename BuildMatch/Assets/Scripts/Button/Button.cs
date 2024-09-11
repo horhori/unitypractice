@@ -20,21 +20,21 @@ public class Button : MonoBehaviour
     }
 
     #region VillageScene
+    // 맵버튼 누르면 스테이지 선택 씬으로 이동
     public void OnMapButtonClicked()
     {
         _SoundManager.PlayUIClickSound(Vector3.zero);
-        //SceneManager.LoadScene("StageScene");
-        SceneManager.LoadScene("PuzzleScene");
-
+        SceneManager.LoadScene("StageScene");
     }
 
+    // 홈버튼 누르면 빌리지 씬으로 이동
     public void OnHomeButtonClicked()
     {
         _SoundManager.PlayUIClickSound(Vector3.zero);
         SceneManager.LoadScene("VillageScene");
     }
 
-    // 임시 버튼
+    // 임시로 NPC 클릭 후 다시 원위치로 되돌아가기
     public void ReturnOriginCamera()
     {
         _PlayerInstance.isQuestEnd = true;
@@ -45,6 +45,7 @@ public class Button : MonoBehaviour
     public void OnStage1ButtonClicked()
     {
         _SoundManager.PlayBackgroundSound(Vector3.zero);
+        _StageManager.stageNumber = 1;
         SceneManager.LoadScene("PuzzleScene");
     }
 

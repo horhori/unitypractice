@@ -11,6 +11,7 @@ public class VillageUIManager : MonoBehaviour
     {
         _ControllerUI = GameObject.Find("Canvas");
         // TODO : 1. UI 빌리지, 퍼즐 통합 관리 구조 짜기
+        // 현재 비활성화 후 유니티에서 직접 넣어서 사용중
         //_QuestUI = GameObject.Find("CanvasNPC");
         //_QuestUI.SetActive(false);
     }
