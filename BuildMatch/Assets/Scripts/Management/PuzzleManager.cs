@@ -13,15 +13,17 @@ public class PuzzleManager : MonoBehaviour
 {
     public static PuzzleManager Instance; // static reference;
 
+    private PuzzleUIManager _PuzzleUIManager = null;
+
     private PotionBoard board;
 
-    public GameObject warningUI; // 10초 남았을 때 경고 UI
-    private Image warningImage;
+    //public GameObject warningUI; // 10초 남았을 때 경고 UI
+    //private Image warningImage;
     public float warningSec; // 경고 뜨는 남은 기준 시간 (현재 10초)
 
-    public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
-    public GameObject clearPanel;
-    public GameObject failedPanel;
+    //public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
+    //public GameObject clearPanel;
+    //public GameObject failedPanel;
 
     //public int goal;
     public int points; // 최대 숫자 9개까지 ex) 999999999
@@ -32,15 +34,14 @@ public class PuzzleManager : MonoBehaviour
 
     // 스왑 이후부터 true로 변경되면서 시간 체크
     // true일때만 시간이 지나감
-    [SerializeField]
-    private bool isGameRunning = false;
+    public bool isGameRunning = false;
 
     // 남은 시간이 종료되었을 때 
     public bool isStageEnded;
 
-    public TMP_Text stageText;
-    public TMP_Text pointsText;
-    public TMP_Text timeText;
+    //public TMP_Text stageText;
+    //public TMP_Text pointsText;
+    //public TMP_Text timeText;
 
     // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
     public Sprite[] bagSprites;
@@ -56,28 +57,29 @@ public class PuzzleManager : MonoBehaviour
 
     private Image[] bagImageList;
 
-    // 경고 UI 설정 컬러값
-    private Color originWarningColor;
-    private Color fullWarningColor;
+    //// 경고 UI 설정 컬러값
+    //private Color originWarningColor;
+    //private Color fullWarningColor;
 
-    // 결과창 Scale 설정값
-    private Vector3 firstResultScale;
-    private Vector3 middleResultScale;
-    private Vector3 lastResultScale;
+    //// 결과창 Scale 설정값
+    //private Vector3 firstResultScale;
+    //private Vector3 middleResultScale;
+    //private Vector3 lastResultScale;
 
     private void Awake()
     {
         Instance = this;
 
         board = FindObjectOfType<PotionBoard>();
+        _PuzzleUIManager = GetComponentInChildren<PuzzleUIManager>();
 
-        warningImage = warningUI.GetComponent<Image>();
-        originWarningColor = warningImage.GetComponent<Image>().color;
-        fullWarningColor = new Color(1, 1, 1, 1);
+        //warningImage = warningUI.GetComponent<Image>();
+        //originWarningColor = warningImage.GetComponent<Image>().color;
+        //fullWarningColor = new Color(1, 1, 1, 1);
             
-        firstResultScale = Vector3.zero;
-        middleResultScale = new Vector3(1.2f, 1.2f, 1);
-        lastResultScale = new Vector3(1, 1, 1);
+        //firstResultScale = Vector3.zero;
+        //middleResultScale = new Vector3(1.2f, 1.2f, 1);
+        //lastResultScale = new Vector3(1, 1, 1);
     }
 
     private void Start()
@@ -108,7 +110,7 @@ public class PuzzleManager : MonoBehaviour
 
     private void UpdatePoint()
     {
-        pointsText.text = string.Format("{0:D9}", points);
+        _PuzzleUIManager.pointsText.text = string.Format("{0:D9}", points);
         // move, goal 삭제 예정
     }
 
@@ -122,7 +124,7 @@ public class PuzzleManager : MonoBehaviour
         // string.Format({0번째 매개변수:표시자리수}, {1번째 매개변수:표시자리수});
         // 00:30으로 표시됨
 
-        timeText.text = string.Format("{0:D2}:{1:D2}", min, (int)sec);
+        _PuzzleUIManager.timeText.text = string.Format("{0:D2}:{1:D2}", min, (int)sec);
     }
 
     private void CheckRemainTime()
@@ -136,7 +138,7 @@ public class PuzzleManager : MonoBehaviour
         }
         else if (min == 0 && sec <= warningSec + 1 && sec >= warningSec)
         {
-            WarningLeftTime();
+            _PuzzleUIManager.WarningLeftTime();
         }
         else if (min == 0 && sec <= 0f)
         {
@@ -183,132 +185,17 @@ public class PuzzleManager : MonoBehaviour
 
     }
 
-    private void WarningLeftTime()
-    {
-        timeText.color = Color.red;
-        warningUI.SetActive(true);
-        StartCoroutine(LerpWarningColor());
-    }
-
-    // 10초 되면 경고 UI 깜빡깜빡하도록(컬러의 a값(불투명도) 조절)
-    private IEnumerator LerpWarningColor()
-    {
-        while (warningUI.GetComponent<Image>().color != fullWarningColor)
-        {
-            warningUI.GetComponent<Image>().color = Color.Lerp(originWarningColor, fullWarningColor, Mathf.PingPong(Time.time, 1));
-            yield return null;
-        }
-    }
-
-    // 결과창 크기 조절
-    private IEnumerator LerpClearPanelScale()
-    {
-        bool firstCheck = false;
-        bool lastCheck = false;
-
-        float elaspedTime = 0f;
-
-        float duration = 0.5f;
-
-        // 0에서 1.2까지 커짐
-        while (!firstCheck)
-        {
-            float t = elaspedTime / duration;
-            clearPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, t);
-
-            elaspedTime += Time.deltaTime;
-
-            if (clearPanel.transform.localScale.x >= middleResultScale.x - 0.1f)
-            {
-                firstCheck = true;
-            }
-
-            yield return null;
-        }
-
-        elaspedTime = 0f;
-
-        // 1.2에서 1까지 줄어듬
-        while (!lastCheck)
-        {
-            float t = elaspedTime / duration;
-            clearPanel.transform.localScale = Vector3.Lerp(middleResultScale, lastResultScale, t);
-
-            elaspedTime += Time.deltaTime;
-
-            if (clearPanel.transform.localScale.x <= lastResultScale.x && firstCheck)
-            {
-                lastCheck = true;
-            }
-
-            yield return null;
-        }
-
-    }
-
-    private IEnumerator LerpFailedPanelScale()
-    {
-        yield return new WaitWhile(()=>board.isProcessMoving);
-
-        // 기존 StageFailed 내용, 보드판 이동이 끝나면 active 상태 false로 만듬 
-        isStageEnded = true;
-        warningUI.SetActive(false);
-        backgroundPanel.SetActive(true);
-        failedPanel.SetActive(true);
-        PotionBoard.Instance.potionParent.SetActive(false);
-        isGameRunning = false;
-
-        bool firstCheck = false;
-        bool lastCheck = false;
-
-        float elaspedTime = 0f;
-
-        float duration = 0.5f;
-
-        // 0에서 1.2까지 커짐
-        while (!firstCheck)
-        {
-            float t = elaspedTime / duration;
-            failedPanel.transform.localScale = Vector3.Lerp(firstResultScale, middleResultScale, t);
-
-            elaspedTime += Time.deltaTime;
-
-            if (failedPanel.transform.localScale.x >= middleResultScale.x - 0.1f)
-            {
-                firstCheck = true;
-            }
-
-            yield return null;
-        }
-
-        elaspedTime = 0f;
-
-        // 1.2에서 1까지 줄어듬
-        while (!lastCheck)
-        {
-            float t = elaspedTime / duration;
-            failedPanel.transform.localScale = Vector3.Lerp(middleResultScale, lastResultScale, t);
-
-            elaspedTime += Time.deltaTime;
-
-            if (failedPanel.transform.localScale.x <= lastResultScale.x && firstCheck)
-            {
-                lastCheck = true;
-            }
-
-            yield return null;
-        }
-    }
+    
 
     private void StageClear()
     {
         isStageEnded = true;
-        warningUI.SetActive(false);
-        backgroundPanel.SetActive(true);
-        clearPanel.SetActive(true);
+        _PuzzleUIManager.warningUI.SetActive(false);
+        _PuzzleUIManager.backgroundPanel.SetActive(true);
+        _PuzzleUIManager.clearPanel.SetActive(true);
         PotionBoard.Instance.potionParent.SetActive(false);
         isGameRunning = false;
-        StartCoroutine(LerpClearPanelScale());
+        StartCoroutine(_PuzzleUIManager.LerpClearPanelScale());
     }
 
     // 클리어 보상 세팅
@@ -318,6 +205,6 @@ public class PuzzleManager : MonoBehaviour
         
     private void StageFailed()
     {
-        StartCoroutine(LerpFailedPanelScale());
+        StartCoroutine(_PuzzleUIManager.LerpFailedPanelScale());
     }
 }
