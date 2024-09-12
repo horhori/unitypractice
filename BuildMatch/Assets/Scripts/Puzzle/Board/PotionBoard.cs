@@ -21,8 +21,7 @@ public class PotionBoard : MonoBehaviour
     public GameObject[] potionPrefabs;
     // 해당 스테이지 블럭 갯수
     public int normalBlockLength;
-    // 해당 스테이지 세팅되는 블럭 목록
-    public GameObject[] stagePotionPrefabs;
+
     // 블럭보드
     public Node[,] potionBoard;
     public GameObject potionBoardGO;
@@ -43,14 +42,20 @@ public class PotionBoard : MonoBehaviour
 
     public bool isProcessMoving; // 동작 이후 블럭 제거 완료될때까지 true, 동작 중이지 않을때 false
 
-    // 바구니 임시 세팅
+    // 세팅
+    // 해당 스테이지 세팅되는 블럭 목록
+    public GameObject[] stagePotionPrefabs;
+    // 해당 스테이지 세팅 목표 바구니
+    public GoalBag[] stageGoalBags;
+
+    // 바구니 세팅
     // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
     private int bag1SubtractCount = 0; // RedBlock
     private int bag2SubtractCount = 0; // GreenBlock
     private int bag3SubtractCount = 0; // PinkBlock
     private int bag4SubtractCount = 0; // RedBlock
 
-    // Unity 상에서 쉽게 특정 위치 안 나오게 
+    // Unity 상에서 쉽게 특정 위치 Inspeector UI로 확인 가능하도록 사용하는
     public ArrayLayout arrayLayout;
 
     // 매칭 로직 담당
@@ -75,11 +80,13 @@ public class PotionBoard : MonoBehaviour
         height = stageData.mapHeight;
         normalBlockLength = stageData.appearedBlockList.Length;
         stagePotionPrefabs = new GameObject[normalBlockLength];
+        stageGoalBags = stageData.goalBags;
+
         for (int i=0; i<normalBlockLength; i++)
         {
             stagePotionPrefabs[i] = potionPrefabs[(int)stageData.appearedBlockList[i]];
         }
-        
+
         // 초기 보드 세팅
         InitializeBoard();
 
@@ -417,6 +424,13 @@ public class PotionBoard : MonoBehaviour
         // TODO: 1.목표 바구니 세팅에 따라 해당 기능 재구성 필요
         foreach (Potion potion in _potionsToRemove)
         {
+            for (int i = 0; i < stageGoalBags.Count(); i++)
+            {
+                if (potion.potionType == stageGoalBags[i].targetBlock)
+                {
+                    stageGoalBags[i].currentNumber++;
+                }
+            }
             if (potion.potionType == PotionType.RedBlock)
             {
                 bag1SubtractCount++;

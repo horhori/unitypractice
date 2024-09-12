@@ -37,13 +37,6 @@ public class Potion : MonoBehaviour
     [SerializeField]
     private Sprite[] sprites = new Sprite[2];
 
-    // 특수블럭 체크
-    //public bool isBomb;
-    //public bool isDrillVertical;
-    //public bool isDrillVertical;
-    //public bool isDrillVertical;  
-    //public bool isDrillVertical;
-
     public Potion(int _x, int _y)
     {
         xIndex = _x;
@@ -68,6 +61,7 @@ public class Potion : MonoBehaviour
 
     public void OnMouseDrag()
     {
+        // 블럭 제거 끝날 때까지 마우스 클릭해도 블럭 빛나는 효과 적용 X
         if (!isMoving && !PotionBoard.Instance.isProcessMoving)
         {
             if (sprites.Length == 2)

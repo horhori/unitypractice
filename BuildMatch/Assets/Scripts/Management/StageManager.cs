@@ -52,24 +52,24 @@ public class StageManager : MonoBehaviour, IManager
                 rewardGold = 200;
                 break;
             case 3:
-                mapWidth = 7;
-                mapHeight = 7;
-                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
-                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                mapWidth = 8;
+                mapHeight = 8;
+                appearedBlockList = new PotionType[] { PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock, PotionType.PurpleBlock, PotionType.PinkBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.GreenBlock, 20), new GoalBag(PotionType.BlueBlock, 20), new GoalBag(PotionType.PurpleBlock, 20) };
                 rewardGold = 300;
                 break;
             case 4:
-                mapWidth = 7;
-                mapHeight = 7;
-                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
-                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                mapWidth = 8;
+                mapHeight = 8;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock, PotionType.PurpleBlock, PotionType.PinkBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.OrangeBlock, 10), new GoalBag(PotionType.YellowBlock, 10), new GoalBag(PotionType.GreenBlock, 10), new GoalBag(PotionType.BlueBlock, 10), new GoalBag(PotionType.PurpleBlock, 10) };
                 rewardGold = 400;
                 break;
             case 5:
-                mapWidth = 7;
-                mapHeight = 7;
-                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock };
-                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15) };
+                mapWidth = 9;
+                mapHeight = 9;
+                appearedBlockList = new PotionType[] { PotionType.RedBlock, PotionType.OrangeBlock, PotionType.YellowBlock, PotionType.GreenBlock, PotionType.BlueBlock, PotionType.PurpleBlock, PotionType.PinkBlock };
+                goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15), new GoalBag(PotionType.OrangeBlock, 15), new GoalBag(PotionType.YellowBlock, 15), new GoalBag(PotionType.GreenBlock, 15), new GoalBag(PotionType.BlueBlock, 15), new GoalBag(PotionType.PurpleBlock, 15), new GoalBag(PotionType.PinkBlock, 15) };
                 rewardGold = 500;
                 break;
             default:
@@ -115,13 +115,15 @@ public struct StageData
 
 public struct GoalBag
 {
-    PotionType targetBlock;
-    int targetNumber;
+    public PotionType targetBlock { get; set; }
+    public int currentNumber { get; set; }
+    int goalNumber { get; set; }
 
-    public GoalBag( PotionType _targetBlock, int _targetNumber )
+    public GoalBag( PotionType _targetBlock, int _goalNumber )
     {
         targetBlock = _targetBlock;
-        targetNumber = _targetNumber;
+        currentNumber = 0;
+        goalNumber = _goalNumber;
     }
 }
 

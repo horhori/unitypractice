@@ -12,11 +12,14 @@ public class Button : MonoBehaviour
 
     private StageManager _StageManager = null;
 
+    private LoadManager _LoadManager = null;
+
     private void Awake()
     {
         _PlayerInstance = GameManager.GetManagerClass<CharacterManager>().player;
         _SoundManager = GameManager.GetManagerClass<SoundManager>();
         _StageManager = GameManager.GetManagerClass<StageManager>();
+        _LoadManager = GameManager.GetManagerClass<LoadManager>();
     }
 
     #region VillageScene
@@ -24,14 +27,14 @@ public class Button : MonoBehaviour
     public void OnMapButtonClicked()
     {
         _SoundManager.PlayUIClickSound(Vector3.zero);
-        SceneManager.LoadScene("StageScene");
+        _LoadManager.LoadScene(LoadManager.SceneName.StageScene);
     }
 
     // 홈버튼 누르면 빌리지 씬으로 이동
     public void OnHomeButtonClicked()
     {
         _SoundManager.PlayUIClickSound(Vector3.zero);
-        SceneManager.LoadScene("VillageScene");
+        _LoadManager.LoadScene(LoadManager.SceneName.VillageScene);
     }
 
     // 임시로 NPC 클릭 후 다시 원위치로 되돌아가기
@@ -46,7 +49,7 @@ public class Button : MonoBehaviour
     {
         _SoundManager.PlayBackgroundSound(Vector3.zero);
         _StageManager.stageNumber = 1;
-        SceneManager.LoadScene("PuzzleScene");
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
 
     public void OnStage2ButtonClicked()

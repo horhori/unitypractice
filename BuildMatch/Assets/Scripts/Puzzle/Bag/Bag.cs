@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 
+// 목표 바구니 오브젝트
 // TDOD : 1. 임시로 PuzzleManager에서 Bag 컴포넌트 처리중
 //           나중에 개별 Bag에 해당 스크립트 올려놓고 처리하도록 변경
 public class Bag : MonoBehaviour
