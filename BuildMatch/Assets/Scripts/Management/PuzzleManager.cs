@@ -34,16 +34,16 @@ public class PuzzleManager : MonoBehaviour
     public bool isStageEnded;
 
     // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
-    public Sprite[] bagSprites;
+    public GameObject[] bagPrefabs;
 
-    public GameObject bag1;
-    private TMP_Text bag1Text;
-    private Image bag1ClearImage;
-    private int bag1CurrentCount;
-    [SerializeField]
-    private int bag1GoalCount; // 1 stage 15
-    public PotionType bag1Type;
-    private bool bag1Check; // currentCount == GoalCount 되면 check됨
+    //public GameObject bag1;
+    //private TMP_Text bag1Text;
+    //private Image bag1ClearImage;
+    //private int bag1CurrentCount;
+    //[SerializeField]
+    //private int bag1GoalCount; // 1 stage 15
+    //public PotionType bag1Type;
+    //private bool bag1Check; // currentCount == GoalCount 되면 check됨
 
     private Image[] bagImageList;
 
@@ -62,15 +62,15 @@ public class PuzzleManager : MonoBehaviour
 
     private void SetUpBag()
     {
-        bag1Text = bag1.GetComponentInChildren<TMP_Text>();
-        bag1Type = PotionType.RedBlock;
-        bag1GoalCount = 15;
-        bag1CurrentCount = 0;
-        bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
-        bagImageList = bag1.GetComponentsInChildren<Image>();
-        bag1ClearImage = bagImageList[2];
-        bag1ClearImage.gameObject.SetActive(false);
-        bag1Check = false;
+        //bag1Text = bag1.GetComponentInChildren<TMP_Text>();
+        //bag1Type = PotionType.RedBlock;
+        //bag1GoalCount = 15;
+        //bag1CurrentCount = 0;
+        //bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
+        //bagImageList = bag1.GetComponentsInChildren<Image>();
+        //bag1ClearImage = bagImageList[2];
+        //bag1ClearImage.gameObject.SetActive(false);
+        //bag1Check = false;
     }
 
     // Update is called once per frame
@@ -123,13 +123,13 @@ public class PuzzleManager : MonoBehaviour
 
     private void UpdateBag()
     {
-        bag1Text.text = bag1CurrentCount.ToString() + "/" + bag1GoalCount.ToString();
+        //bag1Text.text = bag1CurrentCount.ToString() + "/" + bag1GoalCount.ToString();
 
-        if (bag1Check)
-        {
-            bag1Text.gameObject.SetActive(false);
-            bag1ClearImage.gameObject.SetActive(true);
-        }
+        //if (bag1Check)
+        //{
+        //    bag1Text.gameObject.SetActive(false);
+        //    bag1ClearImage.gameObject.SetActive(true);
+        //}
     }
 
     // TODO : 1. 매개변수 _subtractMoves 삭제 -> 스와이프 횟수 -로 종료조건일 때 했었음 
@@ -143,18 +143,18 @@ public class PuzzleManager : MonoBehaviour
         points += _pointsToGain;
 
 
-        bag1CurrentCount += _bag1AddCount;
-        if (bag1CurrentCount >= bag1GoalCount)
-        {
-            bag1CurrentCount = bag1GoalCount;
-            bag1Check = true;
-        }
+        //bag1CurrentCount += _bag1AddCount;
+        //if (bag1CurrentCount >= bag1GoalCount)
+        //{
+        //    bag1CurrentCount = bag1GoalCount;
+        //    bag1Check = true;
+        //}
 
-        // TODO : 1. 스테이지 별 모든 보석 개수 체크 함수 만들기(bag1만 체크하지 말구)
-        if (bag1Check)
-        {
-            StageClear();
-        }
+        //// TODO : 1. 스테이지 별 모든 보석 개수 체크 함수 만들기(bag1만 체크하지 말구)
+        //if (bag1Check)
+        //{
+        //    StageClear();
+        //}
 
     }
 

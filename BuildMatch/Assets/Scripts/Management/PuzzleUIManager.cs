@@ -9,6 +9,13 @@ public class PuzzleUIManager : MonoBehaviour
 {
     private PotionBoard board;
 
+    // 바구니 세팅
+    // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
+    private int bag1SubtractCount = 0; // RedBlock
+    private int bag2SubtractCount = 0; // GreenBlock
+    private int bag3SubtractCount = 0; // PinkBlock
+    private int bag4SubtractCount = 0; // RedBlock
+
     public GameObject warningUI; // 10초 남았을 때 경고 UI
     private Image warningImage;
 
@@ -39,6 +46,11 @@ public class PuzzleUIManager : MonoBehaviour
         firstResultScale = Vector3.zero;
         middleResultScale = new Vector3(1.2f, 1.2f, 1);
         lastResultScale = new Vector3(1, 1, 1);
+    }
+
+    private void Start()
+    {
+
     }
 
     public void WarningLeftTime()

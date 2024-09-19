@@ -17,10 +17,30 @@ public class PotionBoard : MonoBehaviour
     // X축, Y축 간격
     public float spacingX;
     public float spacingY;
+
+    // 세팅
+
     // 일반 블럭 전체 목록
     public GameObject[] potionPrefabs;
-    // 해당 스테이지 블럭 갯수
-    public int normalBlockLength;
+    // 해당 스테이지에서 사용하는 일반 블럭 갯수
+    public int stageNormalBlockLength;
+    // 해당 스테이지 세팅되는 블럭 목록
+    public GameObject[] stagePotionPrefabs;
+    // 블럭 원래 위치
+    // 블럭이 제거되고 새로 생성될 때 해당 위치 참조
+    public GameObject potionParent;
+
+    // 전체 바구니 목록
+    public GameObject[] bagPrefabs;
+
+    // 해당 스테이지 바구니 갯수
+    public int stageBagLength;
+
+    // 해당 스테이지 세팅 바구니 목록
+    public GameObject[] stageBagPrefabs;
+
+    // 바구니 원래 위치
+    public GameObject bagParent;
 
     // 블럭보드
     public Node[,] potionBoard;
@@ -31,9 +51,7 @@ public class PotionBoard : MonoBehaviour
     // 초기 세팅시에서밖에 사용 안하는중
     public List<GameObject> potionsToDestroy = new();
 
-    // 블럭 원래 위치
-    // 블럭이 제거되고 새로 생성될 때 해당 위치 참조
-    public GameObject potionParent;
+
 
     // unity 상에서 선택된 블럭 확인할 수 있게 SerializeField(직렬화) 사용
     // SerializeField : private이여도 unity에서 확인할 수 있음
@@ -42,18 +60,7 @@ public class PotionBoard : MonoBehaviour
 
     public bool isProcessMoving; // 동작 이후 블럭 제거 완료될때까지 true, 동작 중이지 않을때 false
 
-    // 세팅
-    // 해당 스테이지 세팅되는 블럭 목록
-    public GameObject[] stagePotionPrefabs;
-    // 해당 스테이지 세팅 목표 바구니
-    public GoalBag[] stageGoalBags;
 
-    // 바구니 세팅
-    // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
-    private int bag1SubtractCount = 0; // RedBlock
-    private int bag2SubtractCount = 0; // GreenBlock
-    private int bag3SubtractCount = 0; // PinkBlock
-    private int bag4SubtractCount = 0; // RedBlock
 
     // Unity 상에서 쉽게 특정 위치 Inspeector UI로 확인 가능하도록 사용하는
     public ArrayLayout arrayLayout;
@@ -74,18 +81,7 @@ public class PotionBoard : MonoBehaviour
 
     void Start()
     {
-        // 스테이지 매니저에서 세팅값 받아옴
-        StageData stageData = _StageManager.stageData;
-        width = stageData.mapWidth;
-        height = stageData.mapHeight;
-        normalBlockLength = stageData.appearedBlockList.Length;
-        stagePotionPrefabs = new GameObject[normalBlockLength];
-        stageGoalBags = stageData.goalBags;
-
-        for (int i=0; i<normalBlockLength; i++)
-        {
-            stagePotionPrefabs[i] = potionPrefabs[(int)stageData.appearedBlockList[i]];
-        }
+        StageSetup();
 
         // 초기 보드 세팅
         InitializeBoard();
@@ -137,6 +133,36 @@ public class PotionBoard : MonoBehaviour
 
     #region Setup
 
+    void StageSetup()
+    {
+        // 스테이지 매니저에서 세팅값 받아옴
+        StageData stageData = _StageManager.stageData;
+        width = stageData.mapWidth;
+        height = stageData.mapHeight;
+        stageNormalBlockLength = stageData.appearedBlockList.Length;
+        stagePotionPrefabs = new GameObject[stageNormalBlockLength];
+
+        for (int i = 0; i < stageNormalBlockLength; i++)
+        {
+            stagePotionPrefabs[i] = potionPrefabs[(int)stageData.appearedBlockList[i]];
+        }
+
+        // 목표 바구니 세팅
+        GoalBag[] goalBags = stageData.goalBags;
+        stageBagLength = goalBags.Length;
+        stageBagPrefabs = new GameObject[stageBagLength];
+
+        for (int i = 0; i < stageBagLength; i++)
+        {
+            stageBagPrefabs[i] = bagPrefabs[(int)goalBags[i].targetBlock];
+        }
+
+        Vector2 position = Vector2.zero;
+
+        GameObject bag = Instantiate(stageBagPrefabs[0], position, Quaternion.identity);
+        bag.transform.SetParent(bagParent.transform);
+    }
+
     // 보드 생성
     // width, height 값에 따라 보드 판 생성.
     // 각 보드 자리마다 Node를 가지고 있음
@@ -165,7 +191,7 @@ public class PotionBoard : MonoBehaviour
                 else
                 {
                     // 재료 등급 조정
-                    int randomIndex = Random.Range(0, normalBlockLength);
+                    int randomIndex = Random.Range(0, stageNormalBlockLength);
 
                     GameObject potion = Instantiate(stagePotionPrefabs[randomIndex], position, Quaternion.identity);
                     potion.transform.SetParent(potionParent.transform);
@@ -401,11 +427,11 @@ public class PotionBoard : MonoBehaviour
             RefillBlock();
 
             // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-            PuzzleManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
-            bag1SubtractCount = 0;
-            bag2SubtractCount = 0;
-            bag3SubtractCount = 0;
-            bag4SubtractCount = 0;
+            //PuzzleManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
+            //bag1SubtractCount = 0;
+            //bag2SubtractCount = 0;
+            //bag3SubtractCount = 0;
+            //bag4SubtractCount = 0;
 
             yield return new WaitForSeconds(0.6f);
         }
@@ -424,29 +450,29 @@ public class PotionBoard : MonoBehaviour
         // TODO: 1.목표 바구니 세팅에 따라 해당 기능 재구성 필요
         foreach (Potion potion in _potionsToRemove)
         {
-            for (int i = 0; i < stageGoalBags.Count(); i++)
-            {
-                if (potion.potionType == stageGoalBags[i].targetBlock)
-                {
-                    stageGoalBags[i].currentNumber++;
-                }
-            }
-            if (potion.potionType == PotionType.RedBlock)
-            {
-                bag1SubtractCount++;
-            }
-            if (potion.potionType == PotionType.OrangeBlock)
-            {
-                bag2SubtractCount++;
-            }
-            if (potion.potionType == PotionType.YellowBlock)
-            {
-                bag3SubtractCount++;
-            }
-            if (potion.potionType == PotionType.GreenBlock)
-            {
-                bag4SubtractCount++;
-            }
+            //for (int i = 0; i < stageGoalBags.Count(); i++)
+            //{
+            //    if (potion.potionType == stageGoalBags[i].targetBlock)
+            //    {
+            //        stageGoalBags[i].currentNumber++;
+            //    }
+            //}
+            //if (potion.potionType == PotionType.RedBlock)
+            //{
+            //    bag1SubtractCount++;
+            //}
+            //if (potion.potionType == PotionType.OrangeBlock)
+            //{
+            //    bag2SubtractCount++;
+            //}
+            //if (potion.potionType == PotionType.YellowBlock)
+            //{
+            //    bag3SubtractCount++;
+            //}
+            //if (potion.potionType == PotionType.GreenBlock)
+            //{
+            //    bag4SubtractCount++;
+            //}
             // getting it's x and y indicies and storing them
             int _xIndex = potion.xIndex;
             int _yIndex = potion.yIndex;
@@ -742,7 +768,7 @@ public class PotionBoard : MonoBehaviour
         }
         // 일반 블럭인 경우
 
-        return Random.Range(0, normalBlockLength);
+        return Random.Range(0, stageNormalBlockLength);
     }
 
     private int MakeDrillHorizontal()

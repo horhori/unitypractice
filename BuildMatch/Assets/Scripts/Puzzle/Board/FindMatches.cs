@@ -960,7 +960,7 @@ public class FindMatches : MonoBehaviour
         // Enumerable.Repeat<int>(0, board.normalBlockLength).ToArray<int>()
         // 선언하면서 0으로 length만큼 초기화
         // (초기화하고 싶은 값, 길이)
-        int[] blockCounts = Enumerable.Repeat<int>(0, board.normalBlockLength).ToArray<int>();
+        int[] blockCounts = Enumerable.Repeat<int>(0, board.stageNormalBlockLength).ToArray<int>();
 
         // 가장 많은 색상 찾아주는 
         for (int i=0; i<board.width; i++)

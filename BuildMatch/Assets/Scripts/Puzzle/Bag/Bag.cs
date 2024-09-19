@@ -18,14 +18,34 @@ public class Bag : MonoBehaviour
     public int CurrentCount;
     public int GoalCount;
 
+    public Bag(int _CurrentCount, int _GoalCount)
+    {
+        CurrentCount = _CurrentCount;
+        GoalCount = _GoalCount;
+    }
+
     private void Awake()
     {
         _SpriteRenderer = _Bag.GetComponentInChildren<SpriteRenderer>();
         _Text = _Bag.GetComponentInChildren<TMP_Text>();;
     }
-    // Start is called before the first frame update
-    void Start()
-    {
 
+    private void Update()
+    {
+        if (CurrentCount >= GoalCount)
+        {
+            CurrentCount = GoalCount;
+            // sprite 체크로 변경
+            
+            _Text.color = Color.red;
+        }
+    }
+
+    public void UpdateCount()
+    {
+        if (CurrentCount < GoalCount)
+        {
+            CurrentCount++;
+        }
     }
 }
