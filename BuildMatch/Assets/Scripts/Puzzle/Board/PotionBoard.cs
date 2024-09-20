@@ -157,10 +157,14 @@ public class PotionBoard : MonoBehaviour
             stageBagPrefabs[i] = bagPrefabs[(int)goalBags[i].targetBlock];
         }
 
+        // 바구니 생성될때 y축 100 위치로 생성됨
         Vector2 position = Vector2.zero;
 
         GameObject bag = Instantiate(stageBagPrefabs[0], position, Quaternion.identity);
         bag.transform.SetParent(bagParent.transform);
+        bag.transform.localScale = new Vector3(1, 1, 1);
+        // 로컬포지션으로 이렇게 y축 -100 해야 최종적으로 0,0 되서 이렇게 사용
+        bag.transform.localPosition = new Vector2(0, -100);
     }
 
     // 보드 생성
