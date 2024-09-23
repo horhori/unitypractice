@@ -55,8 +55,10 @@ public class Button : MonoBehaviour
     public void OnStage2ButtonClicked()
     {
         // TODO : 1. 스테이지 매니저에서 세팅
+        Debug.Log("되나");
         _SoundManager.PlayBackgroundSound(Vector3.zero);
-
+        _StageManager.stageNumber = 2;
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
     #endregion
 }

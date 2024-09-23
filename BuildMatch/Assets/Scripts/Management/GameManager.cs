@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
         RegisterManagerClass<SoundManager>();
         RegisterManagerClass<StageManager>();
         RegisterManagerClass<CameraManager>();
+        RegisterManagerClass<LoadManager>();
     }
 
     private void RegisterManagerClass<T>() where T : IManager

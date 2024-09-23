@@ -17,7 +17,7 @@ public class StageManager : MonoBehaviour, IManager
     }
 
     // 현재 스테이지
-    public int stageNumber { get; set; } = 2;
+    public int stageNumber { get; set; }
 
     public StageData stageData { get; set; }
 
@@ -28,7 +28,7 @@ public class StageManager : MonoBehaviour, IManager
 
     public void StageSetup()
     {
-        int stageLevel = stageNumber;
+        Debug.Log(stageNumber);
         int mapWidth;
         int mapHeight;
         PotionType[] appearedBlockList;
@@ -72,6 +72,7 @@ public class StageManager : MonoBehaviour, IManager
                 goalBags = new GoalBag[] { new GoalBag(PotionType.RedBlock, 15), new GoalBag(PotionType.OrangeBlock, 15), new GoalBag(PotionType.YellowBlock, 15), new GoalBag(PotionType.GreenBlock, 15), new GoalBag(PotionType.BlueBlock, 15), new GoalBag(PotionType.PurpleBlock, 15), new GoalBag(PotionType.PinkBlock, 15) };
                 rewardGold = 500;
                 break;
+            // 스테이지 0(테스트, puzzleScene에서 바로 실행)인 경우 스테이지 1로 적용
             default:
                 mapWidth = 7;
                 mapHeight = 7;
@@ -82,7 +83,7 @@ public class StageManager : MonoBehaviour, IManager
 
         }
 
-        stageData = new StageData(stageLevel, mapWidth, mapHeight, appearedBlockList, goalBags, rewardGold);
+        stageData = new StageData(stageNumber, mapWidth, mapHeight, appearedBlockList, goalBags, rewardGold);
     }
 
     public void StageClearReward()
@@ -95,16 +96,16 @@ public class StageManager : MonoBehaviour, IManager
 
 public struct StageData
 {
-    public int stageLevel { get; set; }
+    public int stageNumber { get; set; }
     public int mapWidth { get; set; }
     public int mapHeight { get; set; }
     public PotionType[] appearedBlockList { get; set; }
     public GoalBag[] goalBags { get; set; }
     public int rewardGold { get; set; }
 
-    public StageData(int _stageLevel, int _mapWidth, int _mapHeight, PotionType[] _appearedBlockList, GoalBag[] _goalBags, int _rewardGold)
+    public StageData(int _stageNumber, int _mapWidth, int _mapHeight, PotionType[] _appearedBlockList, GoalBag[] _goalBags, int _rewardGold)
     {
-        stageLevel = _stageLevel;
+        stageNumber = _stageNumber;
         mapWidth = _mapWidth;
         mapHeight = _mapHeight;
         appearedBlockList = _appearedBlockList;
@@ -125,6 +126,19 @@ public struct GoalBag
         currentNumber = 0;
         goalNumber = _goalNumber;
     }
+}
+
+// TODO : 1. 클래스로 관리
+public class BoardBag
+{
+    // 해당 스테이지 바구니 갯수
+    public int stageBagLength;
+
+    // 해당 스테이지 세팅 바구니 목록
+    public GameObject[] stageBags;
+
+    // 바구니 원래 위치
+    public GameObject bagParent;
 }
 
 

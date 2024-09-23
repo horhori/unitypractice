@@ -25,7 +25,7 @@ public class Bag : MonoBehaviour
     // 목표량 채웠을 때 체크되는 이미지 따로 저장
     private Image ClearImage;
 
-    private bool ClearCheck; // currentCount == GoalCount 되면 check됨
+    public bool ClearCheck = false; // currentCount == GoalCount 되면 check됨
 
     // TODO : 1. Instituate 함수로 생성자 실행하기? 좀 더 간단할 수 있을듯
     public Bag(int _GoalCount)
@@ -53,13 +53,17 @@ public class Bag : MonoBehaviour
 
     private void Update()
     {
+        _Text.text = CurrentCount.ToString() + " / " + GoalCount.ToString();
+
         // TODO : 1. 완료되면 빨간색 변경 말고 체크 이미지로 변경되게
         if (CurrentCount >= GoalCount)
         {
             CurrentCount = GoalCount;
             // sprite 체크로 변경
-            
-            _Text.color = Color.red;
+            ClearImage.gameObject.SetActive(true);
+            _Text.gameObject.SetActive(false);
+            ClearCheck = true;
+            //_Text.color = Color.red;
         }
     }
 

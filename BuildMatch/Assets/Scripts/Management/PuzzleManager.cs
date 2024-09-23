@@ -36,6 +36,8 @@ public class PuzzleManager : MonoBehaviour
     // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
     public GameObject[] bagPrefabs;
 
+    private bool bagAllClear = false;
+
     //public GameObject bag1;
     //private TMP_Text bag1Text;
     //private Image bag1ClearImage;
@@ -130,10 +132,12 @@ public class PuzzleManager : MonoBehaviour
         //    bag1Text.gameObject.SetActive(false);
         //    bag1ClearImage.gameObject.SetActive(true);
         //}
+
+
     }
 
     // TODO : 1. 매개변수 _subtractMoves 삭제 -> 스와이프 횟수 -로 종료조건일 때 했었음 
-    public void ProcessTurn(int _pointsToGain, bool _subtractMoves, int _bag1AddCount, int _bag2AddCount, int _bag3AddCount, int _bag4AddCount)
+    public void ProcessTurn(int _pointsToGain, bool _subtractMoves)
     {
         if (!isGameRunning)
         {
@@ -141,6 +145,12 @@ public class PuzzleManager : MonoBehaviour
         }
 
         points += _pointsToGain;
+
+        //for (int i=0; i<board.stageBagLength; i++)
+        //{
+        //    Bag bag = board.stageBags[i].GetComponent<Bag>();
+
+        //}
 
 
         //bag1CurrentCount += _bag1AddCount;
@@ -155,7 +165,19 @@ public class PuzzleManager : MonoBehaviour
         //{
         //    StageClear();
         //}
-
+        for (int i = 0; i < board.stageBagLength; i++)
+        {
+            Bag bag = board.stageBags[i].GetComponent<Bag>();
+            if (!bag.ClearCheck)
+            {
+                break;
+            } 
+            // 마지막 체크까지 true이면 스테이지 클리어
+            else if (bag.ClearCheck && i == board.stageBagLength - 1)
+            {
+                StageClear();
+            }
+        }
     }
 
     private void StageClear()

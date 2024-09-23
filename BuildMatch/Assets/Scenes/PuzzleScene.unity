@@ -5213,9 +5213,10 @@ MonoBehaviour:
   - {fileID: 3415760414717960182, guid: 03af70a8465ff9f4a96514e838cc1a56, type: 3}
   - {fileID: 2521227138033001991, guid: 8c13e2c85e7ffd344b0394c5a72fef3e, type: 3}
   - {fileID: 2213744455277266335, guid: 253b27f1206996e49adc5adf0ab492fe, type: 3}
-  stageBagLength: 0
-  stageBagPrefabs: []
   bagParent: {fileID: 2041251536}
+  stageBagLength: 0
+  stageBags: []
+  bagsSubtractCounts: 
   potionBoardGO: {fileID: 1428986004}
   potionsToDestroy: []
   selectedPotion: {fileID: 0}

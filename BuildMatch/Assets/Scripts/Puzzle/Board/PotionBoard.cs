@@ -34,14 +34,17 @@ public class PotionBoard : MonoBehaviour
     // 전체 바구니 목록
     public GameObject[] bagPrefabs;
 
+    // 바구니 원래 위치
+    public GameObject bagParent;
+
+    // 보드 바구니들 정보 클래스
+    public BoardBag boardBag;
+
     // 해당 스테이지 바구니 갯수
     public int stageBagLength;
 
     // 해당 스테이지 세팅 바구니 목록
     public GameObject[] stageBags;
-
-    // 바구니 원래 위치
-    public GameObject bagParent;
 
     // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
     // 바구니 색깔 별 제거한 갯수 증가값
@@ -169,7 +172,18 @@ public class PotionBoard : MonoBehaviour
 
             // TODO : 1. 생성 갯수에 따른 위치 조정
             // 로컬포지션으로 이렇게 y축 -100 해야 최종적으로 0,0 되서 이렇게 사용
-            bag.transform.localPosition = new Vector2(0, -100);
+            // length == 3일 때 0, 1, 2 0 -> -140 2 -> 140
+            // 일단 임시로 함
+            if (stageBagLength == 3)
+            {
+                bag.transform.localPosition = new Vector2(-140 + i*140, -100);
+            } 
+            // length == 1일 때
+            else
+            {
+                bag.transform.localPosition = new Vector2(0, -100);
+            }
+
             bag.GetComponent<Bag>().SetGoalCount(goalBags[i].goalNumber);
             // stageBag 리스트에 생성된 bag 넣어서 나중에 bag check 목록으로 체크
             stageBags[i] = bag;
@@ -440,11 +454,11 @@ public class PotionBoard : MonoBehaviour
             RefillBlock();
 
             // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
-            //PuzzleManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves, bag1SubtractCount, bag2SubtractCount, bag3SubtractCount, bag4SubtractCount);
-            //bag1SubtractCount = 0;
-            //bag2SubtractCount = 0;
-            //bag3SubtractCount = 0;
-            //bag4SubtractCount = 0;
+            PuzzleManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves);
+            bag1SubtractCount = 0;
+            bag2SubtractCount = 0;
+            bag3SubtractCount = 0;
+            bag4SubtractCount = 0;
 
             yield return new WaitForSeconds(0.6f);
         }
@@ -463,6 +477,14 @@ public class PotionBoard : MonoBehaviour
         // TODO: 1.목표 바구니 세팅에 따라 해당 기능 재구성 필요
         foreach (Potion potion in _potionsToRemove)
         {
+            for (int i=0; i<stageBagLength; i++)
+            {
+                Bag bag = stageBags[i].GetComponent<Bag>();
+                if (potion.potionType == bag._PotionType)
+                {
+                    bag.UpdateCount();
+                }
+            }
             //for (int i = 0; i < stageGoalBags.Count(); i++)
             //{
             //    if (potion.potionType == stageGoalBags[i].targetBlock)
