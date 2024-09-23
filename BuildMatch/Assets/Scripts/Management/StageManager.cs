@@ -17,7 +17,7 @@ public class StageManager : MonoBehaviour, IManager
     }
 
     // 현재 스테이지
-    public int stageNumber { get; set; } = 1;
+    public int stageNumber { get; set; } = 2;
 
     public StageData stageData { get; set; }
 
@@ -117,7 +117,7 @@ public struct GoalBag
 {
     public PotionType targetBlock { get; set; }
     public int currentNumber { get; set; }
-    int goalNumber { get; set; }
+    public int goalNumber { get; set; }
 
     public GoalBag( PotionType _targetBlock, int _goalNumber )
     {

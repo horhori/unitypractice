@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PotionBoard : MonoBehaviour
@@ -37,10 +38,18 @@ public class PotionBoard : MonoBehaviour
     public int stageBagLength;
 
     // 해당 스테이지 세팅 바구니 목록
-    public GameObject[] stageBagPrefabs;
+    public GameObject[] stageBags;
 
     // 바구니 원래 위치
     public GameObject bagParent;
+
+    // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
+    // 바구니 색깔 별 제거한 갯수 증가값
+    public int[] bagsSubtractCounts;
+    private int bag1SubtractCount = 0; // RedBlock
+    private int bag2SubtractCount = 0; // GreenBlock
+    private int bag3SubtractCount = 0; // PinkBlock
+    private int bag4SubtractCount = 0; // RedBlock
 
     // 블럭보드
     public Node[,] potionBoard;
@@ -51,16 +60,12 @@ public class PotionBoard : MonoBehaviour
     // 초기 세팅시에서밖에 사용 안하는중
     public List<GameObject> potionsToDestroy = new();
 
-
-
     // unity 상에서 선택된 블럭 확인할 수 있게 SerializeField(직렬화) 사용
     // SerializeField : private이여도 unity에서 확인할 수 있음
     public Potion selectedPotion;
     public Potion targetedPotion;
 
     public bool isProcessMoving; // 동작 이후 블럭 제거 완료될때까지 true, 동작 중이지 않을때 false
-
-
 
     // Unity 상에서 쉽게 특정 위치 Inspeector UI로 확인 가능하도록 사용하는
     public ArrayLayout arrayLayout;
@@ -150,21 +155,25 @@ public class PotionBoard : MonoBehaviour
         // 목표 바구니 세팅
         GoalBag[] goalBags = stageData.goalBags;
         stageBagLength = goalBags.Length;
-        stageBagPrefabs = new GameObject[stageBagLength];
+        stageBags = new GameObject[stageBagLength];
+        bagsSubtractCounts = new int[stageBagLength];
 
         for (int i = 0; i < stageBagLength; i++)
         {
-            stageBagPrefabs[i] = bagPrefabs[(int)goalBags[i].targetBlock];
+            // 바구니 생성될때 y축 100 위치로 생성됨
+            Vector2 position = Vector2.zero;
+
+            GameObject bag = Instantiate(bagPrefabs[(int)goalBags[i].targetBlock], position, Quaternion.identity);
+            bag.transform.SetParent(bagParent.transform);
+            bag.transform.localScale = new Vector3(1, 1, 1);
+
+            // TODO : 1. 생성 갯수에 따른 위치 조정
+            // 로컬포지션으로 이렇게 y축 -100 해야 최종적으로 0,0 되서 이렇게 사용
+            bag.transform.localPosition = new Vector2(0, -100);
+            bag.GetComponent<Bag>().SetGoalCount(goalBags[i].goalNumber);
+            // stageBag 리스트에 생성된 bag 넣어서 나중에 bag check 목록으로 체크
+            stageBags[i] = bag;
         }
-
-        // 바구니 생성될때 y축 100 위치로 생성됨
-        Vector2 position = Vector2.zero;
-
-        GameObject bag = Instantiate(stageBagPrefabs[0], position, Quaternion.identity);
-        bag.transform.SetParent(bagParent.transform);
-        bag.transform.localScale = new Vector3(1, 1, 1);
-        // 로컬포지션으로 이렇게 y축 -100 해야 최종적으로 0,0 되서 이렇게 사용
-        bag.transform.localPosition = new Vector2(0, -100);
     }
 
     // 보드 생성

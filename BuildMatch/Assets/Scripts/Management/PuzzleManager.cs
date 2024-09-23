@@ -45,7 +45,7 @@ public class PuzzleManager : MonoBehaviour
     //public PotionType bag1Type;
     //private bool bag1Check; // currentCount == GoalCount µÇ¸é checkµÊ
 
-    private Image[] bagImageList;
+    //private Image[] bagImageList;
 
     private void Awake()
     {
