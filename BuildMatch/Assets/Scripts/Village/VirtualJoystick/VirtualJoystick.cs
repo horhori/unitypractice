@@ -18,7 +18,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
 
     // 임시 조이스틱 화면 종횡비 추가 값
     // 원래 화면에 따라서 가로>세로 인 경우 터치 값을 제대로 못읽는중
-    private Vector2 _TempVector = new Vector2(0, 177.8f);
+    private Vector2 _TempVector = new Vector2(0, 220.0f);
 
     private void Awake()
     {
