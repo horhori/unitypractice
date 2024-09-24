@@ -42,6 +42,13 @@ public class Button : MonoBehaviour
     {
         _PlayerInstance.isQuestEnd = true;
     }
+
+    // 스테이지 선택 UI 작업 전까지 사용 맵 누르면 바로 퍼즐로 이동
+    public void OnTestMapButtonClicked()
+    {
+        _SoundManager.PlayUIClickSound(Vector3.zero);
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
+    }
     #endregion
 
     #region StageScene
@@ -49,15 +56,16 @@ public class Button : MonoBehaviour
     {
         _SoundManager.PlayBackgroundSound(Vector3.zero);
         _StageManager.stageNumber = 1;
+        //_StageManager.MakeStageBoardSetupData();
         _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
 
     public void OnStage2ButtonClicked()
     {
         // TODO : 1. 스테이지 매니저에서 세팅
-        Debug.Log("되나");
         _SoundManager.PlayBackgroundSound(Vector3.zero);
         _StageManager.stageNumber = 2;
+        //_StageManager.MakeStageBoardSetupData();
         _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
     #endregion

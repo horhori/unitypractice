@@ -15,6 +15,8 @@ public class PuzzleManager : MonoBehaviour
 
     private PuzzleUIManager _PuzzleUIManager = null;
 
+    private StageManager _StageManager = null;
+
     private PotionBoard board;
 
     public float warningSec; // 경고 뜨는 남은 기준 시간 (현재 10초)
@@ -36,8 +38,6 @@ public class PuzzleManager : MonoBehaviour
     // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
     public GameObject[] bagPrefabs;
 
-    private bool bagAllClear = false;
-
     //public GameObject bag1;
     //private TMP_Text bag1Text;
     //private Image bag1ClearImage;
@@ -55,24 +55,13 @@ public class PuzzleManager : MonoBehaviour
 
         board = FindObjectOfType<PotionBoard>();
         _PuzzleUIManager = GetComponentInChildren<PuzzleUIManager>();
+        _StageManager = GameManager.GetManagerClass<StageManager>();
     }
 
     private void Start()
     {
-        SetUpBag();
-    }
-
-    private void SetUpBag()
-    {
-        //bag1Text = bag1.GetComponentInChildren<TMP_Text>();
-        //bag1Type = PotionType.RedBlock;
-        //bag1GoalCount = 15;
-        //bag1CurrentCount = 0;
-        //bag1Text.text = bag1CurrentCount.ToString() + " / " + bag1GoalCount.ToString();
-        //bagImageList = bag1.GetComponentsInChildren<Image>();
-        //bag1ClearImage = bagImageList[2];
-        //bag1ClearImage.gameObject.SetActive(false);
-        //bag1Check = false;
+        _StageManager.MakeStageTimeSetupData();
+        StageTimeSetup();
     }
 
     // Update is called once per frame
@@ -80,7 +69,13 @@ public class PuzzleManager : MonoBehaviour
     {
         UpdatePoint();
         UpdateTime();
-        UpdateBag();
+    }
+
+    private void StageTimeSetup()
+    {
+        StageTimeData stageData = _StageManager.stageTimeData;
+        min = stageData.min;
+        sec = stageData.sec;
     }
 
     private void UpdatePoint()
@@ -121,19 +116,6 @@ public class PuzzleManager : MonoBehaviour
             StageFailed();
             return;
         }
-    }
-
-    private void UpdateBag()
-    {
-        //bag1Text.text = bag1CurrentCount.ToString() + "/" + bag1GoalCount.ToString();
-
-        //if (bag1Check)
-        //{
-        //    bag1Text.gameObject.SetActive(false);
-        //    bag1ClearImage.gameObject.SetActive(true);
-        //}
-
-
     }
 
     // TODO : 1. 매개변수 _subtractMoves 삭제 -> 스와이프 횟수 -로 종료조건일 때 했었음 

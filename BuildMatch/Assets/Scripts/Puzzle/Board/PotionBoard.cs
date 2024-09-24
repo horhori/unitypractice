@@ -49,10 +49,10 @@ public class PotionBoard : MonoBehaviour
     // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
     // 바구니 색깔 별 제거한 갯수 증가값
     public int[] bagsSubtractCounts;
-    private int bag1SubtractCount = 0; // RedBlock
-    private int bag2SubtractCount = 0; // GreenBlock
-    private int bag3SubtractCount = 0; // PinkBlock
-    private int bag4SubtractCount = 0; // RedBlock
+    //private int bag1SubtractCount = 0; // RedBlock
+    //private int bag2SubtractCount = 0; // GreenBlock
+    //private int bag3SubtractCount = 0; // PinkBlock
+    //private int bag4SubtractCount = 0; // RedBlock
 
     // 블럭보드
     public Node[,] potionBoard;
@@ -89,6 +89,7 @@ public class PotionBoard : MonoBehaviour
 
     void Start()
     {
+        _StageManager.MakeStageBoardSetupData();
         StageSetup();
 
         // 초기 보드 세팅
@@ -144,7 +145,7 @@ public class PotionBoard : MonoBehaviour
     void StageSetup()
     {
         // 스테이지 매니저에서 세팅값 받아옴
-        StageData stageData = _StageManager.stageData;
+        StageBoardData stageData = _StageManager.stageBoardData;
         width = stageData.mapWidth;
         height = stageData.mapHeight;
         stageNormalBlockLength = stageData.appearedBlockList.Length;
@@ -455,10 +456,10 @@ public class PotionBoard : MonoBehaviour
 
             // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
             PuzzleManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves);
-            bag1SubtractCount = 0;
-            bag2SubtractCount = 0;
-            bag3SubtractCount = 0;
-            bag4SubtractCount = 0;
+            //bag1SubtractCount = 0;
+            //bag2SubtractCount = 0;
+            //bag3SubtractCount = 0;
+            //bag4SubtractCount = 0;
 
             yield return new WaitForSeconds(0.6f);
         }

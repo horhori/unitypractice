@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static StageManager;
 
 // TODO : 1. PuzzleManager에 있는 Stage 관련 옮겨오기
 //        2. 스테이지 세팅 -> 임시 DB에서 데이터 가져와서 해당 스테이지로 적용
@@ -19,16 +20,17 @@ public class StageManager : MonoBehaviour, IManager
     // 현재 스테이지
     public int stageNumber { get; set; }
 
-    public StageData stageData { get; set; }
+    public StageBoardData stageBoardData { get; set; }
+
+    public StageTimeData stageTimeData { get; set; }
 
     private void Start()
     {
-        StageSetup();
+        //StageBoardSetup();
     }
 
-    public void StageSetup()
+    public void MakeStageBoardSetupData()
     {
-        Debug.Log(stageNumber);
         int mapWidth;
         int mapHeight;
         PotionType[] appearedBlockList;
@@ -83,7 +85,46 @@ public class StageManager : MonoBehaviour, IManager
 
         }
 
-        stageData = new StageData(stageNumber, mapWidth, mapHeight, appearedBlockList, goalBags, rewardGold);
+        stageBoardData = new StageBoardData(stageNumber, mapWidth, mapHeight, appearedBlockList, goalBags, rewardGold);
+    }
+
+    public void MakeStageTimeSetupData()
+    {
+        int min;
+        float sec;
+
+        switch (stageNumber)
+        {
+
+
+            case 1:
+                min = 0;
+                sec = 30.0f;
+                break;
+            case 2:
+                min = 1;
+                sec = 0f;
+                break;
+            case 3:
+                min = 1;
+                sec = 30.0f;
+                break;
+            case 4:
+                min = 2;
+                sec = 0f;
+                break;
+            case 5:
+                min = 2;
+                sec = 30.0f;
+                break;
+            // 스테이지 0(테스트, puzzleScene에서 바로 실행)인 경우 스테이지 1로 적용
+            default:
+                min = 0;
+                sec = 30.0f;
+                break;
+        }
+
+        stageTimeData = new StageTimeData(min, sec);
     }
 
     public void StageClearReward()
@@ -94,7 +135,7 @@ public class StageManager : MonoBehaviour, IManager
     }
 }
 
-public struct StageData
+public struct StageBoardData
 {
     public int stageNumber { get; set; }
     public int mapWidth { get; set; }
@@ -103,7 +144,7 @@ public struct StageData
     public GoalBag[] goalBags { get; set; }
     public int rewardGold { get; set; }
 
-    public StageData(int _stageNumber, int _mapWidth, int _mapHeight, PotionType[] _appearedBlockList, GoalBag[] _goalBags, int _rewardGold)
+    public StageBoardData(int _stageNumber, int _mapWidth, int _mapHeight, PotionType[] _appearedBlockList, GoalBag[] _goalBags, int _rewardGold)
     {
         stageNumber = _stageNumber;
         mapWidth = _mapWidth;
@@ -111,6 +152,18 @@ public struct StageData
         appearedBlockList = _appearedBlockList;
         goalBags = _goalBags;
         rewardGold = _rewardGold;
+    }
+}
+
+public struct StageTimeData
+{
+    public int min { get; set; }
+    public float sec { get; set; }
+
+    public StageTimeData(int _min, float _sec)
+    {
+        min = _min;
+        sec = _sec;
     }
 }
 
@@ -199,3 +252,8 @@ public class BoardBag
 //a40001	5스테이지 해금	
 //a40001	골드	            400
 //a50001	골드	            500
+
+// 스테이지별 시간초
+//
+//
+//
