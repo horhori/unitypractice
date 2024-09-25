@@ -46,13 +46,8 @@ public class PotionBoard : MonoBehaviour
     // 해당 스테이지 세팅 바구니 목록
     public GameObject[] stageBags;
 
-    // TODO : 1. 바구니 컴포넌트 및 랜덤하게 세팅 해결 필요
     // 바구니 색깔 별 제거한 갯수 증가값
     public int[] bagsSubtractCounts;
-    //private int bag1SubtractCount = 0; // RedBlock
-    //private int bag2SubtractCount = 0; // GreenBlock
-    //private int bag3SubtractCount = 0; // PinkBlock
-    //private int bag4SubtractCount = 0; // RedBlock
 
     // 블럭보드
     public Node[,] potionBoard;
@@ -61,6 +56,7 @@ public class PotionBoard : MonoBehaviour
     // 매칭되었을 때 제거할 블럭 목록
     // 매칭되는 블럭들을 추가후 제거하고 비우고 반복
     // 초기 세팅시에서밖에 사용 안하는중
+    // 게임 중에는 FindMatches의 potionsToRemove 사용중
     public List<GameObject> potionsToDestroy = new();
 
     // unity 상에서 선택된 블럭 확인할 수 있게 SerializeField(직렬화) 사용
@@ -456,10 +452,6 @@ public class PotionBoard : MonoBehaviour
 
             // 현재 제거되는 블럭 당 1점으로 점수 카운트 됨
             PuzzleManager.Instance.ProcessTurn(findMatches.potionsToRemove.Count, _subtractMoves);
-            //bag1SubtractCount = 0;
-            //bag2SubtractCount = 0;
-            //bag3SubtractCount = 0;
-            //bag4SubtractCount = 0;
 
             yield return new WaitForSeconds(0.6f);
         }
@@ -486,29 +478,7 @@ public class PotionBoard : MonoBehaviour
                     bag.UpdateCount();
                 }
             }
-            //for (int i = 0; i < stageGoalBags.Count(); i++)
-            //{
-            //    if (potion.potionType == stageGoalBags[i].targetBlock)
-            //    {
-            //        stageGoalBags[i].currentNumber++;
-            //    }
-            //}
-            //if (potion.potionType == PotionType.RedBlock)
-            //{
-            //    bag1SubtractCount++;
-            //}
-            //if (potion.potionType == PotionType.OrangeBlock)
-            //{
-            //    bag2SubtractCount++;
-            //}
-            //if (potion.potionType == PotionType.YellowBlock)
-            //{
-            //    bag3SubtractCount++;
-            //}
-            //if (potion.potionType == PotionType.GreenBlock)
-            //{
-            //    bag4SubtractCount++;
-            //}
+
             // getting it's x and y indicies and storing them
             int _xIndex = potion.xIndex;
             int _yIndex = potion.yIndex;

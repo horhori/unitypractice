@@ -38,17 +38,6 @@ public class PuzzleManager : MonoBehaviour
     // TODO : 1. 나중에 따로 bag 컴포넌트로 관리 필요
     public GameObject[] bagPrefabs;
 
-    //public GameObject bag1;
-    //private TMP_Text bag1Text;
-    //private Image bag1ClearImage;
-    //private int bag1CurrentCount;
-    //[SerializeField]
-    //private int bag1GoalCount; // 1 stage 15
-    //public PotionType bag1Type;
-    //private bool bag1Check; // currentCount == GoalCount 되면 check됨
-
-    //private Image[] bagImageList;
-
     private void Awake()
     {
         Instance = this;
@@ -128,25 +117,6 @@ public class PuzzleManager : MonoBehaviour
 
         points += _pointsToGain;
 
-        //for (int i=0; i<board.stageBagLength; i++)
-        //{
-        //    Bag bag = board.stageBags[i].GetComponent<Bag>();
-
-        //}
-
-
-        //bag1CurrentCount += _bag1AddCount;
-        //if (bag1CurrentCount >= bag1GoalCount)
-        //{
-        //    bag1CurrentCount = bag1GoalCount;
-        //    bag1Check = true;
-        //}
-
-        //// TODO : 1. 스테이지 별 모든 보석 개수 체크 함수 만들기(bag1만 체크하지 말구)
-        //if (bag1Check)
-        //{
-        //    StageClear();
-        //}
         for (int i = 0; i < board.stageBagLength; i++)
         {
             Bag bag = board.stageBags[i].GetComponent<Bag>();

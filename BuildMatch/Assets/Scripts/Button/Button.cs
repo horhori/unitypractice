@@ -69,4 +69,21 @@ public class Button : MonoBehaviour
         _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
     #endregion
+
+    #region StageScene
+    public void OnNextStageButtonClicked()
+    {
+
+    }
+
+    public void OnRestartButtonClicked()
+    {
+
+    }
+
+    public void OnStageSelectButtonClicked()
+    {
+
+    }
+    #endregion
 }
