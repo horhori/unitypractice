@@ -256,11 +256,9 @@ public class FindMatches : MonoBehaviour
 
                     BlockCombination newBlockCombination = new BlockCombination(PotionType.Bomb, extraConnectedPotions);
 
-                    Debug.Log("폭탄 생성");
-                    Debug.Log(newBlockCombination.CombinedBlocks[0]);
-                    Debug.Log(newBlockCombination.SpecialPotionType);
-
                     blockCombinationToRemove.Add(newBlockCombination);
+
+                    CheckBlockCombinationToRemove();
 
                     return new MatchResult
                     {
@@ -314,6 +312,55 @@ public class FindMatches : MonoBehaviour
     }
 
     // 블럭 타입이 일치하는지 확인 후 Match 결과 반환
+    // 기존 IsConnected에서는 특수 블럭 생성때문에 각 경우를 체크해서 반환했는데
+    // 3개 이상 있는 경우 보드 초기화되므로 간단하게 처리하도록 따로 함수 만들었음
+    public MatchResult IsInitializeConnected(Potion potion)
+    {
+        List<Potion> connectedPotions = new()
+        {
+            potion
+        };
+
+        // 가로 체크
+        CheckHorizontalMatch(potion, connectedPotions);
+
+        if (connectedPotions.Count >= 3)
+        {
+            return new MatchResult
+            {
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Horizontal_3
+            };
+        }
+
+        connectedPotions.Clear();
+
+        connectedPotions.Add(potion);
+
+        // 세로 체크
+        CheckVerticalMatch(potion, connectedPotions);
+
+        // 우선 순위 적용
+        // 1. 5 이상 세로 매치 : 프리즘
+        if (connectedPotions.Count >= 3)
+        {
+            return new MatchResult
+            {
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Vertical_3
+            };
+        }
+        else
+        {
+            return new MatchResult
+            {
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.None
+            };
+        }
+    }
+
+    // 블럭 타입이 일치하는지 확인 후 Match 결과 반환
     public MatchResult IsConnected(Potion potion)
     {
         List<Potion> connectedPotions = new()
@@ -334,11 +381,9 @@ public class FindMatches : MonoBehaviour
 
             BlockCombination newBlockCombination = new BlockCombination(PotionType.Prism, connectedPotions);
 
-            Debug.Log("프리즘 생성");
-            Debug.Log(newBlockCombination.CombinedBlocks[0]);
-            Debug.Log(newBlockCombination.SpecialPotionType);
-
             blockCombinationToRemove.Add(newBlockCombination);
+
+            CheckBlockCombinationToRemove();
 
             return new MatchResult
             {
@@ -357,11 +402,9 @@ public class FindMatches : MonoBehaviour
 
             BlockCombination newBlockCombination = new BlockCombination(PotionType.DrillHorizontal, connectedPotions);
 
-            Debug.Log("드릴 가로 생성");
-            Debug.Log(newBlockCombination.CombinedBlocks[0]);
-            Debug.Log(newBlockCombination.SpecialPotionType);
-
             blockCombinationToRemove.Add(newBlockCombination);
+
+            CheckBlockCombinationToRemove();
 
             return new MatchResult
             {
@@ -395,11 +438,9 @@ public class FindMatches : MonoBehaviour
 
             BlockCombination newBlockCombination = new BlockCombination(PotionType.Prism, connectedPotions);
 
-            Debug.Log("프리즘 생성");
-            Debug.Log(newBlockCombination.CombinedBlocks[0]);
-            Debug.Log(newBlockCombination.SpecialPotionType);
-
             blockCombinationToRemove.Add(newBlockCombination);
+
+            CheckBlockCombinationToRemove();
 
             return new MatchResult
             {
@@ -414,11 +455,9 @@ public class FindMatches : MonoBehaviour
 
             BlockCombination newBlockCombination = new BlockCombination(PotionType.DrillVertical, connectedPotions);
 
-            Debug.Log("드릴 세로 생성");
-            Debug.Log(newBlockCombination.CombinedBlocks[0]);
-            Debug.Log(newBlockCombination.SpecialPotionType);
-
             blockCombinationToRemove.Add(newBlockCombination);
+
+            CheckBlockCombinationToRemove();
 
             return new MatchResult
             {
@@ -449,11 +488,9 @@ public class FindMatches : MonoBehaviour
 
             BlockCombination newBlockCombination = new BlockCombination(PotionType.PickRight, connectedPotions);
 
-            Debug.Log("곡괭이 생성");
-            Debug.Log(newBlockCombination.CombinedBlocks[0]);
-            Debug.Log(newBlockCombination.SpecialPotionType);
-
             blockCombinationToRemove.Add(newBlockCombination);
+
+            CheckBlockCombinationToRemove();
 
             return new MatchResult
             {
@@ -1384,6 +1421,20 @@ public class FindMatches : MonoBehaviour
         if (IsSpecialBlock(potion.potionType))
         {
             _blocks.AddRange(RunSpecialBlock(potion));
+        }
+    }
+
+    // 임시 특수 블럭 체크 메서드
+    void CheckBlockCombinationToRemove()
+    {
+        Debug.Log("현재 총 개수 : " + blockCombinationToRemove.Count);
+        Debug.Log("===========================================");
+        int count = 1;
+
+        foreach (BlockCombination bc in blockCombinationToRemove)
+        {
+            Debug.Log(count++ + "번째");
+            Debug.Log("생성해야 할 특수블럭 타입 : " + bc.SpecialPotionType);
         }
     }
 }

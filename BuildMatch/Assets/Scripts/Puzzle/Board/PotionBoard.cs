@@ -276,7 +276,7 @@ public class PotionBoard : MonoBehaviour
                     {
                         // run some matching logic
 
-                        MatchResult matchedPotions = findMatches.IsConnected(potion);
+                        MatchResult matchedPotions = findMatches.IsInitializeConnected(potion);
 
                         if (matchedPotions.connectedPotions.Count >= 3)
                         {   
