@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class FindMatches : MonoBehaviour
@@ -13,19 +14,19 @@ public class FindMatches : MonoBehaviour
     public List<Potion> potionsToRemove = new();
 
     // 특수블럭 생성된 후 제거되는 조합 모음
-    public List<BlockCombination> blockCombinationToRemove = new();
+    //public List<BlockCombination> blockCombinationToRemove = new();
 
     // 특수블럭 생성 여부
     // 4 가로 체크 후 드릴(가로) 생성
-    public bool isCheckedHorizontal_4 = false;
-    // 4 세로 체크 후 드릴(가로) 생성
-    public bool isCheckedVertical_4 = false;
-    // 네모 체크 후 곡괭이 생성
-    public bool isCheckedSquare = false;
-    // 5 가로, 세로 체크 후 프리즘 생성
-    public bool isCheckedMatched_5 = false;
-    // 5 L자 체크 후 폭탄 생성
-    public bool isCheckedSuper = false;
+    //public bool isCheckedHorizontal_4 = false;
+    //// 4 세로 체크 후 드릴(가로) 생성
+    //public bool isCheckedVertical_4 = false;
+    //// 네모 체크 후 곡괭이 생성
+    //public bool isCheckedSquare = false;
+    //// 5 가로, 세로 체크 후 프리즘 생성
+    //public bool isCheckedMatched_5 = false;
+    //// 5 L자 체크 후 폭탄 생성
+    //public bool isCheckedSuper = false;
 
 
     void Awake()
@@ -209,15 +210,29 @@ public class FindMatches : MonoBehaviour
 
                             potionsToRemove.AddRange(superMatchedPotions.connectedPotions);
 
-                            // TODO : 1. 이거 없어도 되는지 체크 필요
                             foreach (Potion pot in superMatchedPotions.connectedPotions)
                             {
                                 pot.isMatched = true;
+
+                                // MatchDirection에 따라서 바뀔 특수블럭 정보 Potion에 저장
+                                if (pot.isChangedBlock)
+                                {
+                                    pot.SetChangedSpecialBlockType(matchedPotions.direction);
+
+                                    // 두개 이상 블럭 움직였을 때 중복 특수블럭 생성 방지용 isChangedBlock false로 만듬
+                                    foreach (Potion pot2 in superMatchedPotions.connectedPotions)
+                                    {
+                                        pot2.isChangedBlock = false;
+                                    }
+                                }
                             }
 
                             hasMatched = true;
                         }
                     }
+
+                    // 매칭 체크 후 블럭 제거로 인해 체크한 isChangedBlock false로 만듬
+                    potion.isChangedBlock = false;
                 }
             }
         }
@@ -249,16 +264,10 @@ public class FindMatches : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    isCheckedSuper = true;
+                    //isCheckedSuper = true;
                     // 폭탄 생성
 
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
-
-                    BlockCombination newBlockCombination = new BlockCombination(PotionType.Bomb, extraConnectedPotions);
-
-                    blockCombinationToRemove.Add(newBlockCombination);
-
-                    CheckBlockCombinationToRemove();
 
                     return new MatchResult
                     {
@@ -286,7 +295,7 @@ public class FindMatches : MonoBehaviour
 
                 if (extraConnectedPotions.Count >= 2)
                 {
-                    isCheckedSuper = true;
+                    //isCheckedSuper = true;
                     extraConnectedPotions.AddRange(_matchedResults.connectedPotions);
 
                     return new MatchResult
@@ -340,8 +349,6 @@ public class FindMatches : MonoBehaviour
         // 세로 체크
         CheckVerticalMatch(potion, connectedPotions);
 
-        // 우선 순위 적용
-        // 1. 5 이상 세로 매치 : 프리즘
         if (connectedPotions.Count >= 3)
         {
             return new MatchResult
@@ -350,6 +357,25 @@ public class FindMatches : MonoBehaviour
                 direction = MatchDirection.Vertical_3
             };
         }
+
+        connectedPotions.Clear();
+
+        connectedPotions.Add(potion);
+
+        // 4 이상 네모 : 곡괭이 체크
+        CheckSquareMatch(potion, connectedPotions);
+
+        if (connectedPotions.Count >= 4)
+        {
+            //isCheckedSquare = true;
+
+            return new MatchResult
+            {
+                connectedPotions = connectedPotions,
+                direction = MatchDirection.Square
+            };
+        }
+
         else
         {
             return new MatchResult
@@ -377,13 +403,13 @@ public class FindMatches : MonoBehaviour
         // 1. 5 이상 가로 매치 : 프리즘
         if (connectedPotions.Count >= 5)
         {
-            isCheckedMatched_5 = true;
+            //isCheckedMatched_5 = true;
 
-            BlockCombination newBlockCombination = new BlockCombination(PotionType.Prism, connectedPotions);
+            //BlockCombination newBlockCombination = new BlockCombination(PotionType.Prism, connectedPotions);
 
-            blockCombinationToRemove.Add(newBlockCombination);
+            //blockCombinationToRemove.Add(newBlockCombination);
 
-            CheckBlockCombinationToRemove();
+            //CheckBlockCombinationToRemove();
 
             return new MatchResult
             {
@@ -398,13 +424,7 @@ public class FindMatches : MonoBehaviour
         {
             // 4 이상 가로 매치
 
-            isCheckedHorizontal_4 = true;
-
-            BlockCombination newBlockCombination = new BlockCombination(PotionType.DrillHorizontal, connectedPotions);
-
-            blockCombinationToRemove.Add(newBlockCombination);
-
-            CheckBlockCombinationToRemove();
+            //isCheckedHorizontal_4 = true;
 
             return new MatchResult
             {
@@ -434,13 +454,7 @@ public class FindMatches : MonoBehaviour
         // 1. 5 이상 세로 매치 : 프리즘
         if (connectedPotions.Count >= 5)
         {
-            isCheckedMatched_5 = true;
-
-            BlockCombination newBlockCombination = new BlockCombination(PotionType.Prism, connectedPotions);
-
-            blockCombinationToRemove.Add(newBlockCombination);
-
-            CheckBlockCombinationToRemove();
+            //isCheckedMatched_5 = true;
 
             return new MatchResult
             {
@@ -451,13 +465,7 @@ public class FindMatches : MonoBehaviour
         // 2. 4 세로 매치 : 드릴 세로
         else if (connectedPotions.Count == 4)
         {
-            isCheckedVertical_4 = true;
-
-            BlockCombination newBlockCombination = new BlockCombination(PotionType.DrillVertical, connectedPotions);
-
-            blockCombinationToRemove.Add(newBlockCombination);
-
-            CheckBlockCombinationToRemove();
+            //isCheckedVertical_4 = true;
 
             return new MatchResult
             {
@@ -484,13 +492,7 @@ public class FindMatches : MonoBehaviour
 
         if (connectedPotions.Count >= 4)
         {
-            isCheckedSquare = true;
-
-            BlockCombination newBlockCombination = new BlockCombination(PotionType.PickRight, connectedPotions);
-
-            blockCombinationToRemove.Add(newBlockCombination);
-
-            CheckBlockCombinationToRemove();
+            //isCheckedSquare = true;
 
             return new MatchResult
             {
@@ -1425,18 +1427,18 @@ public class FindMatches : MonoBehaviour
     }
 
     // 임시 특수 블럭 체크 메서드
-    void CheckBlockCombinationToRemove()
-    {
-        Debug.Log("현재 총 개수 : " + blockCombinationToRemove.Count);
-        Debug.Log("===========================================");
-        int count = 1;
+    //void CheckBlockCombinationToRemove()
+    //{
+    //    Debug.Log("현재 총 개수 : " + blockCombinationToRemove.Count);
+    //    Debug.Log("===========================================");
+    //    int count = 1;
 
-        foreach (BlockCombination bc in blockCombinationToRemove)
-        {
-            Debug.Log(count++ + "번째");
-            Debug.Log("생성해야 할 특수블럭 타입 : " + bc.SpecialPotionType);
-        }
-    }
+    //    foreach (BlockCombination bc in blockCombinationToRemove)
+    //    {
+    //        Debug.Log(count++ + "번째");
+    //        Debug.Log("생성해야 할 특수블럭 타입 : " + bc.SpecialPotionType);
+    //    }
+    //}
 }
 
 public class MatchResult
@@ -1445,39 +1447,41 @@ public class MatchResult
     public MatchDirection direction;
 }
 
-public class BlockCombination
-{
-    // 생성해야 할 특수블럭 타입
-    public PotionType SpecialPotionType;
+//public class BlockCombination
+//{
+//    // 생성해야 할 특수블럭 타입
+//    public PotionType SpecialPotionType;
 
-    // 연결된 블럭들 -> 애니메이션 적용해야 함
-    public List<Potion> CombinedBlocks;
+//    // 연결된 블럭들 -> 애니메이션 적용해야 함
+//    public List<Potion> CombinedBlocks;
 
-    // 특수블럭 생성될 위치
-    public int xIndex;
-    public int yIndex;
+//    // 특수블럭 생성될 위치
+//    public int xIndex;
+//    public int yIndex;
 
-    public BlockCombination(PotionType _SpecialPotionType, List<Potion> _CombinedBlocks)
-    {
-        SpecialPotionType = _SpecialPotionType;
-        CombinedBlocks = _CombinedBlocks;
+//    public BlockCombination(PotionType _SpecialPotionType, List<Potion> _CombinedBlocks)
+//    {
+//        Debug.Log("생성자 실행");
+//        SpecialPotionType = _SpecialPotionType;
+//        CombinedBlocks = _CombinedBlocks;
 
-        foreach(Potion pot in CombinedBlocks)
-        {
-            if (pot.isMoving)
-            {
-                Debug.Log("특수블럭 생성될 x 위치 : " + pot.xIndex);
-                Debug.Log("특수블럭 생성될 y 위치 : " + pot.yIndex);
-            }
-        }
-    }
+//        foreach(Potion pot in CombinedBlocks)
+//        {
+//            if (pot.isChangedBlock)
+//            {
+//                Debug.Log("움직인 블럭 : " + pot);
+//                Debug.Log("특수블럭 생성될 x 위치 : " + pot.xIndex);
+//                Debug.Log("특수블럭 생성될 y 위치 : " + pot.yIndex);
+//            }
+//        }
+//    }
 
-    public void SetIndicies(int _xIndex, int _yIndex)
-    {
-        xIndex = _xIndex;
-        yIndex = _yIndex;
-    }
-}
+//    public void SetIndicies(int _xIndex, int _yIndex)
+//    {
+//        xIndex = _xIndex;
+//        yIndex = _yIndex;
+//    }
+//}
 
 
 // 족보 : 3배열, 4배열 직선, 4배열 네모, 5배열 직선, 5배열 L자 (시스템 기획서 27P)

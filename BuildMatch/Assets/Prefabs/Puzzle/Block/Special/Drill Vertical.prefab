@@ -55,7 +55,9 @@ MonoBehaviour:
   currentSwipeable: 0
   swipeAngle: 0
   swipeResist: 0
-  isMoving: 0
+  isSwipeMoving: 0
+  isChangedBlock: 0
+  changedSpecialBlockType: 13
   sprites:
   - {fileID: 21300000, guid: 7385ef66e31e724478c8efa47d9471ee, type: 3}
   - {fileID: 21300000, guid: 963102471a2603042b936ff950baea90, type: 3}

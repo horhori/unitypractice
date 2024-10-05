@@ -4616,7 +4616,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1217580713}
         m_TargetAssemblyTypeName: Button, Assembly-CSharp
-        m_MethodName: OnMapButtonClicked
+        m_MethodName: OnStage1ButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

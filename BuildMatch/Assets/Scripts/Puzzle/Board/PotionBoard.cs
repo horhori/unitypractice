@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
 
 public class PotionBoard : MonoBehaviour
 {
@@ -85,6 +88,7 @@ public class PotionBoard : MonoBehaviour
 
     void Start()
     {
+        // Setup
         _StageManager.MakeStageBoardSetupData();
         StageSetup();
 
@@ -92,48 +96,17 @@ public class PotionBoard : MonoBehaviour
         InitializeBoard();
 
         // 초기 생성 때 매칭 로직에서 나중에 할거랑 겹쳐서 임시로 처리
-        findMatches.isCheckedVertical_4 = false;
-        findMatches.isCheckedHorizontal_4 = false;
-        findMatches.isCheckedSquare = false;
-        findMatches.isCheckedSuper = false;
-        findMatches.isCheckedMatched_5 = false;
+        //findMatches.isCheckedVertical_4 = false;
+        //findMatches.isCheckedHorizontal_4 = false;
+        //findMatches.isCheckedSquare = false;
+        //findMatches.isCheckedSuper = false;
+        //findMatches.isCheckedMatched_5 = false;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            SelectPotion();
-        }
-
-        if (Input.GetMouseButtonUp(0) && selectedPotion)
-        {
-
-            // 입력값(각도)을 계산하여 Run
-            if (selectedPotion.currentSwipeable)
-            {
-                RunInput();
-            }
-            else
-            {
-                if (findMatches.IsSpecialBlock(selectedPotion.potionType))
-                {
-                    isProcessMoving = true;
-                    StartCoroutine(ProcessOriginMatches(selectedPotion));
-                }
-            }
-        }
-
-        // 특수 블럭 조합 효과 테스트용
-        if (Input.GetMouseButtonDown(1))
-        {
-            SelectPotion();
-        }
-
-        if (Input.GetMouseButtonUp(1) && selectedPotion)
-        {
-            StartCoroutine(TestProcessOriginSpecialMatches(selectedPotion));
-        }
+        // Swapping Potions
+        UpdateInputMouse();
     }
 
     #region Setup
@@ -294,6 +267,47 @@ public class PotionBoard : MonoBehaviour
 
     #region Swapping Potions
 
+    // Update마다 Input 체크
+    private void UpdateInputMouse()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            SelectPotion();
+        }
+
+        if (Input.GetMouseButtonUp(0) && selectedPotion)
+        {
+
+            // 입력값(각도)을 계산하여 Run
+            if (selectedPotion.currentSwipeable)
+            {
+                RunInput();
+            }
+            else
+            {
+                if (findMatches.IsSpecialBlock(selectedPotion.potionType))
+                {
+                    isProcessMoving = true;
+                    //
+                    selectedPotion.isChangedBlock = true;
+                    //
+                    StartCoroutine(ProcessOriginMatches(selectedPotion));
+                }
+            }
+        }
+
+        // 특수 블럭 조합 효과 테스트용
+        if (Input.GetMouseButtonDown(1))
+        {
+            SelectPotion();
+        }
+
+        if (Input.GetMouseButtonUp(1) && selectedPotion)
+        {
+            StartCoroutine(TestProcessOriginSpecialMatches(selectedPotion));
+        }
+    }
+
     // Update에서 마우스 클릭 시 SelectPotion() 메서드로 선택한 블럭 저장
     private void SelectPotion()
     {
@@ -358,6 +372,11 @@ public class PotionBoard : MonoBehaviour
         // 바꾼 다음에 매칭이 일어나고 블럭이 제거되는 동안 true
         isProcessMoving = true;
 
+        //
+        _currentPotion.isChangedBlock = true;
+        _targetPotion.isChangedBlock = true;
+        //
+
         // startCoroutine ProcessMatches.
         StartCoroutine(ProcessSwapMatches(_currentPotion, _targetPotion));
     }
@@ -399,6 +418,10 @@ public class PotionBoard : MonoBehaviour
             // 매칭이 일어나지 않은 경우 다시 스왑
             DoSwap(_currentPotion, _targetPotion);
             isProcessMoving = false;
+            //
+            _currentPotion.isChangedBlock = false;
+            _targetPotion.isChangedBlock = false;
+            //
         }
 
         //isProcessingMove = false;
@@ -438,6 +461,9 @@ public class PotionBoard : MonoBehaviour
         if (findMatches.potionsToRemove.Count > 0)
         {
             isProcessMoving = true;
+            // 여기서 블럭들 제거되고 움직일 때 움직인 블럭들 체킹해야 됨
+
+            //
 
             foreach (Potion potionToRemove in findMatches.potionsToRemove)
             {
@@ -467,7 +493,6 @@ public class PotionBoard : MonoBehaviour
     // 블럭 지워지고 다시 생성
     private void RemoveBlock(List<Potion> _potionsToRemove)
     {
-        // TODO: 1.목표 바구니 세팅에 따라 해당 기능 재구성 필요
         foreach (Potion potion in _potionsToRemove)
         {
             for (int i=0; i<stageBagLength; i++)
@@ -483,11 +508,14 @@ public class PotionBoard : MonoBehaviour
             int _xIndex = potion.xIndex;
             int _yIndex = potion.yIndex;
 
+            PotionType changedSpecialPotionType = potion.changedSpecialBlockType;
+
             // Destroy the potion
             Destroy(potion.gameObject);
 
             _RemoveBlockEffect = GameObject.Find("RemoveBlockEffectPool").GetComponent<RemoveBlockEffectPool>();
 
+            // 애니메이션 끝까지 실행
             if (_RemoveBlockEffect != null)
             {
                 _RemoveBlockEffect.PlayEffect(potion.transform.position);
@@ -495,6 +523,24 @@ public class PotionBoard : MonoBehaviour
 
             // Create a blank node on the potion board
             potionBoard[_xIndex, _yIndex] = new Node(true, null);
+
+            // 특수 블럭 생성되어야 하는 경우 생성
+            if (changedSpecialPotionType != PotionType.None)
+            {
+                Vector2 position = new Vector2(_xIndex - spacingX, _yIndex - spacingY);
+                GameObject newPotion = Instantiate(potionPrefabs[(int)changedSpecialPotionType], position, Quaternion.identity);
+
+                newPotion.transform.SetParent(potionParent.transform);
+                newPotion.name = "[" + _xIndex + ", " + _yIndex + "]" + newPotion.name;
+
+                newPotion.GetComponent<Potion>().potionType = changedSpecialPotionType;
+
+                // set indicies
+                newPotion.GetComponent<Potion>().SetIndicies(_xIndex, _yIndex);
+
+                // set it on the potion board
+                potionBoard[_xIndex, _yIndex] = new Node(true, newPotion);
+            }
         }
     }
 
@@ -751,68 +797,68 @@ public class PotionBoard : MonoBehaviour
     // FindMatches가 가지고 있는 특수 블록 생성 여부에 따라서 해당 블럭 우선 생성
     private int MakeBlock()
     {
-        // 특수 블럭인 경우
-        if (findMatches.isCheckedHorizontal_4)
-        {
-            return MakeDrillHorizontal();
-        }
-        else if (findMatches.isCheckedVertical_4)
-        {
-            return MakeDrillVertical();
-        }
-        else if (findMatches.isCheckedSquare)
-        {
-            return MakePickRight();
-        }
-        else if (findMatches.isCheckedMatched_5)
-        {
-            return MakePrism();
-        }
-        else if (findMatches.isCheckedSuper)
-        {
-            return MakeBomb();
-        }
+        //// 특수 블럭인 경우
+        //if (findMatches.isCheckedHorizontal_4)
+        //{
+        //    return MakeDrillHorizontal();
+        //}
+        //else if (findMatches.isCheckedVertical_4)
+        //{
+        //    return MakeDrillVertical();
+        //}
+        //else if (findMatches.isCheckedSquare)
+        //{
+        //    return MakePickRight();
+        //}
+        //else if (findMatches.isCheckedMatched_5)
+        //{
+        //    return MakePrism();
+        //}
+        //else if (findMatches.isCheckedSuper)
+        //{
+        //    return MakeBomb();
+        //}
         // 일반 블럭인 경우
 
         return Random.Range(0, stageNormalBlockLength);
     }
 
-    private int MakeDrillHorizontal()
-    {
-        findMatches.isCheckedHorizontal_4 = false;
-        return (int)PotionType.DrillHorizontal;
-    }
+    //private int MakeDrillHorizontal()
+    //{
+    //    findMatches.isCheckedHorizontal_4 = false;
+    //    return (int)PotionType.DrillHorizontal;
+    //}
 
-    private int MakeDrillVertical()
-    {
-        findMatches.isCheckedVertical_4 = false;
-        return (int)PotionType.DrillVertical;
-    }
+    //private int MakeDrillVertical()
+    //{
+    //    findMatches.isCheckedVertical_4 = false;
+    //    return (int)PotionType.DrillVertical;
+    //}
 
-    private int MakePickLeft()
-    {
-        findMatches.isCheckedSquare = false;
-        return (int)PotionType.PickLeft;
-    }
+    //private int MakePickLeft()
+    //{
+    //    findMatches.isCheckedSquare = false;
+    //    return (int)PotionType.PickLeft;
+    //}
 
-    // 곡괭이 생성 위치는 논의
-    private int MakePickRight()
-    {
-        findMatches.isCheckedSquare = false;
-        return (int)PotionType.PickRight;
-    }
+    //// 곡괭이 생성 위치는 논의
+    //private int MakePickRight()
+    //{
+    //    findMatches.isCheckedSquare = false;
+    //    return (int)PotionType.PickRight;
+    //}
 
-    private int MakePrism()
-    {
-        findMatches.isCheckedMatched_5 = false;
-        return (int)PotionType.Prism;
-    }
+    //private int MakePrism()
+    //{
+    //    findMatches.isCheckedMatched_5 = false;
+    //    return (int)PotionType.Prism;
+    //}
 
-    private int MakeBomb()
-    {
-        findMatches.isCheckedSuper = false;
-        return (int)PotionType.Bomb;
-    }
+    //private int MakeBomb()
+    //{
+    //    findMatches.isCheckedSuper = false;
+    //    return (int)PotionType.Bomb;
+    //}
 
     #endregion
 }

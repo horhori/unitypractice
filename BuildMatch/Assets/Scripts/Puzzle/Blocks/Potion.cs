@@ -31,7 +31,13 @@ public class Potion : MonoBehaviour
     public float swipeAngle = 0;
     public float swipeResist = 0.2f;
 
-    public bool isMoving;
+    // 유저가 드래그해서 움직인 블럭(해당 블럭과 스와이프로 바뀌는 블럭) -> 현재 클릭한 위치 블럭 애니메이션 체크
+    public bool isSwipeMoving;
+
+    // 현재 움직여온 블럭 -> 조합 체크 시 특수 블럭 생성될 위치 체크용
+    public bool isChangedBlock;
+
+    public PotionType changedSpecialBlockType;
 
     // 클릭했을 때 이미지 변경하기 위한 Sprite 모음
     [SerializeField]
@@ -42,7 +48,9 @@ public class Potion : MonoBehaviour
         xIndex = _x;
         yIndex = _y;
         currentSwipeable = false;
-        isMoving = false;
+        isSwipeMoving = false;
+        isChangedBlock = false;
+        changedSpecialBlockType = PotionType.None;
     }
 
     public void SetIndicies(int _x, int _y)
@@ -53,7 +61,7 @@ public class Potion : MonoBehaviour
 
     public void OnMouseDown()
     {
-        if (!isMoving)
+        if (!isSwipeMoving)
         {
             currentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
@@ -62,7 +70,7 @@ public class Potion : MonoBehaviour
     public void OnMouseDrag()
     {
         // 블럭 제거 끝날 때까지 마우스 클릭해도 블럭 빛나는 효과 적용 X
-        if (!isMoving && !PotionBoard.Instance.isProcessMoving)
+        if (!isSwipeMoving && !PotionBoard.Instance.isProcessMoving)
         {
             if (sprites.Length == 2)
             {
@@ -81,7 +89,7 @@ public class Potion : MonoBehaviour
 
     public void OnMouseUp()
     {
-        if (!isMoving)
+        if (!isSwipeMoving)
         {
             if (sprites.Length == 2)
             {
@@ -122,7 +130,8 @@ public class Potion : MonoBehaviour
  
     private IEnumerator MoveCoroutine(Vector2 _targetPos)
     {
-        isMoving = true;
+        isSwipeMoving = true;
+        isChangedBlock = true;
 
         Vector2 startPosition = transform.position;
 
@@ -147,7 +156,32 @@ public class Potion : MonoBehaviour
         }
 
         transform.position = _targetPos;
-        isMoving = false;
+        isSwipeMoving = false;
+    }
+
+    public void SetChangedSpecialBlockType(MatchDirection _matchDirection)
+    {
+        switch (_matchDirection)
+        {
+            case MatchDirection.Vertical_4:
+                changedSpecialBlockType = PotionType.DrillVertical; 
+                break;
+            case MatchDirection.Horizontal_4:
+                changedSpecialBlockType= PotionType.DrillHorizontal;
+                break;
+            case MatchDirection.LongVertical:
+                changedSpecialBlockType = PotionType.Prism;
+                break;
+            case MatchDirection.LongHorizontal:
+                changedSpecialBlockType= PotionType.Prism;
+                break;
+            case MatchDirection.Super:
+                changedSpecialBlockType = PotionType.Bomb;
+                break;
+            case MatchDirection.Square:
+                changedSpecialBlockType = PotionType.PickRight;
+                break;
+        }
     }
 }
 
@@ -168,4 +202,6 @@ public enum PotionType
     PickLeft, // 곡괭이 역대각(왼쪽 기울임)
     PickRight, // 곡괭이 대각(오른쪽 기울임)
     Prism, // 프리즘
+    // None : null 대신 활용
+    None
 }
