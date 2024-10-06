@@ -3724,11 +3724,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   potionsToRemove: []
-  isCheckedHorizontal_4: 0
-  isCheckedVertical_4: 0
-  isCheckedSquare: 0
-  isCheckedMatched_5: 0
-  isCheckedSuper: 0
 --- !u!4 &911737944
 Transform:
   m_ObjectHideFlags: 0
@@ -5289,7 +5284,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Level 1
+  m_text: Level X
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
