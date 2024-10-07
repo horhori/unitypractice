@@ -94,13 +94,6 @@ public class PotionBoard : MonoBehaviour
 
         // 초기 보드 세팅
         InitializeBoard();
-
-        // 초기 생성 때 매칭 로직에서 나중에 할거랑 겹쳐서 임시로 처리
-        //findMatches.isCheckedVertical_4 = false;
-        //findMatches.isCheckedHorizontal_4 = false;
-        //findMatches.isCheckedSquare = false;
-        //findMatches.isCheckedSuper = false;
-        //findMatches.isCheckedMatched_5 = false;
     }
 
     private void Update()
@@ -795,70 +788,11 @@ public class PotionBoard : MonoBehaviour
     #region 특수블럭 생성
 
     // FindMatches가 가지고 있는 특수 블록 생성 여부에 따라서 해당 블럭 우선 생성
+    // -> 특수 블럭은 따로 뺐음
     private int MakeBlock()
     {
-        //// 특수 블럭인 경우
-        //if (findMatches.isCheckedHorizontal_4)
-        //{
-        //    return MakeDrillHorizontal();
-        //}
-        //else if (findMatches.isCheckedVertical_4)
-        //{
-        //    return MakeDrillVertical();
-        //}
-        //else if (findMatches.isCheckedSquare)
-        //{
-        //    return MakePickRight();
-        //}
-        //else if (findMatches.isCheckedMatched_5)
-        //{
-        //    return MakePrism();
-        //}
-        //else if (findMatches.isCheckedSuper)
-        //{
-        //    return MakeBomb();
-        //}
-        // 일반 블럭인 경우
-
         return Random.Range(0, stageNormalBlockLength);
     }
-
-    //private int MakeDrillHorizontal()
-    //{
-    //    findMatches.isCheckedHorizontal_4 = false;
-    //    return (int)PotionType.DrillHorizontal;
-    //}
-
-    //private int MakeDrillVertical()
-    //{
-    //    findMatches.isCheckedVertical_4 = false;
-    //    return (int)PotionType.DrillVertical;
-    //}
-
-    //private int MakePickLeft()
-    //{
-    //    findMatches.isCheckedSquare = false;
-    //    return (int)PotionType.PickLeft;
-    //}
-
-    //// 곡괭이 생성 위치는 논의
-    //private int MakePickRight()
-    //{
-    //    findMatches.isCheckedSquare = false;
-    //    return (int)PotionType.PickRight;
-    //}
-
-    //private int MakePrism()
-    //{
-    //    findMatches.isCheckedMatched_5 = false;
-    //    return (int)PotionType.Prism;
-    //}
-
-    //private int MakeBomb()
-    //{
-    //    findMatches.isCheckedSuper = false;
-    //    return (int)PotionType.Bomb;
-    //}
 
     #endregion
 }
