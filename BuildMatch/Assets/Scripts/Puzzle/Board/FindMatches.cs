@@ -201,7 +201,7 @@ public class FindMatches : MonoBehaviour
                                 // MatchDirection에 따라서 바뀔 특수블럭 정보 Potion에 저장
                                 if (pot.isChangedBlock)
                                 {
-                                    pot.SetChangedSpecialBlockType(matchedPotions.direction);
+                                    pot.SetChangedSpecialBlockType(superMatchedPotions.direction);
 
                                     // 두개 이상 블럭 움직였을 때 중복 특수블럭 생성 방지용 isChangedBlock false로 만듬
                                     foreach (Potion pot2 in superMatchedPotions.connectedPotions)
@@ -377,9 +377,9 @@ public class FindMatches : MonoBehaviour
 
         // 우선 순위 적용 :
         // 1. 5개 이상 가로, 세로(프리즘)
-        // 2. L자, T자(폭탄)
+        // 2. L자, T자(폭탄) -> 이 메서드 벗어나서 체크
         // 3. 4개 이상 가로, 세로(드릴)
-        // 4. 네모(곡괭이)
+        // 4. 네모(곡괭이) -> 2개 이상 가로인 경우 체크
         // 5. 3개 이상 가로, 세로
 
         // 가로 체크
@@ -395,7 +395,7 @@ public class FindMatches : MonoBehaviour
             };
         }
 
-        // 2. 4 가로 매치 : 드릴 가로
+        // 3. 4 가로 매치 : 드릴 가로
 
         else if (connectedPotions.Count == 4)
         {
@@ -408,7 +408,7 @@ public class FindMatches : MonoBehaviour
 
         // 4. 네모
 
-        else if (connectedPotions.Count == 2)
+        else if (connectedPotions.Count >= 2)
         {
             List<Potion> newConnectedPotions = new()
             {
@@ -426,19 +426,32 @@ public class FindMatches : MonoBehaviour
                     direction = MatchDirection.Square
                 };
             } 
+
+            // 5. 3 가로 매치
+            if (connectedPotions.Count == 3)
+            {
+                // XOO
+                // OOO 인 경우 아래만 사라짐 -> 예외처리
+
+                return new MatchResult
+                {
+                    connectedPotions = connectedPotions,
+                    direction = MatchDirection.Horizontal_3
+                };
+            }
         }
 
         // 5. 3 가로 매치
-        else if (connectedPotions.Count == 3)
-        {
-            // 3줄일때 곡괭이 체크 따로 해야함
-            return new MatchResult
-            {
-                connectedPotions = connectedPotions,
-                direction = MatchDirection.Horizontal_3
-            };
+        //else if (connectedPotions.Count == 3)
+        //{
+        //    // 3줄일때 곡괭이 체크 따로 해야함
+        //    return new MatchResult
+        //    {
+        //        connectedPotions = connectedPotions,
+        //        direction = MatchDirection.Horizontal_3
+        //    };
 
-        }
+        //}
 
         connectedPotions.Clear();
 
@@ -467,16 +480,57 @@ public class FindMatches : MonoBehaviour
             };
         }
         // 4. 네모 체크
+        else if (connectedPotions.Count >= 2)
+        {
+            List<Potion> newConnectedPotions = new()
+            {
+                potion
+            };
+
+            // 4 이상 네모 : 곡괭이
+            CheckSquareMatch(potion, newConnectedPotions);
+
+            if (newConnectedPotions.Count >= 4)
+            {
+                return new MatchResult
+                {
+                    connectedPotions = newConnectedPotions,
+                    direction = MatchDirection.Square
+                };
+            }
+
+            // 5. 3 세로 매치
+            if (connectedPotions.Count == 3)
+            {
+                // OO
+                // OO
+                // OX인 경우 왼쪽만 사라짐 -> 예외처리
+                return new MatchResult
+                {
+                    connectedPotions = connectedPotions,
+                    direction = MatchDirection.Vertical_3
+                };
+            }
+
+            else
+            {
+                return new MatchResult
+                {
+                    connectedPotions = connectedPotions,
+                    direction = MatchDirection.None
+                };
+            }
+        }
 
         // 5. 3 세로 매치
-        if (connectedPotions.Count == 3)
-        {
-            return new MatchResult
-            {
-                connectedPotions = connectedPotions,
-                direction = MatchDirection.Vertical_3
-            };
-        }
+        //if (connectedPotions.Count == 3)
+        //{
+        //    return new MatchResult
+        //    {
+        //        connectedPotions = connectedPotions,
+        //        direction = MatchDirection.Vertical_3
+        //    };
+        //}
 
         //// 네모 체크
         //connectedPotions.Clear();
