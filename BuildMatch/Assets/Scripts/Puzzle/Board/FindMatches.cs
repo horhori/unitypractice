@@ -425,33 +425,31 @@ public class FindMatches : MonoBehaviour
                     connectedPotions = newConnectedPotions,
                     direction = MatchDirection.Square
                 };
-            } 
+            }
 
             // 5. 3 가로 매치
             if (connectedPotions.Count == 3)
             {
                 // XOO
-                // OOO 인 경우 아래만 사라짐 -> 예외처리
-
-                return new MatchResult
+                // OOO인 경우 아래만 사라짐 -> 예외처리
+                if (CheckHorizontal3SquareMatch(potion, connectedPotions))
                 {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Horizontal_3
-                };
+                    return new MatchResult
+                    {
+                        connectedPotions = connectedPotions,
+                        direction = MatchDirection.Square
+                    };
+                }
+                else
+                {
+                    return new MatchResult
+                    {
+                        connectedPotions = connectedPotions,
+                        direction = MatchDirection.Horizontal_3
+                    };
+                }
             }
         }
-
-        // 5. 3 가로 매치
-        //else if (connectedPotions.Count == 3)
-        //{
-        //    // 3줄일때 곡괭이 체크 따로 해야함
-        //    return new MatchResult
-        //    {
-        //        connectedPotions = connectedPotions,
-        //        direction = MatchDirection.Horizontal_3
-        //    };
-
-        //}
 
         connectedPotions.Clear();
 
@@ -505,11 +503,21 @@ public class FindMatches : MonoBehaviour
                 // OO
                 // OO
                 // OX인 경우 왼쪽만 사라짐 -> 예외처리
-                return new MatchResult
+                if (CheckVertical3SquareMatch(potion, connectedPotions))
                 {
-                    connectedPotions = connectedPotions,
-                    direction = MatchDirection.Vertical_3
-                };
+                    return new MatchResult
+                    {
+                        connectedPotions = connectedPotions,
+                        direction = MatchDirection.Square
+                    };
+                } else
+                {
+                    return new MatchResult
+                    {
+                        connectedPotions = connectedPotions,
+                        direction = MatchDirection.Vertical_3
+                    };
+                }
             }
 
             else
@@ -521,32 +529,6 @@ public class FindMatches : MonoBehaviour
                 };
             }
         }
-
-        // 5. 3 세로 매치
-        //if (connectedPotions.Count == 3)
-        //{
-        //    return new MatchResult
-        //    {
-        //        connectedPotions = connectedPotions,
-        //        direction = MatchDirection.Vertical_3
-        //    };
-        //}
-
-        //// 네모 체크
-        //connectedPotions.Clear();
-
-        //connectedPotions.Add(potion);
-
-        //CheckSquareMatch(potion, connectedPotions);
-
-        //if (connectedPotions.Count >= 4)
-        //{
-        //    return new MatchResult
-        //    {
-        //        connectedPotions = connectedPotions,
-        //        direction = MatchDirection.Square
-        //    };
-        //}
 
         else
         {
@@ -735,9 +717,61 @@ public class FindMatches : MonoBehaviour
         } 
     }
 
-    void CheckLine3SquareMatch()
+    // 가로 3인 경우 네모 조합이 있는지 체크
+    // XOO
+    // OOO
+    bool CheckHorizontal3SquareMatch(Potion pot, List<Potion> connectedPotions)
     {
+        PotionType potionType = pot.potionType;
+        int x = pot.xIndex;
+        int y = pot.yIndex;
 
+        if (x < board.width - 2 && y < board.height - 1)
+        {
+            if (IsUsableAndNotBeforeMatched(x + 1, y + 1) && IsUsableAndNotBeforeMatched(x + 2, y + 1))
+            {
+                Potion rightupneighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
+                Potion rightrightupneighbourPotion = board.potionBoard[x + 2, y + 1].potion.GetComponent<Potion>();
+
+                if (rightupneighbourPotion.potionType == potionType && rightrightupneighbourPotion.potionType == potionType)
+                {
+                    connectedPotions.Add(rightupneighbourPotion);
+                    connectedPotions.Add(rightrightupneighbourPotion);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // 세로 3인 경우 네모 조합이 있는지 체크
+    // OO
+    // OO
+    // OX
+    bool CheckVertical3SquareMatch(Potion pot, List<Potion> connectedPotions)
+    {
+        PotionType potionType = pot.potionType;
+        int x = pot.xIndex;
+        int y = pot.yIndex;
+
+        if (x < board.width - 1 && y < board.height - 2)
+        {
+            if (IsUsableAndNotBeforeMatched(x + 1, y + 1) && IsUsableAndNotBeforeMatched(x + 1, y + 2))
+            {
+                Potion rightupneighbourPotion = board.potionBoard[x + 1, y + 1].potion.GetComponent<Potion>();
+                Potion rightupupneighbourPotion = board.potionBoard[x + 1, y + 2].potion.GetComponent<Potion>();
+
+                if (rightupneighbourPotion.potionType == potionType && rightupupneighbourPotion.potionType == potionType)
+                {
+                    connectedPotions.Add(rightupneighbourPotion);
+                    connectedPotions.Add(rightupupneighbourPotion);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     // 세로, 가로 방향(direction) Super 매칭(L자)되나 체크
