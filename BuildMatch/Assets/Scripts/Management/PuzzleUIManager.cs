@@ -9,6 +9,8 @@ public class PuzzleUIManager : MonoBehaviour
 {
     private PotionBoard board;
 
+    private StageManager _StageManager = null;
+
     public GameObject warningUI; // 10초 남았을 때 경고 UI
     private Image warningImage;
 
@@ -16,9 +18,9 @@ public class PuzzleUIManager : MonoBehaviour
     public GameObject clearPanel;
     public GameObject failedPanel;
 
-    public TMP_Text stageText;
-    public TMP_Text pointsText;
-    public TMP_Text timeText;
+    public Text stageText;
+    public Text pointsText;
+    public Text timeText;
 
     // 경고 UI 설정 컬러값
     public Color originWarningColor;
@@ -31,6 +33,8 @@ public class PuzzleUIManager : MonoBehaviour
 
     private void Awake()
     {
+        _StageManager = GameManager.GetManagerClass<StageManager>();
+
         board = FindObjectOfType<PotionBoard>();
         warningImage = warningUI.GetComponent<Image>();
         originWarningColor = warningImage.GetComponent<Image>().color;
@@ -43,7 +47,7 @@ public class PuzzleUIManager : MonoBehaviour
 
     private void Start()
     {
-
+        stageText.text = "Stage " + _StageManager.stageNumber;
     }
 
     public void WarningLeftTime()

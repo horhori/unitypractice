@@ -18,7 +18,7 @@ public class StageManager : MonoBehaviour, IManager
     }
 
     // 현재 스테이지
-    public int stageNumber { get; set; }
+    public int stageNumber { get; set; } = 1;
 
     public StageBoardData stageBoardData { get; set; }
 
