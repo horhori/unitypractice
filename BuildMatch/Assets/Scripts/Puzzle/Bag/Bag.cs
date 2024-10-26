@@ -10,8 +10,6 @@ public class Bag : MonoBehaviour
 {
     public GameObject _Bag;
 
-    //public SpriteRenderer _SpriteRenderer = null;
-
     public TMP_Text _Text = null;
 
     public PotionType _PotionType;
@@ -42,8 +40,7 @@ public class Bag : MonoBehaviour
 
     private void Awake()
     {
-        //_SpriteRenderer = _Bag.GetComponentInChildren<SpriteRenderer>();
-        _Text = _Bag.GetComponentInChildren<TMP_Text>();;
+        _Text = _Bag.GetComponentInChildren<TMP_Text>();
         _Text.text = CurrentCount.ToString() + " / " + GoalCount.ToString();
         bagImageList = _Bag.GetComponentsInChildren<Image>();
         ClearImage = bagImageList[2];
@@ -55,7 +52,6 @@ public class Bag : MonoBehaviour
     {
         _Text.text = CurrentCount.ToString() + " / " + GoalCount.ToString();
 
-        // TODO : 1. 완료되면 빨간색 변경 말고 체크 이미지로 변경되게
         if (CurrentCount >= GoalCount)
         {
             CurrentCount = GoalCount;
@@ -63,7 +59,6 @@ public class Bag : MonoBehaviour
             ClearImage.gameObject.SetActive(true);
             _Text.gameObject.SetActive(false);
             ClearCheck = true;
-            //_Text.color = Color.red;
         }
     }
 

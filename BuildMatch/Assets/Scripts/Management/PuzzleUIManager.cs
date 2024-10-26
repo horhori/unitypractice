@@ -11,20 +11,23 @@ public class PuzzleUIManager : MonoBehaviour
 
     private StageManager _StageManager = null;
 
-    public GameObject warningUI; // 10초 남았을 때 경고 UI
-    private Image warningImage;
-
-    public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
-    public GameObject clearPanel;
-    public GameObject failedPanel;
-
+    // 상단 표시
     public Text stageText;
     public Text pointsText;
     public Text timeText;
 
+    // 경고 UI
+    public GameObject warningUI; // 10초 남았을 때 경고 UI
+    private Image warningImage;
+
     // 경고 UI 설정 컬러값
     public Color originWarningColor;
     public Color fullWarningColor;
+
+    // 결과창
+    public GameObject backgroundPanel; // grey background 승리/패배 화면 클릭할 때 포션 동작 안되게 
+    public GameObject clearPanel;
+    public GameObject failedPanel;
 
     // 결과창 Scale 설정값
     public Vector3 firstResultScale;
@@ -47,7 +50,19 @@ public class PuzzleUIManager : MonoBehaviour
 
     private void Start()
     {
+        SettingStageText();
+    }
+
+    // 게임 시작할 때 스테이지 텍스트 넘버 등 스테이지에 맞는 텍스트 고정
+    public void SettingStageText()
+    {
         stageText.text = "Stage " + _StageManager.stageNumber;
+
+        Text clearPanelStageText = clearPanel.GetComponentInChildren<Text>();
+        clearPanelStageText.text = "Stage " + _StageManager.stageNumber;
+
+        Text failedPanelStageText = failedPanel.GetComponentInChildren<Text>();
+        failedPanelStageText.text = "Stage " + _StageManager.stageNumber;
     }
 
     public void WarningLeftTime()
