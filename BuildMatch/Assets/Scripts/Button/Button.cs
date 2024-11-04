@@ -108,12 +108,19 @@ public class Button : MonoBehaviour
     #region StageScene
     public void OnNextStageButtonClicked()
     {
+        // TODO : 1. 마지막 스테이지(스테이지5)에서는 승리 창을 완벽 클리어(다음 버튼 없게) 작업 필요
+        // 현재 stage 5에서 보석 다 해도 클리어 안되는중
+        if (_StageManager.stageNumber < 5)
+        {
+            _StageManager.stageNumber++;
+        }
 
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
 
     public void OnRestartButtonClicked()
     {
-
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }
 
     public void OnStageSelectButtonClicked()
