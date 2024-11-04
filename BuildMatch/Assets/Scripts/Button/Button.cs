@@ -27,7 +27,7 @@ public class Button : MonoBehaviour
     public void OnMapButtonClicked()
     {
         _SoundManager.PlayUIClickSound(Vector3.zero);
-        _LoadManager.LoadScene(LoadManager.SceneName.StageScene);
+        _LoadManager.LoadScene(LoadManager.SceneName.MainStageScene);
     }
 
     // 홈버튼 누르면 빌리지 씬으로 이동
@@ -51,7 +51,15 @@ public class Button : MonoBehaviour
     }
     #endregion
 
-    #region StageScene
+    #region MainStageScene
+    public void OnSubStage1ButtonClicked()
+    {
+        _SoundManager.PlayUIClickSound(Vector3.zero);
+        _LoadManager.LoadScene(LoadManager.SceneName.SubStageScene);
+    }
+    #endregion
+
+    #region SubStageScene
     public void OnStage1ButtonClicked()
     {
         _SoundManager.PlayBackgroundSound(Vector3.zero);
@@ -65,6 +73,33 @@ public class Button : MonoBehaviour
         // TODO : 1. 스테이지 매니저에서 세팅
         _SoundManager.PlayBackgroundSound(Vector3.zero);
         _StageManager.stageNumber = 2;
+        //_StageManager.MakeStageBoardSetupData();
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
+    }
+
+    public void OnStage3ButtonClicked()
+    {
+        // TODO : 1. 스테이지 매니저에서 세팅
+        _SoundManager.PlayBackgroundSound(Vector3.zero);
+        _StageManager.stageNumber = 3;
+        //_StageManager.MakeStageBoardSetupData();
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
+    }
+
+    public void OnStage4ButtonClicked()
+    {
+        // TODO : 1. 스테이지 매니저에서 세팅
+        _SoundManager.PlayBackgroundSound(Vector3.zero);
+        _StageManager.stageNumber = 4;
+        //_StageManager.MakeStageBoardSetupData();
+        _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
+    }
+
+    public void OnStage5ButtonClicked()
+    {
+        // TODO : 1. 스테이지 매니저에서 세팅
+        _SoundManager.PlayBackgroundSound(Vector3.zero);
+        _StageManager.stageNumber = 5;
         //_StageManager.MakeStageBoardSetupData();
         _LoadManager.LoadScene(LoadManager.SceneName.PuzzleScene);
     }

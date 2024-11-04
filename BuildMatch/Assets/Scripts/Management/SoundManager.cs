@@ -48,4 +48,9 @@ public class SoundManager : MonoBehaviour, IManager
             AudioSource.PlayClipAtPoint(audioClips[2], position, 0.7f);
         }
     }
+
+    public void PlayRemoveBlockSound(Vector3 position)
+    {
+        AudioSource.PlayClipAtPoint(audioClips[3], position);
+    }
 }

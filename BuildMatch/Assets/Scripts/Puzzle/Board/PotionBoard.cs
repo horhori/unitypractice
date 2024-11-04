@@ -14,6 +14,9 @@ public class PotionBoard : MonoBehaviour
 
     private StageManager _StageManager = null;
 
+    // 사운드 매니저 변수 참조
+    private SoundManager _SoundManager = null;
+
     // 가로 세로 블럭 개수 설정
     // 스테이지 따라 width, height 달라짐
     public int width;
@@ -84,6 +87,7 @@ public class PotionBoard : MonoBehaviour
         findMatches = FindObjectOfType<FindMatches>();
 
         _StageManager = GameManager.GetManagerClass<StageManager>();
+        _SoundManager = GameManager.GetManagerClass<SoundManager>();
     }
 
     void Start()
@@ -503,6 +507,9 @@ public class PotionBoard : MonoBehaviour
 
             PotionType changedSpecialPotionType = potion.changedSpecialBlockType;
 
+            // 제거 사운드 재생
+            _SoundManager.PlayRemoveBlockSound(potion.transform.position);
+
             // Destroy the potion
             Destroy(potion.gameObject);
 
@@ -513,6 +520,8 @@ public class PotionBoard : MonoBehaviour
             {
                 _RemoveBlockEffect.PlayEffect(potion.transform.position);
             }
+
+
 
             // Create a blank node on the potion board
             potionBoard[_xIndex, _yIndex] = new Node(true, null);

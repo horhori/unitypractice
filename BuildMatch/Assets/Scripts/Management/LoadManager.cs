@@ -13,7 +13,7 @@ public class LoadManager : MonoBehaviour, IManager
         }
     }
 
-    public enum SceneName { VillageScene, StageScene, PuzzleScene }
+    public enum SceneName { VillageScene, PuzzleScene, MainStageScene, SubStageScene }
     //public SceneName nextScene { get; set; } = SceneName.StageScene;
 
     public void LoadScene(SceneName sceneName)
